@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UniJSON;
 
 
-namespace DXGLTF
+namespace GltfScene
 {
-    class Scene
+    public class Scene
     {
+        public string Json
+        {
+            get;
+            private set;
+        }
+
         public void Load(string path)
         {
             var ext = Path.GetExtension(path).ToLower();
@@ -34,7 +36,9 @@ namespace DXGLTF
             var bytes = File.ReadAllBytes(path);
             var parsed = JsonParser.Parse(new Utf8String(bytes));
 
-            Console.WriteLine(parsed["nodes"].ValueCount);
+            Json = parsed.ToString();
+
+            Console.WriteLine(Json);
         }
 
         public void LoadGlb(string path)

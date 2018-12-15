@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DXGLTFContent;
+using GltfScene;
+using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,9 +12,14 @@ namespace DXGLTF
     {
         Scene m_scene = new Scene();
 
+        D3DContent m_content;
+
         public Form1()
         {
             InitializeComponent();
+
+            m_content = new D3DContent();
+            m_content.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.Document);
         }
 
         struct FileDialogFilter

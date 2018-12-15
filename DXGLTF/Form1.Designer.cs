@@ -31,7 +31,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.userControl11 = new D3DPanel.D3DPanel();
+            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,20 +60,21 @@
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
-            // userControl11
+            // dockPanel1
             // 
-            this.userControl11.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.userControl11.Location = new System.Drawing.Point(0, 24);
-            this.userControl11.Name = "userControl11";
-            this.userControl11.Size = new System.Drawing.Size(383, 227);
-            this.userControl11.TabIndex = 3;
+            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingSdi;
+            this.dockPanel1.Location = new System.Drawing.Point(0, 24);
+            this.dockPanel1.Name = "dockPanel1";
+            this.dockPanel1.Size = new System.Drawing.Size(383, 227);
+            this.dockPanel1.TabIndex = 1;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(383, 251);
-            this.Controls.Add(this.userControl11);
+            this.Controls.Add(this.dockPanel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -90,7 +91,7 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-        private D3DPanel.D3DPanel userControl11;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
     }
 }
 

@@ -6,7 +6,7 @@ using System;
 
 namespace D3DPanel
 {
-    class D3DRenderer
+    public class D3DRenderer
     {
         public int Width
         {
