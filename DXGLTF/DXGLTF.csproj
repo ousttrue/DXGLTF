@@ -50,6 +50,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="D3DContent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="D3DContent.Designer.cs">
+      <DependentUpon>D3DContent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,6 +64,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="D3DContent.resx">
+      <DependentUpon>D3DContent.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -86,9 +95,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DXGLTFContent\DXGLTFContent.csproj">
-      <Project>{29f23d17-ee5d-4818-b982-84ebbc15757d}</Project>
-      <Name>DXGLTFContent</Name>
+    <ProjectReference Include="..\D3DPanel\D3DPanel.csproj">
+      <Project>{e24bc52f-580a-4245-bd00-821906b8e1de}</Project>
+      <Name>D3DPanel</Name>
     </ProjectReference>
     <ProjectReference Include="..\GltfScene\GltfScene.csproj">
       <Project>{9afa370c-76d6-4dd0-9926-8039cb8b0366}</Project>
