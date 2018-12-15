@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Reactive.Bindings;
+using System;
 using System.IO;
 using UniJSON;
 
@@ -7,10 +8,17 @@ namespace GltfScene
 {
     public class Scene
     {
-        public string Json
+        ReactiveProperty<string> m_json;
+        public ReactiveProperty<string> Json
         {
-            get;
-            private set;
+            get
+            {
+                if (m_json == null)
+                {
+                    m_json = new ReactiveProperty<string>();
+                }
+                return m_json;
+            }
         }
 
         public void Load(string path)
@@ -36,7 +44,7 @@ namespace GltfScene
             var bytes = File.ReadAllBytes(path);
             var parsed = JsonParser.Parse(new Utf8String(bytes));
 
-            Json = parsed.ToString();
+            Json.Value = parsed.ToString();
 
             Console.WriteLine(Json);
         }

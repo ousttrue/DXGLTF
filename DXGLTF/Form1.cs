@@ -12,14 +12,18 @@ namespace DXGLTF
     {
         Scene m_scene = new Scene();
 
-        D3DContent m_content;
+        D3DContent m_d3dContent;
+        JsonContent m_jsonContent;
 
         public Form1()
         {
             InitializeComponent();
 
-            m_content = new D3DContent();
-            m_content.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.Document);
+            m_d3dContent = new D3DContent();
+            m_d3dContent.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.Document);
+
+            m_jsonContent = new JsonContent(m_scene);
+            m_jsonContent.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockLeft);
         }
 
         struct FileDialogFilter
