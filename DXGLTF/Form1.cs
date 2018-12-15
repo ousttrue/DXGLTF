@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace DXGLTF
 {
     public partial class Form1 : Form
     {
+        Scene m_scene = new Scene();
+
         public Form1()
         {
             InitializeComponent();
@@ -56,7 +54,7 @@ namespace DXGLTF
 
         void OpenFile(string file)
         {
-            Console.WriteLine(file);
+            m_scene.Load(file);
         }
     }
 }

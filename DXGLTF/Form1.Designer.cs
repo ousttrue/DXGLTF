@@ -56,15 +56,16 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // userControl11
             // 
-            this.userControl11.Location = new System.Drawing.Point(12, 27);
+            this.userControl11.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.userControl11.Location = new System.Drawing.Point(0, 24);
             this.userControl11.Name = "userControl11";
-            this.userControl11.Size = new System.Drawing.Size(215, 147);
+            this.userControl11.Size = new System.Drawing.Size(383, 227);
             this.userControl11.TabIndex = 3;
             // 
             // Form1
