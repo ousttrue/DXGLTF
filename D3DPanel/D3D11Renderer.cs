@@ -130,7 +130,6 @@ namespace D3DPanel
             ClearRenderTarget();
             var desc = m_swapChain.Description;
             m_swapChain.ResizeBuffers(desc.BufferCount, Width, Height, desc.ModeDescription.Format, desc.Flags);
-            GetRenderTarget();
         }
 
         public void Paint(IntPtr hWnd)
@@ -140,9 +139,6 @@ namespace D3DPanel
                 CreateDevice(hWnd);
             }
 
-            var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
-            m_context.ClearRenderTargetView(m_renderView, clear);
-
             // Camera
             if (m_renderView == null)
             {
@@ -150,6 +146,8 @@ namespace D3DPanel
             }
             m_context.OutputMerger.SetTargets(m_renderView);
             m_context.Rasterizer.SetViewport(Viewport);
+            var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
+            m_context.ClearRenderTargetView(m_renderView, clear);
 
             foreach (var d in m_drawables)
             {
@@ -184,8 +182,6 @@ namespace D3DPanel
             // Ignore all windows events
             var factory = m_swapChain.GetParent<Factory>();
             factory.MakeWindowAssociation(hWnd, WindowAssociationFlags.IgnoreAll);
-
-            GetRenderTarget();
         }
     }
 }
