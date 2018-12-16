@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +14,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.11.0\lib\net35\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,7 +47,54 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UniJSON/Scripts/**/*.cs" />
+    <Compile Include="UniJSON\Editor\Tests\IWriteStreamTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\JsonDiffTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\JsonFormatterTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\JsonParserTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\JsonSerializerTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\SchemaTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Json\ValidatorTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\ArrayTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\BooleanTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\FloatTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\IntTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\MapTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\RawTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\StringTest.cs" />
+    <Compile Include="UniJSON\Editor\Tests\MsgPack\TimeTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\RPCTests.cs" />
+    <Compile Include="UniJSON\Editor\Tests\Utf8StringTest.cs" />
     <Compile Include="UnityEngine.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="UniJSON\Editor\Tests.meta" />
+    <None Include="UniJSON\Editor\Tests\IWriteStreamTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\JsonDiffTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\JsonFormatterTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\JsonParserTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\JsonSerializerTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\SchemaTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Json\ValidatorTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\ArrayTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\BooleanTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\FloatTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\IntTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\MapTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\RawTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\StringTest.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\MsgPack\TimeTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\RPCTests.cs.meta" />
+    <None Include="UniJSON\Editor\Tests\Utf8StringTest.cs.meta" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.11.2\build\net35\NUnit3TestAdapter.props'))" />
+  </Target>
 </Project>

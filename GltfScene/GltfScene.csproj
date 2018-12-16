@@ -76,6 +76,10 @@
     <Compile Include="Scene.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GltfFormat\GltfFormat.csproj">
+      <Project>{e7b4846e-a89e-449e-9278-cd0e409ccdf7}</Project>
+      <Name>GltfFormat</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UniJSON\UniJSON.csproj">
       <Project>{bc5de392-dc0f-49e9-81b2-04b1fafc1b67}</Project>
       <Name>UniJSON</Name>

@@ -15,6 +15,7 @@ namespace DXGLTF
         D3DContent m_d3dContent;
         JsonContent m_jsonContent;
 
+
         public Form1()
         {
             InitializeComponent();
