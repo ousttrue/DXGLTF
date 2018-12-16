@@ -3,7 +3,8 @@ using System;
 using System.IO;
 using UniJSON;
 using UniGLTF;
-
+using System.Threading;
+using System.Reactive.Linq;
 
 namespace GltfScene
 {
@@ -14,6 +15,17 @@ namespace GltfScene
 
         ReactiveProperty<glTF> m_gltf = new ReactiveProperty<glTF>();
         public ReactiveProperty<glTF> Gltf { get { return m_gltf; } }
+
+        public IObservable<glTF> GltfObservableOnCurrent
+        {
+            get
+            {
+                return Gltf
+                        .Where(x => x != null)
+                        .ObserveOn(SynchronizationContext.Current);
+
+            }
+        }
 
         public void Load(string path)
         {

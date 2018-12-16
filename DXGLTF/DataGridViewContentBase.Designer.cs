@@ -1,6 +1,6 @@
 ﻿namespace DXGLTF
 {
-    partial class BufferViewContent
+    partial class DataGridViewContentBase
     {
         /// <summary> 
         /// 必要なデザイナー変数です。

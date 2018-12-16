@@ -79,6 +79,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferViewContent.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="D3DContent.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,14 +102,20 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BufferViewContent.cs">
+    <Compile Include="DataGridViewContentBase.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BufferViewContent.Designer.cs">
-      <DependentUpon>BufferViewContent.cs</DependentUpon>
+    <Compile Include="DataGridViewContentBase.Designer.cs">
+      <DependentUpon>DataGridViewContentBase.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="BufferViewContent.resx">
-      <DependentUpon>BufferViewContent.cs</DependentUpon>
+    <Compile Include="TreeViewContentBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TreeViewContentBase.Designer.cs">
+      <DependentUpon>TreeViewContentBase.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="DataGridViewContentBase.resx">
+      <DependentUpon>DataGridViewContentBase.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="D3DContent.resx">
       <DependentUpon>D3DContent.cs</DependentUpon>
@@ -127,6 +136,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="TreeViewContentBase.resx">
+      <DependentUpon>TreeViewContentBase.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

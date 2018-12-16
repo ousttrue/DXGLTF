@@ -1,6 +1,7 @@
 ﻿using DXGLTFContent;
 using GltfScene;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,22 +13,25 @@ namespace DXGLTF
     {
         Scene m_scene = new Scene();
 
-        D3DContent m_d3dContent;
-        JsonContent m_jsonContent;
-        BufferViewContent m_bufferViewContent;
+        Dictionary<string, DockContent> m_contentMap = new Dictionary<string, DockContent>();
+        void AddContent(string name, DockContent content, DockState state)
+        {
+            content.Text = name;
+            content.TabText = name;
+            content.Show(dockPanel1, state);
+            m_contentMap.Add(name, content);
+        }
 
         public Form1()
         {
             InitializeComponent();
 
-            m_d3dContent = new D3DContent();
-            m_d3dContent.Show(dockPanel1, DockState.Document);
-
-            m_jsonContent = new JsonContent(m_scene);
-            m_jsonContent.Show(dockPanel1, DockState.DockLeft);
-
-            m_bufferViewContent = new BufferViewContent(m_scene);
-            m_bufferViewContent.Show(dockPanel1, DockState.DockLeft);
+            AddContent("3D", new D3DContent(), DockState.Document);
+            AddContent("json", new JsonContent(m_scene), DockState.DockRight);
+            AddContent("buffer view", new BufferViewContent(m_scene), DockState.DockRight);
+            AddContent("accessor", new AccessorContent(m_scene), DockState.DockRight);
+            AddContent("material", new MaterialContent(m_scene), DockState.DockRight);
+            AddContent("node", new NodeContent(m_scene), DockState.DockLeft);
         }
 
         struct FileDialogFilter
