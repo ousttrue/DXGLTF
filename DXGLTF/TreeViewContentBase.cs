@@ -25,24 +25,31 @@ namespace DXGLTF
 
     class NodeContent : TreeViewContentBase
     {
-        public NodeContent(Scene scene):base(scene)
+        public NodeContent(Scene scene) : base(scene)
         {
         }
 
         TreeNode[] m_nodes;
+        glTF m_gltf;
 
         protected override void OnUpdated(glTF gltf)
         {
             TreeView.Nodes.Clear();
+            m_gltf = gltf;
+            if (gltf == null)
+            {
+                return;
+            }
 
             m_nodes = gltf.nodes.Select(x => new TreeNode(x.name)).ToArray();
 
-            for(int i=0; i<gltf.nodes.Count; ++i)
+            for (int i = 0; i < gltf.nodes.Count; ++i)
             {
                 var parent = m_nodes[i];
 
                 var node = gltf.nodes[i];
-                if (node.children != null) {
+                if (node.children != null)
+                {
                     foreach (var j in node.children)
                     {
                         parent.Nodes.Add(m_nodes[j]);

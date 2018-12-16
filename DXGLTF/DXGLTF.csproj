@@ -79,9 +79,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BufferViewContent.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="D3DContent.cs">
       <SubType>Form</SubType>
     </Compile>
