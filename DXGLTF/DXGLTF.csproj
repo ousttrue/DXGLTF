@@ -146,6 +146,10 @@
       <Project>{e24bc52f-580a-4245-bd00-821906b8e1de}</Project>
       <Name>D3DPanel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GltfFormat\GltfFormat.csproj">
+      <Project>{e7b4846e-a89e-449e-9278-cd0e409ccdf7}</Project>
+      <Name>GltfFormat</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GltfScene\GltfScene.csproj">
       <Project>{9afa370c-76d6-4dd0-9926-8039cb8b0366}</Project>
       <Name>GltfScene</Name>

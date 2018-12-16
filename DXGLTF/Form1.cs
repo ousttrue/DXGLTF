@@ -4,7 +4,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace DXGLTF
 {
@@ -14,17 +14,20 @@ namespace DXGLTF
 
         D3DContent m_d3dContent;
         JsonContent m_jsonContent;
-
+        BufferViewContent m_bufferViewContent;
 
         public Form1()
         {
             InitializeComponent();
 
             m_d3dContent = new D3DContent();
-            m_d3dContent.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.Document);
+            m_d3dContent.Show(dockPanel1, DockState.Document);
 
             m_jsonContent = new JsonContent(m_scene);
-            m_jsonContent.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockLeft);
+            m_jsonContent.Show(dockPanel1, DockState.DockLeft);
+
+            m_bufferViewContent = new BufferViewContent(m_scene);
+            m_bufferViewContent.Show(dockPanel1, DockState.DockLeft);
         }
 
         struct FileDialogFilter

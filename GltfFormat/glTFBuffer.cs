@@ -9,19 +9,8 @@ namespace UniGLTF
     {
         IBytesBuffer Storage;
 
-        public void OpenStorage(IStorage storage)
+        public glTFBuffer()
         {
-            Storage = new ArraySegmentByteBuffer(storage.Get(uri));
-            /*
-            if (string.IsNullOrEmpty(uri))
-            {
-                Storage = (glbDataBytes);
-            }
-            else
-            {
-                Storage = new UriByteBuffer(baseDir, uri);
-            }
-            */
         }
 
         public glTFBuffer(IBytesBuffer storage)
