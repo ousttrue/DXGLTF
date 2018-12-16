@@ -4,11 +4,11 @@ using System.Windows.Forms;
 
 namespace D3DPanel
 {
-    public partial class D3DPanel: UserControl
+    public partial class D3D11Panel: UserControl
     {
-        D3DRenderer m_renderer = new D3DRenderer();
+        D3D11Renderer m_renderer = new D3D11Renderer();
 
-        public D3DPanel()
+        public D3D11Panel()
         {
             InitializeComponent();
         }
@@ -21,6 +21,7 @@ namespace D3DPanel
         private void D3DPanel_SizeChanged(object sender, EventArgs e)
         {
             m_renderer.Resize(ClientSize.Width, ClientSize.Height);
+            Invalidate();
         }
     }
 }

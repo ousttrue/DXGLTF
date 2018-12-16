@@ -41,7 +41,7 @@ namespace DXGLTF
                 return;
             }
 
-            m_nodes = gltf.nodes.Select(x => new TreeNode(x.name)).ToArray();
+            m_nodes = gltf.nodes.Select((x, i) => new TreeNode(string.Format("[{0}]{1}", i, x.name))).ToArray();
 
             for (int i = 0; i < gltf.nodes.Count; ++i)
             {

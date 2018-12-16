@@ -1,6 +1,6 @@
 ﻿namespace D3DPanel
 {
-    partial class D3DPanel
+    partial class D3D11Panel
     {
         /// <summary>
         /// 必要なデザイナー変数です。

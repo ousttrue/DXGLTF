@@ -14,7 +14,7 @@ namespace DXGLTFContent
 {
     public partial class D3DContent: DockContent
     {
-        D3DRenderer m_renderer = new D3DRenderer();
+        D3D11Renderer m_renderer = new D3D11Renderer();
 
         public D3DContent()
         {
@@ -29,6 +29,7 @@ namespace DXGLTFContent
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
             m_renderer.Resize(ClientSize.Width, ClientSize.Height);
+            Invalidate();
         }
     }
 }
