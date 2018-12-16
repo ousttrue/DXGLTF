@@ -5,6 +5,7 @@ using UniJSON;
 using UniGLTF;
 using System.Threading;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace GltfScene
 {
@@ -21,14 +22,24 @@ namespace GltfScene
             get
             {
                 return Gltf
-                        .Where(x => x != null)
                         .ObserveOn(SynchronizationContext.Current);
 
             }
         }
 
-        public void Load(string path)
+        public async void Load(string path)
         {
+            Json.Value = "";
+            Gltf.Value = null;
+
+            await Task.Run(() =>
+            {
+                _Load(path);
+            });
+        }
+
+        void _Load(string path)
+        { 
             var ext = Path.GetExtension(path).ToLower();
             switch (ext)
             {

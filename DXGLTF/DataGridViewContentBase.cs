@@ -19,10 +19,12 @@ namespace DXGLTF
             InitializeComponent();
             dataGridView1.DataSource = DataSource;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            scene.Gltf
-                    .Where(x => x != null)
-                    .ObserveOn(SynchronizationContext.Current)
-                    .Subscribe(OnUpdated);
+            scene.GltfObservableOnCurrent
+                    .Subscribe(x =>
+                    {
+                        OnUpdated(x);
+                        dataGridView1.Refresh();
+                    });
         }
 
         protected void AutoResizeColumns()
