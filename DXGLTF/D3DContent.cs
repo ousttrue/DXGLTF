@@ -16,6 +16,10 @@ namespace DXGLTFContent
     {
         D3D11Renderer m_renderer = new D3D11Renderer();
         List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
+        Camera m_camera = new Camera
+        {
+            View = Matrix.Identity,
+        };
 
         public D3DContent(Scene scene)
         {
@@ -91,9 +95,14 @@ namespace DXGLTFContent
             Invalidate();
         }
 
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+        }
+
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
-            m_renderer.Begin(Handle);
+            m_camera.Update();
+            m_renderer.Begin(Handle, m_camera);
             foreach (var x in m_drawables)
             {
                 x.Draw(m_renderer);
@@ -104,6 +113,89 @@ namespace DXGLTFContent
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
             m_renderer.Resize(ClientSize.Width, ClientSize.Height);
+            m_camera.Resize(ClientSize.Width, ClientSize.Height);
+            Invalidate();
+        }
+
+        int m_mouseX;
+        int m_mouseY;
+        private void D3DContent_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (m_mouseX != 0 && m_mouseY != 0)
+            {
+                var deltaX = e.X - m_mouseX;
+                var deltaY = e.Y - m_mouseY;
+
+                if (m_rightDown)
+                {
+                    m_camera.YawPitch(deltaX, deltaY);
+                    Invalidate();
+                }
+
+                if (m_middleDown)
+                {
+                    m_camera.Shift(deltaX, deltaY);
+                    Invalidate();
+                }
+            }
+            m_mouseX = e.X;
+            m_mouseY = e.Y;
+        }
+
+        bool m_leftDown;
+        bool m_middleDown;
+        bool m_rightDown;
+        private void D3DContent_MouseDown(object sender, MouseEventArgs e)
+        {
+            Focus();
+
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    m_leftDown = true;
+                    Capture = true;
+                    break;
+
+                case MouseButtons.Middle:
+                    m_middleDown = true;
+                    Capture = true;
+                    break;
+
+                case MouseButtons.Right:
+                    m_rightDown = true;
+                    Capture = true;
+                    break;
+            }
+        }
+
+        private void D3DContent_MouseUp(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    m_leftDown = false;
+                    break;
+
+                case MouseButtons.Middle:
+                    m_middleDown = false;
+                    break;
+
+                case MouseButtons.Right:
+                    m_rightDown = false;
+                    break;
+            }
+
+            if (!m_leftDown
+                && !m_middleDown
+                && !m_rightDown)
+            {
+                Capture = false;
+            }
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            m_camera.Dolly(e.Delta);
             Invalidate();
         }
     }

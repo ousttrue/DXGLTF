@@ -2,15 +2,71 @@
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 
 namespace D3DPanel
 {
-    public class D3D11Renderer : IDisposable
+    public class Camera
+    {
+        const float ToRadians = (float)(System.Math.PI / 180);
+
+        int m_screenWidth;
+        int m_screenHeight;
+        public void Resize(int w, int h)
+        {
+            m_screenWidth = w;
+            m_screenHeight = h;
+            AspectRatio = (float)w / h;
+        }
+
+        public Matrix View;
+        public float Yaw;
+        public float Pitch;
+        public void YawPitch(int dx, int dy)
+        {
+            Yaw += ((float)dx / m_screenWidth);
+            Pitch += ((float)dy / m_screenHeight);
+        }
+
+        const float SHIFT = 1.0f;
+        public float ShiftX;
+        public float ShiftY;
+        public void Shift(int dx, int dy)
+        {
+            ShiftX += ((float)dx / m_screenWidth) * Distance * SHIFT;
+            ShiftY += ((float)dy / m_screenWidth) * Distance * SHIFT;
+        }
+        public float Distance=5;
+        public void Dolly(int delta)
+        {
+            if (delta < 0)
+            {
+                Distance *= 1.1f;
+            }
+            else if(delta>0)
+            {
+                Distance *= 0.9f;
+            }
+        }
+
+        public Matrix Projection;
+        public float FovY = 30.0f * ToRadians;
+        public float AspectRatio = 1.0f;
+        public float ZNear = 0.1f;
+        public float ZFar = 10.0f;
+
+        public Matrix ViewProjection;
+
+        public void Update()
+        {
+            View = Matrix.Translation(ShiftX, -ShiftY, -Distance) * Matrix.RotationYawPitchRoll(Yaw, Pitch, 0);
+            Projection = Matrix.PerspectiveFovRH(FovY, AspectRatio, ZNear, ZFar);
+            ViewProjection = View * Projection;
+            ViewProjection.Transpose();
+        }
+    }
+
+    public class D3D11Renderer : System.IDisposable
     {
         public int Width
         {
@@ -32,6 +88,8 @@ namespace D3DPanel
             }
         }
 
+        Camera m_camera;
+
         #region Resource
         SharpDX.Direct3D11.Device m_device;
         public SharpDX.Direct3D11.Device Device => m_device;
@@ -39,9 +97,17 @@ namespace D3DPanel
         DeviceContext m_context;
         public DeviceContext Context => m_context;
 
+        SharpDX.Direct3D11.Buffer m_constantBuffer;
+
         public void Dispose()
         {
             ClearRenderTarget();
+
+            if (m_constantBuffer == null)
+            {
+                m_constantBuffer.Dispose();
+                m_constantBuffer = null;
+            }
 
             if (m_swapChain != null)
             {
@@ -110,7 +176,7 @@ namespace D3DPanel
             m_swapChain.ResizeBuffers(desc.BufferCount, Width, Height, desc.ModeDescription.Format, desc.Flags);
         }
 
-        public void Begin(IntPtr hWnd)
+        public void Begin(System.IntPtr hWnd, Camera camera)
         {
             if (m_device == null)
             {
@@ -125,6 +191,13 @@ namespace D3DPanel
             var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
             m_context.ClearRenderTargetView(m_renderView, clear);
 
+            if (m_constantBuffer == null)
+            {
+                m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref camera.ViewProjection);
+            }
+            m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
+            m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
+
             m_context.OutputMerger.SetTargets(m_renderView);
             m_context.Rasterizer.SetViewport(Viewport);
         }
@@ -135,7 +208,7 @@ namespace D3DPanel
             m_swapChain.Present(0, PresentFlags.None);
         }
 
-        void CreateDevice(IntPtr hWnd)
+        void CreateDevice(System.IntPtr hWnd)
         {
             // SwapChain description
             var desc = new SwapChainDescription()

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace D3DPanel
 {
-    public partial class D3D11Panel: UserControl
+    public partial class D3D11Panel : UserControl
     {
         D3D11Renderer m_renderer = new D3D11Renderer();
 
@@ -24,6 +24,11 @@ namespace D3DPanel
             */
         }
 
+        Camera m_camera = new Camera
+        {
+
+        };
+
         public void ClearDrawables()
         {
             foreach (var d in m_drawables)
@@ -40,7 +45,7 @@ namespace D3DPanel
 
         private void D3DPanel_Paint(object sender, PaintEventArgs e)
         {
-            m_renderer.Begin(Handle);
+            m_renderer.Begin(Handle, m_camera);
             foreach(var d in m_drawables)
             {
                 d.Draw(m_renderer);

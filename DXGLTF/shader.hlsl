@@ -8,11 +8,16 @@ struct PS_IN
 	float4 position : SV_POSITION;
 };
 
+cbuffer Camera: register(b0)
+{
+	float4x4 wvp;
+};
+
 PS_IN VS( VS_IN input )
 {
 	PS_IN output = (PS_IN)0;
 	
-	output.position = float4(input.position.xy, 0.5, 0.5);
+	output.position = mul(float4(input.position, 1), wvp);
 	
 	return output;
 }
