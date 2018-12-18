@@ -12,7 +12,7 @@ PS_IN VS( VS_IN input )
 {
 	PS_IN output = (PS_IN)0;
 	
-	output.position = float4(input.position, 0.5);
+	output.position = float4(input.position.xy, 0.5, 0.5);
 	
 	return output;
 }

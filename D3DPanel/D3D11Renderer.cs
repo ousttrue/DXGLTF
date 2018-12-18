@@ -131,7 +131,7 @@ namespace D3DPanel
 
         public void End()
         {
-            m_context.Flush();
+            //m_context.Flush();
             m_swapChain.Present(0, PresentFlags.None);
         }
 
