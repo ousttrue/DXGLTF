@@ -80,20 +80,25 @@ namespace D3DPanel
 
             context.InputAssembler.PrimitiveTopology = Topology;
 
-            if (m_indexBuffer == null)
-            {
-                m_indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, m_indices);
-            }
-            context.InputAssembler.SetIndexBuffer(m_indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
-
             if (m_vertexBuffer == null)
             {
                 m_vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, m_vertices);
             }
             context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(m_vertexBuffer, Vertex.Stride, 0));
 
-            //context.DrawIndexed(m_indices.Length, 0, 0);
-            context.Draw(m_vertices.Length, 0);
+            if (m_indices == null)
+            {
+                context.Draw(m_vertices.Length, 0);
+            }
+            else
+            {
+                if (m_indexBuffer == null)
+                {
+                    m_indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, m_indices);
+                }
+                context.InputAssembler.SetIndexBuffer(m_indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+                context.DrawIndexed(m_indices.Length, 0, 0);
+            }
         }
     }
 }

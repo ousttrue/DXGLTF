@@ -25,8 +25,8 @@ namespace GltfScene
             get
             {
                 return Gltf
+                        .Skip(1)
                         .ObserveOn(SynchronizationContext.Current);
-
             }
         }
 
