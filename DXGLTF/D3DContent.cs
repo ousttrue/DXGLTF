@@ -25,8 +25,7 @@ namespace DXGLTFContent
                 OnSceneLoaded(x, UniGLTF.FolderIO.FromFile(scene.LoadPath.Value)));
 
             m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(null),
-                new Vector3[]
-                {
+                new Vector3[]{
                     new Vector3(0.0f, 0.5f, 0.5f),
                     new Vector3(0.5f, -0.5f, 0.5f),
                     new Vector3(-0.5f, -0.5f, 0.5f),
@@ -55,11 +54,15 @@ namespace DXGLTFContent
 
         void OnSceneLoaded(UniGLTF.glTF gltf, UniGLTF.IBufferIO io)
         {
+            foreach (var x in m_drawables)
+            {
+                x.Dispose();
+            }
+            m_drawables.Clear();
             if (gltf == null)
             {
                 return;
             }
-            m_drawables.Clear();
 
             foreach (var mesh in gltf.meshes)
             {
@@ -85,6 +88,7 @@ namespace DXGLTFContent
                     m_drawables.Add(drawable);
                 }
             }
+            Invalidate();
         }
 
         private void D3DContent_Paint(object sender, PaintEventArgs e)

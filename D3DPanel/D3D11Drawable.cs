@@ -7,9 +7,17 @@ namespace D3DPanel
 {
     struct Vertex
     {
+#if true
         public Vector3 Position;
-        public Vector3 Normal;
-        public Vector4 TexCoord0;
+#else
+        public Vector4 Position;
+        public Vector4 Color;
+        public Vertex(Vector4 p, Vector4 c)
+        {
+            Position = p;
+            Color = c;
+        }
+#endif
 
         public static int Stride = Marshal.SizeOf<Vertex>();
     }
@@ -26,13 +34,24 @@ namespace D3DPanel
             m_shader = shader;
 
             m_indices = indices;
+
+#if true
             m_vertices = new Vertex[positions.Length];
             for (int i = 0; i < m_vertices.Length; ++i)
             {
                 m_vertices[i].Position = positions[i];
-                if (normals != null) m_vertices[i].Normal = normals[i];
-                if (uvs != null) m_vertices[i].TexCoord0 = new Vector4(uvs[i].X, uvs[i].Y, 0, 0);
+                //if (normals != null) m_vertices[i].Normal = normals[i];
+                //if (uvs != null) m_vertices[i].TexCoord0 = new Vector2(uvs[i].X, uvs[i].Y);
             }
+#else
+            m_vertices = new
+                Vertex[]
+            {
+                new Vertex(new Vector4(0.0f, 0.5f, 0.5f, 1.0f), new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),
+                new Vertex(new Vector4(0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),
+                new Vertex(new Vector4(-0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),
+            };
+#endif
         }
 
         D3D11Shader m_shader;
