@@ -33,10 +33,10 @@ namespace UniGLTF
         #region Buffer      
         [JsonSchema(MinItems = 1)]
         public List<glTFBuffer> buffers = new List<glTFBuffer>();
-        public int AddBuffer(IBytesBuffer bytesBuffer)
+        public int AddBuffer()
         {
             var index = buffers.Count;
-            buffers.Add(new glTFBuffer(bytesBuffer));
+            buffers.Add(new glTFBuffer());
             return index;
         }
 
@@ -52,28 +52,28 @@ namespace UniGLTF
         [JsonSchema(MinItems = 1)]
         public List<glTFAccessor> accessors = new List<glTFAccessor>();
 
-        T[] GetAttrib<T>(glTFAccessor accessor, glTFBufferView view) where T : struct
+        T[] GetAttrib<T>(IBufferIO io, glTFAccessor accessor, glTFBufferView view) where T : struct
         {
-            return GetAttrib<T>(accessor.count, accessor.byteOffset, view);
+            return GetAttrib<T>(io, accessor.count, accessor.byteOffset, view);
         }
-        T[] GetAttrib<T>(int count, int byteOffset, glTFBufferView view) where T : struct
+        T[] GetAttrib<T>(IBufferIO io, int count, int byteOffset, glTFBufferView view) where T : struct
         {
             var attrib = new T[count];
             //
-            var segment = buffers[view.buffer].GetBytes();
+            var segment = io.GetBytes(buffers[view.buffer].uri);
             var bytes = new ArraySegment<Byte>(segment.Array, segment.Offset + view.byteOffset + byteOffset, count * view.byteStride);
             bytes.MarshalCoyTo(attrib);
             return attrib;
         }
 
-        public ArraySegment<Byte> GetViewBytes(int bufferView)
+        public ArraySegment<Byte> GetViewBytes(IBufferIO io, int bufferView)
         {
             var view = bufferViews[bufferView];
-            var segment = buffers[view.buffer].GetBytes();
+            var segment = io.GetBytes(buffers[view.buffer].uri);
             return new ArraySegment<byte>(segment.Array, segment.Offset + view.byteOffset, view.byteLength);
         }
 
-        IEnumerable<int> _GetIndices(glTFAccessor accessor, out int count)
+        IEnumerable<int> _GetIndices(IBufferIO io, glTFAccessor accessor, out int count)
         {
             count = accessor.count;
             var view = bufferViews[accessor.bufferView];
@@ -81,48 +81,48 @@ namespace UniGLTF
             {
                 case glComponentType.UNSIGNED_BYTE:
                     {
-                        return GetAttrib<Byte>(accessor, view).Select(x => (int)(x));
+                        return GetAttrib<Byte>(io, accessor, view).Select(x => (int)(x));
                     }
 
                 case glComponentType.UNSIGNED_SHORT:
                     {
-                        return GetAttrib<UInt16>(accessor, view).Select(x => (int)(x));
+                        return GetAttrib<UInt16>(io, accessor, view).Select(x => (int)(x));
                     }
 
                 case glComponentType.UNSIGNED_INT:
                     {
-                        return GetAttrib<UInt32>(accessor, view).Select(x => (int)(x));
+                        return GetAttrib<UInt32>(io, accessor, view).Select(x => (int)(x));
                     }
             }
             throw new NotImplementedException("GetIndices: unknown componenttype: " + accessor.componentType);
         }
 
-        IEnumerable<int> _GetIndices(glTFBufferView view, int count, int byteOffset, glComponentType componentType)
+        IEnumerable<int> _GetIndices(IBufferIO io, glTFBufferView view, int count, int byteOffset, glComponentType componentType)
         {
             switch (componentType)
             {
                 case glComponentType.UNSIGNED_BYTE:
                     {
-                        return GetAttrib<Byte>(count, byteOffset, view).Select(x => (int)(x));
+                        return GetAttrib<Byte>(io, count, byteOffset, view).Select(x => (int)(x));
                     }
 
                 case glComponentType.UNSIGNED_SHORT:
                     {
-                        return GetAttrib<UInt16>(count, byteOffset, view).Select(x => (int)(x));
+                        return GetAttrib<UInt16>(io, count, byteOffset, view).Select(x => (int)(x));
                     }
 
                 case glComponentType.UNSIGNED_INT:
                     {
-                        return GetAttrib<UInt32>(count, byteOffset, view).Select(x => (int)(x));
+                        return GetAttrib<UInt32>(io, count, byteOffset, view).Select(x => (int)(x));
                     }
             }
             throw new NotImplementedException("GetIndices: unknown componenttype: " + componentType);
         }
 
-        public int[] GetIndices(int accessorIndex)
+        public int[] GetIndices(IBufferIO io, int accessorIndex)
         {
             int count;
-            var result = _GetIndices(accessors[accessorIndex], out count);
+            var result = _GetIndices(io, accessors[accessorIndex], out count);
             var indices = new int[count];
 
             // flip triangles
@@ -139,14 +139,14 @@ namespace UniGLTF
             return indices;
         }
 
-        public T[] GetArrayFromAccessor<T>(int accessorIndex) where T : struct
+        public T[] GetArrayFromAccessor<T>(IBufferIO io, int accessorIndex) where T : struct
         {
             var vertexAccessor = accessors[accessorIndex];
 
             if (vertexAccessor.count <= 0) return new T[] { };
 
             var result = (vertexAccessor.bufferView != -1)
-                ? GetAttrib<T>(vertexAccessor, bufferViews[vertexAccessor.bufferView])
+                ? GetAttrib<T>(io, vertexAccessor, bufferViews[vertexAccessor.bufferView])
                 : new T[vertexAccessor.count]
                 ;
 
@@ -154,8 +154,8 @@ namespace UniGLTF
             if (sparse != null && sparse.count > 0)
             {
                 // override sparse values
-                var indices = _GetIndices(bufferViews[sparse.indices.bufferView], sparse.count, sparse.indices.byteOffset, sparse.indices.componentType);
-                var values = GetAttrib<T>(sparse.count, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
+                var indices = _GetIndices(io, bufferViews[sparse.indices.bufferView], sparse.count, sparse.indices.byteOffset, sparse.indices.componentType);
+                var values = GetAttrib<T>(io, sparse.count, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
 
                 var it = indices.GetEnumerator();
                 for (int i = 0; i < sparse.count; ++i)
@@ -167,7 +167,7 @@ namespace UniGLTF
             return result;
         }
 
-        public float[] GetArrayFromAccessorAsFloat(int accessorIndex)
+        public float[] GetArrayFromAccessorAsFloat(IBufferIO io, int accessorIndex)
         {
             var vertexAccessor = accessors[accessorIndex];
 
@@ -175,7 +175,7 @@ namespace UniGLTF
 
             var bufferCount = vertexAccessor.count * vertexAccessor.TypeCount;
             var result = (vertexAccessor.bufferView != -1)
-                    ? GetAttrib<float>(bufferCount, vertexAccessor.byteOffset, bufferViews[vertexAccessor.bufferView])
+                    ? GetAttrib<float>(io, bufferCount, vertexAccessor.byteOffset, bufferViews[vertexAccessor.bufferView])
                     : new float[bufferCount]
                 ;
 
@@ -183,8 +183,8 @@ namespace UniGLTF
             if (sparse != null && sparse.count > 0)
             {
                 // override sparse values
-                var indices = _GetIndices(bufferViews[sparse.indices.bufferView], sparse.count, sparse.indices.byteOffset, sparse.indices.componentType);
-                var values = GetAttrib<float>(sparse.count * vertexAccessor.TypeCount, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
+                var indices = _GetIndices(io, bufferViews[sparse.indices.bufferView], sparse.count, sparse.indices.byteOffset, sparse.indices.componentType);
+                var values = GetAttrib<float>(io, sparse.count * vertexAccessor.TypeCount, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
 
                 var it = indices.GetEnumerator();
                 for (int i = 0; i < sparse.count; ++i)
@@ -231,7 +231,7 @@ namespace UniGLTF
             return GetSampler(samplerIndex);
         }
 
-        public ArraySegment<Byte> GetImageBytes(IStorage storage, int imageIndex, out string textureName)
+        public ArraySegment<Byte> GetImageBytes(IBufferIO io, int imageIndex, out string textureName)
         {
             var image = images[imageIndex];
             if (string.IsNullOrEmpty(image.uri))
@@ -241,7 +241,7 @@ namespace UniGLTF
                 //
                 //m_imageBytes = ToArray(byteSegment);
                 textureName = !string.IsNullOrEmpty(image.name) ? image.name : string.Format("{0:00}#GLB", imageIndex);
-                return GetViewBytes(image.bufferView);
+                return GetViewBytes(io, image.bufferView);
             }
             else
             {
@@ -253,7 +253,7 @@ namespace UniGLTF
                 {
                     textureName = !string.IsNullOrEmpty(image.name) ? image.name : Path.GetFileNameWithoutExtension(image.uri);
                 }
-                return storage.Get(image.uri);
+                return io.GetBytes(image.uri);
             }
         }
 
@@ -501,7 +501,7 @@ namespace UniGLTF
             return f.ToString();
         }
 
-        public byte[] ToGlbBytes(bool UseUniJSONSerializer = false)
+        public byte[] ToGlbBytes(ArraySegment<Byte> bytes, bool UseUniJSONSerializer = false)
         {
             string json;
             if (UseUniJSONSerializer)
@@ -515,7 +515,7 @@ namespace UniGLTF
 
             RemoveUnusedExtensions(json);
 
-            return Glb.ToBytes(json, buffers[0].GetBytes());
+            return Glb.ToBytes(json, bytes);
         }
     }
 }

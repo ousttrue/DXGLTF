@@ -7,17 +7,15 @@ namespace UniGLTF
     [Serializable]
     public class glTFBuffer : JsonSerializableBase
     {
-        IBytesBuffer Storage;
-
         public glTFBuffer()
         {
+            // for GLB
         }
 
-        public glTFBuffer(IBytesBuffer storage)
+        public glTFBuffer(string _uri)
         {
-            Storage = storage;
+            this.uri = _uri;
         }
-
         public string uri;
 
         //[JsonSchema(Required = true, Minimum = 1)]
@@ -27,22 +25,6 @@ namespace UniGLTF
         public object extensions;
         public object extras;
         public string name;
-
-        public glTFBufferView Append<T>(T[] array, glBufferTarget target) where T : struct
-        {
-            return Append(new ArraySegment<T>(array), target);
-        }
-        public glTFBufferView Append<T>(ArraySegment<T> segment, glBufferTarget target) where T : struct
-        {
-            var view = Storage.Extend(segment, target);
-            byteLength = Storage.GetBytes().Count;
-            return view;
-        }
-
-        public ArraySegment<Byte> GetBytes()
-        {
-            return Storage.GetBytes();
-        }
 
         protected override void SerializeMembers(GLTFJsonFormatter f)
         {

@@ -11,6 +11,9 @@ namespace GltfScene
 {
     public class Scene
     {
+        ReactiveProperty<string> m_loadPath = new ReactiveProperty<string>();
+        public ReactiveProperty<string> LoadPath { get { return m_loadPath; } }
+
         ReactiveProperty<string> m_json = new ReactiveProperty<string>();
         public ReactiveProperty<string> Json { get { return m_json; } }
 
@@ -65,9 +68,9 @@ namespace GltfScene
 
             glTF gltf = null;
             parsed.Deserialize(ref gltf);
+
+            LoadPath.Value = path;
             Gltf.Value = gltf;
-           
-            Console.WriteLine(Json);
         }
 
         public void LoadGlb(string path)

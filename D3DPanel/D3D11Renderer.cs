@@ -32,37 +32,15 @@ namespace D3DPanel
             }
         }
 
-        public D3D11Renderer()
-        {
-            string vsPath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "MiniTri.fx");
-            string psPath = vsPath;
-            var vsSource = File.ReadAllText(vsPath, Encoding.UTF8);
-            var psSource = default(string);
-            if (vsPath == psPath)
-            {
-                psSource = vsSource;
-            }
-            else
-            {
-                psSource = File.ReadAllText(psPath, Encoding.UTF8);
-            }
-
-            m_drawables.Add(new D3D11Drawable(new D3D11Shader(vsSource, psSource)));
-        }
-
         #region Resource
         SharpDX.Direct3D11.Device m_device;
+        public SharpDX.Direct3D11.Device Device => m_device;
+
         DeviceContext m_context;
-        List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
+        public DeviceContext Context => m_context;
 
         public void Dispose()
         {
-            foreach (var d in m_drawables)
-            {
-                d.Dispose();
-            }
-            m_drawables.Clear();
-
             ClearRenderTarget();
 
             if (m_swapChain != null)
@@ -132,7 +110,7 @@ namespace D3DPanel
             m_swapChain.ResizeBuffers(desc.BufferCount, Width, Height, desc.ModeDescription.Format, desc.Flags);
         }
 
-        public void Paint(IntPtr hWnd)
+        public void Begin(IntPtr hWnd)
         {
             if (m_device == null)
             {
@@ -144,16 +122,15 @@ namespace D3DPanel
             {
                 GetRenderTarget();
             }
-            m_context.OutputMerger.SetTargets(m_renderView);
-            m_context.Rasterizer.SetViewport(Viewport);
             var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
             m_context.ClearRenderTargetView(m_renderView, clear);
 
-            foreach (var d in m_drawables)
-            {
-                d.Draw(m_device, m_context);
-            }
+            m_context.OutputMerger.SetTargets(m_renderView);
+            m_context.Rasterizer.SetViewport(Viewport);
+        }
 
+        public void End()
+        { 
             m_swapChain.Present(0, PresentFlags.None);
         }
 

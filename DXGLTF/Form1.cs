@@ -26,12 +26,13 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            AddContent("3D", new D3DContent(), DockState.Document);
+            AddContent("3D", new D3DContent(m_scene), DockState.Document);
             AddContent("json", new JsonContent(m_scene), DockState.DockRight);
             AddContent("buffer view", new BufferViewContent(m_scene), DockState.DockRight);
             AddContent("accessor", new AccessorContent(m_scene), DockState.DockRight);
             AddContent("material", new MaterialContent(m_scene), DockState.DockRight);
             AddContent("node", new NodeContent(m_scene), DockState.DockLeft);
+            AddContent("primitive", new PrimitiveContent(m_scene), DockState.DockRight);
         }
 
         struct FileDialogFilter

@@ -13,6 +13,12 @@ namespace D3DPanel
         VertexShader m_vs;
         PixelShader m_ps;
 
+        public InputElement[] InputElements
+        {
+            get;
+            private set;
+        }
+
         public void Dispose()
         {
             if (m_layout != null)
@@ -38,6 +44,15 @@ namespace D3DPanel
         {
             m_vsCompiled = ShaderBytecode.Compile(vs, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             m_psCompiled = ShaderBytecode.Compile(ps, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
+
+            // ToDo: Create from vs
+            InputElements = new[]
+            {
+                new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
+                new InputElement("NORMAL", 0, SharpDX.DXGI.Format.R32G32B32_Float, 12, 0),
+                new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 24, 0),
+                //new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 16, 0)
+            };
         }
 
         public void SetupContext(Device device, DeviceContext context)
@@ -63,11 +78,7 @@ namespace D3DPanel
                 m_layout = new InputLayout(
                     device,
                     ShaderSignature.GetInputSignature(m_vsCompiled),
-                    new[]
-                        {
-                        new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 0, 0),
-                        new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 16, 0)
-                        });
+                    InputElements);
             }
             context.InputAssembler.InputLayout = m_layout;
         }
