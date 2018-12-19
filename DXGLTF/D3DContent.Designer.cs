@@ -1,4 +1,4 @@
-﻿namespace DXGLTFContent
+﻿namespace DXGLTF
 {
     partial class D3DContent
     {

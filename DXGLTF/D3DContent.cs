@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 
-namespace DXGLTFContent
+namespace DXGLTF
 {
     public partial class D3DContent : DockContent
     {
@@ -20,6 +20,7 @@ namespace DXGLTFContent
         {
             View = Matrix.Identity,
         };
+        ShaderLoader m_shaderLoader = new ShaderLoader();
 
         public D3DContent(Scene scene)
         {
@@ -30,7 +31,7 @@ namespace DXGLTFContent
                 OnSceneLoaded(x.Item1, x.Item2);
             });
 
-            m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(null),
+            m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(ShaderType.Gizmo),
                 new Vector3[]{
                     new Vector3(0.0f, 0.5f, 0),
                     new Vector3(0.5f, -0.5f, 0),
@@ -41,6 +42,20 @@ namespace DXGLTFContent
                 ));
         }
 
+        D3D11Shader CreateMaterial(ShaderType type)
+        {
+            var source = m_shaderLoader.GetShaderSource(type);
+            var shader = new D3D11Shader();
+
+            source.Subscribe(x =>
+            {
+                shader.SetShader(x, x);
+            });
+
+            return shader;
+        }
+
+        /*
         D3D11Shader CreateMaterial(UniGLTF.glTFMaterial material)
         {
             string vsPath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "shaders/shader.hlsl");
@@ -57,6 +72,7 @@ namespace DXGLTFContent
             }
             return new D3D11Shader(vsSource, psSource);
         }
+        */
 
         void OnSceneLoaded(UniGLTF.glTF gltf, UniGLTF.IBufferIO io)
         {
@@ -89,7 +105,7 @@ namespace DXGLTFContent
                         throw new NotImplementedException();
                     }
                     var positions = gltf.GetArrayFromAccessor<Vector3>(io, primitive.attributes.POSITION);
-                    var material = CreateMaterial(gltf.materials[primitive.material]);
+                    var material = CreateMaterial(ShaderType.Unlit);
                     var drawable = new D3D11Drawable(indices, material, positions, null, null);
                     m_drawables.Add(drawable);
                 }

@@ -84,5 +84,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GltfFormat\GltfFormat.csproj">
+      <Project>{e7b4846e-a89e-449e-9278-cd0e409ccdf7}</Project>
+      <Name>GltfFormat</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

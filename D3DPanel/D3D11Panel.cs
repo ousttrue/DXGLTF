@@ -13,7 +13,8 @@ namespace D3DPanel
         List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
         public void AddDrawable(string vs, string ps)
         {
-            var shader = new D3D11Shader(vs, ps);
+            var shader = new D3D11Shader();
+            shader.SetShader(vs, ps);
 
             /*
             var positions = 

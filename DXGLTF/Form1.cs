@@ -1,5 +1,4 @@
-﻿using DXGLTFContent;
-using GltfScene;
+﻿using GltfScene;
 using System;
 using System.Collections.Generic;
 using System.Data;

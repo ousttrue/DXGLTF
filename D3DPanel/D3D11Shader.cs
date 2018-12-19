@@ -40,8 +40,14 @@ namespace D3DPanel
             }
         }
 
-        public D3D11Shader(string vs, string ps)
+        public void SetShader(string vs, string ps)
         {
+            Dispose();
+            if(string.IsNullOrEmpty(vs) || string.IsNullOrEmpty(ps))
+            {
+                return;
+            }
+
             m_vsCompiled = ShaderBytecode.Compile(vs, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             m_psCompiled = ShaderBytecode.Compile(ps, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
 
@@ -64,6 +70,11 @@ namespace D3DPanel
 
         public void SetupContext(Device device, DeviceContext context)
         {
+            if (m_vsCompiled == null)
+            {
+                return;
+            }
+
             // Prepare All the stages
             context.InputAssembler.InputLayout = m_layout;
 
