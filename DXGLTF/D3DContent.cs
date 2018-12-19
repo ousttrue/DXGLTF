@@ -30,9 +30,9 @@ namespace DXGLTFContent
 
             m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(null),
                 new Vector3[]{
-                    new Vector3(0.0f, 0.5f, 0.5f),
-                    new Vector3(0.5f, -0.5f, 0.5f),
-                    new Vector3(-0.5f, -0.5f, 0.5f),
+                    new Vector3(0.0f, 0.5f, 0),
+                    new Vector3(0.5f, -0.5f, 0),
+                    new Vector3(-0.5f, -0.5f, 0),
                 },
                 null,
                 null

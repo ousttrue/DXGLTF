@@ -6,66 +6,6 @@ using SharpDX.DXGI;
 
 namespace D3DPanel
 {
-    public class Camera
-    {
-        const float ToRadians = (float)(System.Math.PI / 180);
-
-        int m_screenWidth;
-        int m_screenHeight;
-        public void Resize(int w, int h)
-        {
-            m_screenWidth = w;
-            m_screenHeight = h;
-            AspectRatio = (float)w / h;
-        }
-
-        public Matrix View;
-        public float Yaw;
-        public float Pitch;
-        public void YawPitch(int dx, int dy)
-        {
-            Yaw += ((float)dx / m_screenWidth);
-            Pitch += ((float)dy / m_screenHeight);
-        }
-
-        const float SHIFT = 1.0f;
-        public float ShiftX;
-        public float ShiftY;
-        public void Shift(int dx, int dy)
-        {
-            ShiftX += ((float)dx / m_screenWidth) * Distance * SHIFT;
-            ShiftY += ((float)dy / m_screenWidth) * Distance * SHIFT;
-        }
-        public float Distance=5;
-        public void Dolly(int delta)
-        {
-            if (delta < 0)
-            {
-                Distance *= 1.1f;
-            }
-            else if(delta>0)
-            {
-                Distance *= 0.9f;
-            }
-        }
-
-        public Matrix Projection;
-        public float FovY = 30.0f * ToRadians;
-        public float AspectRatio = 1.0f;
-        public float ZNear = 0.1f;
-        public float ZFar = 10.0f;
-
-        public Matrix ViewProjection;
-
-        public void Update()
-        {
-            View = Matrix.Translation(ShiftX, -ShiftY, -Distance) * Matrix.RotationYawPitchRoll(Yaw, Pitch, 0);
-            Projection = Matrix.PerspectiveFovRH(FovY, AspectRatio, ZNear, ZFar);
-            ViewProjection = View * Projection;
-            ViewProjection.Transpose();
-        }
-    }
-
     public class D3D11Renderer : System.IDisposable
     {
         public int Width
