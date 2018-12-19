@@ -28,8 +28,6 @@ namespace D3DPanel
             }
         }
 
-        Camera m_camera;
-
         #region Resource
         SharpDX.Direct3D11.Device m_device;
         public SharpDX.Direct3D11.Device Device => m_device;

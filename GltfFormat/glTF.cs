@@ -56,12 +56,24 @@ namespace UniGLTF
         {
             return GetAttrib<T>(io, accessor.count, accessor.byteOffset, view);
         }
+
+        ArraySegment<Byte> GetBytes(IBufferIO io, glTFAccessor accessor, glTFBufferView view)
+        {
+            return GetBytes(io, accessor.ElementSize * accessor.count, accessor.byteOffset, view);
+        }
+
+        ArraySegment<Byte> GetBytes(IBufferIO io, int size, int byteOffset, glTFBufferView view)
+        {
+            var segment = io.GetBytes(buffers[view.buffer].uri);
+            var bytes = new ArraySegment<Byte>(segment.Array, segment.Offset + view.byteOffset + byteOffset, size);
+            return bytes;
+        }
+
         T[] GetAttrib<T>(IBufferIO io, int count, int byteOffset, glTFBufferView view) where T : struct
         {
             var attrib = new T[count];
             //
-            var segment = io.GetBytes(buffers[view.buffer].uri);
-            var bytes = new ArraySegment<Byte>(segment.Array, segment.Offset + view.byteOffset + byteOffset, count * view.byteStride);
+            var bytes = GetBytes(io, count, byteOffset, view);
             bytes.MarshalCoyTo(attrib);
             return attrib;
         }
@@ -137,6 +149,15 @@ namespace UniGLTF
             }
 
             return indices;
+        }
+
+        public ArraySegment<Byte> GetBytesFromAccessor(IBufferIO io, int accessorIndex)
+        {
+            var vertexAccessor = accessors[accessorIndex];
+
+            if (vertexAccessor.count <= 0) return default(ArraySegment<byte>);
+            if (vertexAccessor.bufferView == -1) return default(ArraySegment<byte>);
+            return GetBytes(io, vertexAccessor, bufferViews[vertexAccessor.bufferView]);
         }
 
         public T[] GetArrayFromAccessor<T>(IBufferIO io, int accessorIndex) where T : struct

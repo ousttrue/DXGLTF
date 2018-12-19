@@ -1,4 +1,5 @@
-﻿using SharpDX.D3DCompiler;
+﻿using Reactive.Bindings;
+using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
 using System.Linq;
 
@@ -14,10 +15,10 @@ namespace D3DPanel
         VertexShader m_vs;
         PixelShader m_ps;
 
-        public InputElement[] InputElements
+        ReactiveProperty<InputElement[]> m_inputElements = new ReactiveProperty<InputElement[]>();
+        public ReactiveProperty<InputElement[]> InputElements
         {
-            get;
-            private set;
+            get { return m_inputElements; }
         }
 
         public void Dispose()
@@ -104,7 +105,7 @@ namespace D3DPanel
             m_psCompiled = ShaderBytecode.Compile(ps, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
 
             var reflection = new ShaderReflection(m_vsCompiled.Bytecode);
-            InputElements = Enumerable.Range(0, reflection.Description.InputParameters)
+            InputElements.Value = Enumerable.Range(0, reflection.Description.InputParameters)
                 .Select(x => reflection.GetInputParameterDescription(x))
                 .Select(x => ToInputElement(x))
                 .ToArray()
@@ -139,7 +140,7 @@ namespace D3DPanel
                 m_layout = new InputLayout(
                     device,
                     ShaderSignature.GetInputSignature(m_vsCompiled),
-                    InputElements);
+                    InputElements.Value);
             }
             context.InputAssembler.InputLayout = m_layout;
         }

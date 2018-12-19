@@ -3,10 +3,8 @@ using GltfScene;
 using SharpDX;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -33,15 +31,13 @@ namespace DXGLTF
                 OnSceneLoaded(x.Item1, x.Item2);
             });
 
-            m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(ShaderType.Gizmo),
-                new Vector3[]{
+            var drawable = new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(ShaderType.Gizmo));
+            drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(0.0f, 0.5f, 0),
                     new Vector3(0.5f, -0.5f, 0),
                     new Vector3(-0.5f, -0.5f, 0),
-                },
-                null,
-                null
-                ));
+                }));
+            m_drawables.Add(drawable);
         }
 
         D3D11Shader CreateMaterial(ShaderType type)
@@ -109,9 +105,19 @@ namespace DXGLTF
                     {
                         throw new NotImplementedException();
                     }
-                    var positions = gltf.GetArrayFromAccessor<Vector3>(io, primitive.attributes.POSITION);
+
                     var material = CreateMaterial(ShaderType.Unlit);
-                    var drawable = new D3D11Drawable(indices, material, positions, null, null);
+                    var drawable = new D3D11Drawable(indices, material);
+
+                    var attribs = primitive.attributes;
+                    
+                    var positions = gltf.GetBytesFromAccessor(io, primitive.attributes.POSITION);
+                    if (positions.Count == 0)
+                    {
+                        throw new Exception();
+                    }
+                    drawable.SetAttribute(Semantics.POSITION, new VertexAttribute(positions, 4 * 3));
+
                     m_drawables.Add(drawable);
                 }
             }

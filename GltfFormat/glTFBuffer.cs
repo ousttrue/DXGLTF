@@ -188,6 +188,29 @@ namespace UniGLTF
         [JsonSchema(Required = true, Minimum = 1)]
         public int count;
 
+        public int ElementSize
+        {
+            get
+            {
+                switch (componentType)
+                {
+                    case glComponentType.UNSIGNED_BYTE:
+                    case glComponentType.BYTE:
+                        return TypeCount;
+
+                    case glComponentType.UNSIGNED_SHORT:
+                    case glComponentType.SHORT:
+                        return TypeCount * 2;
+
+                    case glComponentType.UNSIGNED_INT:
+                    case glComponentType.FLOAT:
+                        return TypeCount * 4;
+                }
+
+                throw new NotImplementedException();
+            }
+        }
+
         [JsonSchema(MinItems = 1, MaxItems = 16)]
         public float[] max;
 
