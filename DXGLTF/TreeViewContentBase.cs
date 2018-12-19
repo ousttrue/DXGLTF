@@ -17,7 +17,10 @@ namespace DXGLTF
 
             InitializeComponent();
 
-            m_scene.GltfObservableOnCurrent.Subscribe(OnUpdated);
+            m_scene.GltfObservableOnCurrent.Subscribe(x =>
+            {
+                OnUpdated(x.Item1);
+            });
         }
         protected abstract void OnUpdated(glTF gltf);
         protected TreeView TreeView { get { return treeView1; } }

@@ -9,6 +9,9 @@ namespace UniGLTF
         ArraySegment<Byte> GetBytes(string uri);
     }
 
+    /// <summary>
+    /// for GLTF
+    /// </summary>
     public class FolderIO: IBufferIO
     {
         string m_baseFolder;
@@ -37,6 +40,28 @@ namespace UniGLTF
                 m_cache = File.ReadAllBytes(path);
             }
             return new ArraySegment<byte>(m_cache);
+        }
+    }
+
+    /// <summary>
+    /// for GLB
+    /// </summary>
+    public class BytesIO : IBufferIO
+    {
+        ArraySegment<byte> m_bytes;
+
+        public BytesIO(ArraySegment<byte> bytes)
+        {
+            m_bytes = bytes;
+        }
+
+        public ArraySegment<byte> GetBytes(string uri)
+        {
+            if (!string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("glb not allow uri");
+            }
+            return m_bytes;
         }
     }
 }

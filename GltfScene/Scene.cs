@@ -17,10 +17,10 @@ namespace GltfScene
         ReactiveProperty<string> m_json = new ReactiveProperty<string>();
         public ReactiveProperty<string> Json { get { return m_json; } }
 
-        ReactiveProperty<glTF> m_gltf = new ReactiveProperty<glTF>();
-        public ReactiveProperty<glTF> Gltf { get { return m_gltf; } }
+        ReactiveProperty<(glTF, IBufferIO)> m_gltf = new ReactiveProperty<(glTF, IBufferIO)>();
+        public ReactiveProperty<(glTF, IBufferIO)> Gltf { get { return m_gltf; } }
 
-        public IObservable<glTF> GltfObservableOnCurrent
+        public IObservable<(glTF, IBufferIO)> GltfObservableOnCurrent
         {
             get
             {
@@ -32,8 +32,9 @@ namespace GltfScene
 
         public async void Load(string path)
         {
+            // clear
             Json.Value = "";
-            Gltf.Value = null;
+            Gltf.Value = (null, null);
 
             await Task.Run(() =>
             {
@@ -70,7 +71,7 @@ namespace GltfScene
             parsed.Deserialize(ref gltf);
 
             LoadPath.Value = path;
-            Gltf.Value = gltf;
+            Gltf.Value = (gltf, FolderIO.FromFile(path));
         }
 
         public void LoadGlb(string path)
@@ -101,7 +102,7 @@ namespace GltfScene
             parsed.Deserialize(ref gltf);
 
             LoadPath.Value = path;
-            Gltf.Value = gltf;
+            Gltf.Value = (gltf, new BytesIO(bytesChunk.Bytes));
         }
     }
 }

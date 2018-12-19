@@ -21,7 +21,7 @@ namespace DXGLTF
             scene.GltfObservableOnCurrent
                     .Subscribe(x =>
                     {
-                        OnUpdated(x);
+                        OnUpdated(x.Item1);
                         dataGridView1.Refresh();
                     });
         }
