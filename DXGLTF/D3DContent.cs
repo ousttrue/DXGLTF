@@ -43,7 +43,7 @@ namespace DXGLTFContent
 
         D3D11Shader CreateMaterial(UniGLTF.glTFMaterial material)
         {
-            string vsPath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "shader.hlsl");
+            string vsPath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "shaders/shader.hlsl");
             string psPath = vsPath;
             var vsSource = File.ReadAllText(vsPath, Encoding.UTF8);
             var psSource = default(string);

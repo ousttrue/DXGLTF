@@ -172,7 +172,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="shader.hlsl">
+    <Content Include="shaders\shader.hlsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
