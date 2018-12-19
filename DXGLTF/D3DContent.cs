@@ -26,7 +26,16 @@ namespace DXGLTFContent
             InitializeComponent();
 
             scene.GltfObservableOnCurrent.Subscribe(x =>
-                OnSceneLoaded(x, UniGLTF.FolderIO.FromFile(scene.LoadPath.Value)));
+            {
+                try
+                {
+                    OnSceneLoaded(x, UniGLTF.FolderIO.FromFile(scene.LoadPath.Value));
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            });
 
             m_drawables.Add(new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(null),
                 new Vector3[]{

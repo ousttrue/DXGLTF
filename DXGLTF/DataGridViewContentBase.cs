@@ -133,32 +133,35 @@ namespace DXGLTF
 
                 Material = primitives.material;
                 Mode = primitives.mode;
-                var sb = new List<string>();
-                if (primitives.attributes.POSITION != -1)
+                if (primitives.attributes != null)
                 {
-                    sb.Add($"POS={primitives.attributes.POSITION}");
+                    var sb = new List<string>();
+                    if (primitives.attributes.POSITION != -1)
+                    {
+                        sb.Add($"POS={primitives.attributes.POSITION}");
+                    }
+                    if (primitives.attributes.NORMAL != -1)
+                    {
+                        sb.Add($"NOM={primitives.attributes.NORMAL}");
+                    }
+                    if (primitives.attributes.TEXCOORD_0 != -1)
+                    {
+                        sb.Add($"TEX={primitives.attributes.TEXCOORD_0}");
+                    }
+                    if (primitives.attributes.COLOR_0 != -1)
+                    {
+                        sb.Add($"COL={primitives.attributes.COLOR_0}");
+                    }
+                    if (primitives.attributes.JOINTS_0 != -1)
+                    {
+                        sb.Add($"JOT={primitives.attributes.JOINTS_0}");
+                    }
+                    if (primitives.attributes.WEIGHTS_0 != -1)
+                    {
+                        sb.Add($"WGT={primitives.attributes.WEIGHTS_0}");
+                    }
+                    Attributes = string.Join(",", sb);
                 }
-                if (primitives.attributes.NORMAL != -1)
-                {
-                    sb.Add($"NOM={primitives.attributes.NORMAL}");
-                }
-                if (primitives.attributes.TEXCOORD_0 != -1)
-                {
-                    sb.Add($"TEX={primitives.attributes.TEXCOORD_0}");
-                }
-                if (primitives.attributes.COLOR_0 != -1)
-                {
-                    sb.Add($"COL={primitives.attributes.COLOR_0}");
-                }
-                if (primitives.attributes.JOINTS_0 != -1)
-                {
-                    sb.Add($"JOT={primitives.attributes.JOINTS_0}");
-                }
-                if (primitives.attributes.WEIGHTS_0 != -1)
-                {
-                    sb.Add($"WGT={primitives.attributes.WEIGHTS_0}");
-                }
-                Attributes = string.Join(",", sb);
                 Indices = primitives.indices;
             }
         }
