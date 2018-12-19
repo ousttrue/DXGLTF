@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -47,9 +49,12 @@ namespace DXGLTF
             var source = m_shaderLoader.GetShaderSource(type);
             var shader = new D3D11Shader();
 
-            source.Subscribe(x =>
+            source
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(x =>
             {
                 shader.SetShader(x, x);
+                Invalidate();
             });
 
             return shader;

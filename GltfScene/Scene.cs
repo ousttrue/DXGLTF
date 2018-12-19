@@ -25,7 +25,7 @@ namespace GltfScene
             get
             {
                 return Gltf
-                        .Skip(1)
+                        .SkipWhile(x => x.Item1==null)
                         .ObserveOn(SynchronizationContext.Current);
             }
         }
