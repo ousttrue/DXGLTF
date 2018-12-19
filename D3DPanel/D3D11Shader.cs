@@ -1,5 +1,6 @@
 ﻿using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
+using System.Linq;
 
 
 namespace D3DPanel
@@ -40,6 +41,57 @@ namespace D3DPanel
             }
         }
 
+        const RegisterComponentMaskFlags MASK_XYZ = 
+            RegisterComponentMaskFlags.ComponentX 
+            | RegisterComponentMaskFlags.ComponentY 
+            | RegisterComponentMaskFlags.ComponentZ
+            ;
+        const RegisterComponentMaskFlags MASK_XY =
+            RegisterComponentMaskFlags.ComponentX
+            | RegisterComponentMaskFlags.ComponentY
+            ;
+
+        static SharpDX.DXGI.Format GetFormat(RegisterComponentType type, RegisterComponentMaskFlags mask)
+        {
+            if (mask.HasFlag(RegisterComponentMaskFlags.All))
+            {
+                switch (type)
+                {
+                    case RegisterComponentType.Float32:
+                        return SharpDX.DXGI.Format.R32G32B32A32_Float;
+                }
+                throw new System.NotImplementedException();
+            }
+            else if (mask.HasFlag(MASK_XYZ))
+            {
+                switch (type)
+                {
+                    case RegisterComponentType.Float32:
+                        return SharpDX.DXGI.Format.R32G32B32_Float;
+                }
+                throw new System.NotImplementedException();
+            }
+            else if (mask.HasFlag(MASK_XY))
+            {
+                switch (type)
+                {
+                    case RegisterComponentType.Float32:
+                        return SharpDX.DXGI.Format.R32G32_Float;
+                }
+                throw new System.NotImplementedException();
+            }
+            else
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        static InputElement ToInputElement(ShaderParameterDescription desc)
+        {
+            return new InputElement(desc.SemanticName, desc.SemanticIndex,
+                GetFormat(desc.ComponentType, desc.UsageMask), 0);
+        }
+
         public void SetShader(string vs, string ps)
         {
             Dispose();
@@ -51,21 +103,12 @@ namespace D3DPanel
             m_vsCompiled = ShaderBytecode.Compile(vs, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             m_psCompiled = ShaderBytecode.Compile(ps, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
 
-#if true
-            // ToDo: Create from vs
-            InputElements = new[]
-            {
-                new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
-                //new InputElement("NORMAL", 0, SharpDX.DXGI.Format.R32G32B32_Float, 12, 0),
-                //new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 24, 0),
-            };
-#else
-            InputElements = new[]
-            {
-                new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 0, 0),
-                new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 16, 0)
-            };
-#endif
+            var reflection = new ShaderReflection(m_vsCompiled.Bytecode);
+            InputElements = Enumerable.Range(0, reflection.Description.InputParameters)
+                .Select(x => reflection.GetInputParameterDescription(x))
+                .Select(x => ToInputElement(x))
+                .ToArray()
+                ;
         }
 
         public void SetupContext(Device device, DeviceContext context)
