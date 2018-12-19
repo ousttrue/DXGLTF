@@ -49,6 +49,7 @@
     <Compile Include="ExtensionsAndExtras\glTFNode.cs" />
     <Compile Include="ExtensionsAndExtras\KHR_draco_mesh_compression.cs" />
     <Compile Include="ExtensionsAndExtras\KHR_materials_unlit.cs" />
+    <Compile Include="glbImporter.cs" />
     <Compile Include="glbTypes.cs" />
     <Compile Include="glEnum.cs" />
     <Compile Include="glTF.cs" />

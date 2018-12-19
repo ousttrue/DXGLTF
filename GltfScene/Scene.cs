@@ -42,7 +42,7 @@ namespace GltfScene
         }
 
         void _Load(string path)
-        { 
+        {
             var ext = Path.GetExtension(path).ToLower();
             switch (ext)
             {
@@ -76,6 +76,32 @@ namespace GltfScene
         public void LoadGlb(string path)
         {
             var bytes = File.ReadAllBytes(path);
+
+            var it = glbImporter.ParseGlbChanks(bytes).GetEnumerator();
+
+            if (!it.MoveNext()) throw new FormatException();
+            var jsonChunk = it.Current;
+            if (jsonChunk.ChunkType != GlbChunkType.JSON)
+            {
+                throw new FormatException();
+            }
+
+            if (!it.MoveNext()) throw new FormatException();
+            var bytesChunk = it.Current;
+            if (bytesChunk.ChunkType != GlbChunkType.BIN)
+            {
+                throw new FormatException();
+            }
+
+            var parsed = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
+
+            Json.Value = parsed.ToString();
+
+            glTF gltf = null;
+            parsed.Deserialize(ref gltf);
+
+            LoadPath.Value = path;
+            Gltf.Value = gltf;
         }
     }
 }
