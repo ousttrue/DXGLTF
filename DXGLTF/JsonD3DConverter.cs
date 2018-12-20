@@ -148,12 +148,20 @@ namespace DXGLTF
 
                     var attribs = primitive.attributes;
 
-                    var positions = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.POSITION);
-                    if (positions.Count == 0)
                     {
-                        throw new Exception();
+                        var positions = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.POSITION);
+                        if (positions.Count == 0)
+                        {
+                            throw new Exception();
+                        }
+                        drawable.SetAttribute(Semantics.POSITION, new VertexAttribute(positions, 4 * 3));
                     }
-                    drawable.SetAttribute(Semantics.POSITION, new VertexAttribute(positions, 4 * 3));
+
+                    if(primitive.attributes.TEXCOORD_0!=-1)
+                    {
+                        var uv = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.TEXCOORD_0);
+                        drawable.SetAttribute(Semantics.TEXCOORD, new VertexAttribute(uv, 4 * 2));
+                    }
 
                     m_drawables.Add(drawable);
                 }

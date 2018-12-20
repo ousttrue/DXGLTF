@@ -26,7 +26,7 @@ PS_IN VS( VS_IN input )
 	PS_IN output = (PS_IN)0;
 	
 	output.position = mul(float4(input.position, 1), wvp);
-	output.uv = float2(input.uv.x, 1 - input.uv.y);
+	output.uv = float2(input.uv.x, input.uv.y);
 	output.color = input.color; 
 	
 	return output;
