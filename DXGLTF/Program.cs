@@ -17,6 +17,7 @@ namespace DXGLTF
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
+            Console.WriteLine(SharpDX.Diagnostics.ObjectTracker.ReportActiveObjects());
         }
     }
 }
