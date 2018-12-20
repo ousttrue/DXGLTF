@@ -11,6 +11,9 @@ namespace D3DPanel
     public enum Semantics
     {
         POSITION,
+        NORMAL,
+        TEXCOORD,
+        COLOR,
     }
 
     public class D3D11Drawable : System.IDisposable
@@ -103,7 +106,12 @@ namespace D3DPanel
                 int offset = 0;
                 foreach(var input in inputs)
                 {
-                    buffer.Set(pos.Value, pos.ElementSize, offset);
+                    VertexAttribute attr;
+                    var semantics = (Semantics)Enum.Parse(typeof(Semantics), input.SemanticName, true);
+                    if (m_attributes.TryGetValue(semantics, out attr))
+                    {
+                        buffer.Set(attr.Value, attr.ElementSize, offset);
+                    }
                     offset += GetSize(input);
                 }
                 m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, BindFlags.VertexBuffer, buffer.Buffer);

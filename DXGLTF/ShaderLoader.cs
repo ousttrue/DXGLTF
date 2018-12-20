@@ -3,7 +3,6 @@ using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
@@ -63,10 +62,10 @@ namespace DXGLTF
             return m_map[type].Source;
         }
 
-        public D3D11Shader CreateMaterial(ShaderType type)
+        public D3D11Shader CreateMaterial(ShaderType type, ImageBytes textureBytes)
         {
             var source = GetShaderSource(type);
-            var shader = new D3D11Shader();
+            var shader = new D3D11Shader(textureBytes);
 
             source
                 .ObserveOn(SynchronizationContext.Current)

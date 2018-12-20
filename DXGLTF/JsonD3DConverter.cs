@@ -44,7 +44,9 @@ namespace DXGLTF
 
         public JsonD3DConverter()
         {
-            var drawable = new D3D11Drawable(new[] { 0, 1, 2 }, m_shaderLoader.CreateMaterial(ShaderType.Gizmo));
+            // default triangle
+            var drawable = new D3D11Drawable(new[] { 0, 1, 2 }, 
+                m_shaderLoader.CreateMaterial(ShaderType.Gizmo, default(ImageBytes)));
             drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(0.0f, 0.5f, 0),
                     new Vector3(0.5f, -0.5f, 0),
@@ -55,6 +57,11 @@ namespace DXGLTF
 
         public void SetSelection(Source source, JsonNode node)
         {
+            if (source.GlTF == null)
+            {
+                return;
+            }
+
             if (!node.IsValid)
             {
                 return;
@@ -67,10 +74,31 @@ namespace DXGLTF
                 return;
             }
 
+            Dispose();
             switch (p[0].ToString())
             {
                 case "meshes":
-                    ShowMesh(source, node, p);
+                    if (p.Count == 1)
+                    {
+                        ShowMesh(source, source.GlTF.meshes);
+                    }
+                    else
+                    {
+                        var index = p[1].ToInt32();
+                        ShowMesh(source, new[] { source.GlTF.meshes[index] });
+                    }
+                    break;
+
+                case "images":
+                    if (p.Count == 1)
+                    {
+                        ShowImage(source, source.GlTF.images);
+                    }
+                    else
+                    {
+                        var index = p[1].ToInt32();
+                        ShowImage(source, new[] { source.GlTF.images[index] });
+                    }
                     break;
 
                 default:
@@ -78,27 +106,6 @@ namespace DXGLTF
                     break;
             }
             m_updated.OnNext(Unit.Default);
-        }
-
-        void ShowMesh(Source source, JsonNode node, JsonPointer p)
-        {
-            Dispose();
-            var gltf = source.GlTF;
-            if (gltf == null)
-            {
-                return;
-            }
-
-            if (p.Count == 1)
-            {
-                // meshes
-                ShowMesh(source, source.GlTF.meshes);
-            }
-            else
-            {
-                var index = p[1].ToInt32();
-                ShowMesh(source, new[] { source.GlTF.meshes[index] });
-            }
         }
 
         void ShowMesh(Source source, IEnumerable<UniGLTF.glTFMesh> meshes)
@@ -123,7 +130,7 @@ namespace DXGLTF
                         throw new NotImplementedException();
                     }
 
-                    var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit);
+                    var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, default(ImageBytes));
                     var drawable = new D3D11Drawable(indices, material);
 
                     var attribs = primitive.attributes;
@@ -137,6 +144,53 @@ namespace DXGLTF
 
                     m_drawables.Add(drawable);
                 }
+            }
+        }
+
+        static ImageFormat GetImageFormat(string mime)
+        {
+            switch(mime)
+            {
+                case "image/png": return ImageFormat.Png;
+                case "image/jpeg": return ImageFormat.Jpeg;
+            }
+            throw new NotImplementedException();
+        }
+
+        void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images)
+        {
+            var gltf = source.GlTF;
+            foreach (var image in images)
+            {
+                var bytes = default(ArraySegment<byte>);
+                if (string.IsNullOrEmpty(image.uri))
+                {
+                    bytes = gltf.GetViewBytes(source.IO, image.bufferView);
+                }
+                else
+                {
+                    bytes = source.IO.GetBytes(image.uri);
+                }
+                var format = GetImageFormat(image.mimeType);
+                var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, new ImageBytes(format, bytes));
+               
+                var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, material);
+                drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
+                    new Vector3(-1, 1, 0),
+                    new Vector3(1, 1, 0),
+                    new Vector3(1, -1, 0),
+                    new Vector3(-1, -1, 0),
+                }));
+                drawable.SetAttribute(Semantics.TEXCOORD, VertexAttribute.Create(new Vector2[]{
+                    new Vector2(0, 0),
+                    new Vector2(1, 0),
+                    new Vector2(1, 1),
+                    new Vector2(0, 1),
+                }));
+
+                m_drawables.Add(drawable);
+
+                break;
             }
         }
     }

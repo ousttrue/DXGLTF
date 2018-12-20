@@ -1,4 +1,5 @@
 ﻿using Reactive.Bindings;
+using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
 using System;
@@ -10,14 +11,34 @@ using System.Reactive.Subjects;
 
 namespace D3DPanel
 {
+    public enum ImageFormat
+    {
+        Png,
+        Jpeg,
+    }
+
+    public struct ImageBytes
+    {
+        public ImageFormat Format;
+        public ArraySegment<byte> Bytes;
+
+        public ImageBytes(ImageFormat format, ArraySegment<byte> bytes)
+        {
+            Format = format;
+            Bytes = bytes;
+        }
+    }
+
     public class D3D11Shader : IDisposable
     {
         CompilationResult m_vsCompiled;
         CompilationResult m_psCompiled;
+        ImageBytes m_textureBytes;
 
         InputLayout m_layout;
         VertexShader m_vs;
         PixelShader m_ps;
+        ShaderResourceView m_srv;
 
         ReactiveProperty<InputElement[]> m_inputElements = new ReactiveProperty<InputElement[]>();
         public ReactiveProperty<InputElement[]> InputElements
@@ -27,6 +48,12 @@ namespace D3DPanel
 
         public void Dispose()
         {
+            if (m_srv != null)
+            {
+                m_srv.Dispose();
+                m_srv = null;
+            }
+
             if (m_layout != null)
             {
                 m_layout.Dispose();
@@ -46,9 +73,9 @@ namespace D3DPanel
             }
         }
 
-        const RegisterComponentMaskFlags MASK_XYZ = 
-            RegisterComponentMaskFlags.ComponentX 
-            | RegisterComponentMaskFlags.ComponentY 
+        const RegisterComponentMaskFlags MASK_XYZ =
+            RegisterComponentMaskFlags.ComponentX
+            | RegisterComponentMaskFlags.ComponentY
             | RegisterComponentMaskFlags.ComponentZ
             ;
         const RegisterComponentMaskFlags MASK_XY =
@@ -103,10 +130,15 @@ namespace D3DPanel
             get { return m_updated.AsObservable(); }
         }
 
+        public D3D11Shader(ImageBytes image)
+        {
+            m_textureBytes = image;
+        }
+
         public void SetShader(string vs, string ps)
         {
             Dispose();
-            if(string.IsNullOrEmpty(vs) || string.IsNullOrEmpty(ps))
+            if (string.IsNullOrEmpty(vs) || string.IsNullOrEmpty(ps))
             {
                 return;
             }
@@ -124,7 +156,7 @@ namespace D3DPanel
             m_updated.OnNext(Unit.Default);
         }
 
-        public void SetupContext(Device device, DeviceContext context)
+        public void SetupContext(SharpDX.Direct3D11.Device device, DeviceContext context)
         {
             if (m_vsCompiled == null)
             {
@@ -155,6 +187,23 @@ namespace D3DPanel
                     InputElements.Value);
             }
             context.InputAssembler.InputLayout = m_layout;
+
+            if (m_textureBytes.Bytes.Count > 0)
+            {
+                if (m_srv == null)
+                {
+                    var (buffer, desc, stride) = ImageLoader.LoadImage(m_textureBytes);
+                    using (buffer)
+                    {
+                        var rect = new DataRectangle(buffer.DataPointer, stride);
+                        using (var texture = new Texture2D(device, desc, rect))
+                        {
+                            m_srv = new ShaderResourceView(device, texture);
+                        }
+                    }
+                }
+                context.PixelShader.SetShaderResource(0, m_srv);
+            }
         }
     }
 }

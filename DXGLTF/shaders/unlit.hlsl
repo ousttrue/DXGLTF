@@ -1,3 +1,6 @@
+Texture2D ShaderTexture: register(t0);
+SamplerState Sampler: register(s0);
+
 struct VS_IN
 {
 	float3 position : POSITION;
@@ -31,5 +34,6 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : SV_Target
 {
-	return input.color;
+	return ShaderTexture.Sample(Sampler, input.uv);
+	//return input.color;
 }

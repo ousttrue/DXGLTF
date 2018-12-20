@@ -11,9 +11,9 @@ namespace D3DPanel
         D3D11Renderer m_renderer = new D3D11Renderer();
 
         List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
-        public void AddDrawable(string vs, string ps)
+        public void AddDrawable(string vs, string ps, ImageBytes textureBytes)
         {
-            var shader = new D3D11Shader();
+            var shader = new D3D11Shader(textureBytes);
             shader.SetShader(vs, ps);
 
             /*
