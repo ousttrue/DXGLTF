@@ -12,6 +12,7 @@ namespace GltfScene
 {
     public struct Source
     {
+        public string Path;
         public IBufferIO IO;
         public glTF GlTF;
         public JsonNode JSON;
@@ -28,7 +29,7 @@ namespace GltfScene
             get
             {
                 return Source
-                        .SkipWhile(x => x.GlTF==null)
+                        .SkipWhile(x => x.GlTF == null)
                         .ObserveOn(SynchronizationContext.Current);
             }
         }
@@ -46,7 +47,7 @@ namespace GltfScene
                     return _Load(path);
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error($"fail to load: {path}: {ex}");
             }
@@ -56,7 +57,10 @@ namespace GltfScene
         {
             var bytes = File.ReadAllBytes(path);
 
-            Source source;
+            var source = new Source
+            {
+                Path = path
+            };
 
             try
             {

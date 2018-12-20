@@ -57,7 +57,6 @@ namespace DXGLTF
         {
             if (!node.IsValid)
             {
-                Logger.Debug($"selected: none");
                 return;
             }
 

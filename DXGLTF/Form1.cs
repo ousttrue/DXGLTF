@@ -4,8 +4,10 @@ using NLog.Windows.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using UniJSON;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace DXGLTF
@@ -30,6 +32,19 @@ namespace DXGLTF
         {
             InitializeComponent();
 
+            m_scene.SourceObservableOnCurrent.Subscribe(x =>
+            {
+                if (x.GlTF != null)
+                {
+                    var path = Path.GetFileName(x.Path);
+                    this.Text = $"[{path}] {x.GlTF.TriangleCount} tris";
+                }
+                else
+                {
+                    this.Text = "";
+                }
+            });
+
             var document = new D3DContent(m_scene);
             AddContent("selected", document, DockState.Document);
 
@@ -39,6 +54,15 @@ namespace DXGLTF
             AddContent("jsonnode", jsonNode, DockState.DockLeft);
             jsonNode.Selected.Subscribe(x =>
             {
+                if (x.IsValid)
+                {
+                    var p = new JsonPointer(x);
+                    toolStripStatusLabel1.Text = $"{p}";
+                }
+                else
+                {
+                    toolStripStatusLabel1.Text ="";
+                }
                 document.SetSelection(jsonNode.Source, x);
             });
         }

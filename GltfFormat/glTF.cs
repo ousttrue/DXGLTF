@@ -323,6 +323,23 @@ namespace UniGLTF
             return hasVertexColor;
         }
 
+        public int TriangleCount
+        {
+            get
+            {
+                var count = 0;
+                foreach (var mesh in meshes)
+                {
+                    foreach (var prim in mesh.primitives)
+                    {
+                        var accessor = accessors[prim.indices];
+                        count += accessor.count;
+                    }
+                }
+                return count / 3;
+            }
+        }
+
         [JsonSchema(MinItems = 1)]
         public List<glTFNode> nodes = new List<glTFNode>();
 
@@ -481,10 +498,10 @@ namespace UniGLTF
 
         void Traverse(JsonNode node, JsonFormatter f, Utf8String parentKey)
         {
-            if(node.IsMap())
+            if (node.IsMap())
             {
                 f.BeginMap();
-                foreach(var kv in node.ObjectItemsRaw)
+                foreach (var kv in node.ObjectItemsRaw)
                 {
                     if (parentKey == s_extensions)
                     {
@@ -498,10 +515,10 @@ namespace UniGLTF
                 }
                 f.EndMap();
             }
-            else if(node.IsArray())
+            else if (node.IsArray())
             {
                 f.BeginList();
-                foreach(var x in node.ArrayItemsRaw)
+                foreach (var x in node.ArrayItemsRaw)
                 {
                     Traverse(x, f, default(Utf8String));
                 }
