@@ -30,17 +30,20 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            AddContent("3D", new D3DContent(m_scene), DockState.Document);
-            AddContent("json", new JsonContent(m_scene), DockState.DockRight);
-            AddContent("buffer view", new BufferViewContent(m_scene), DockState.DockRight);
-            AddContent("accessor", new AccessorContent(m_scene), DockState.DockRight);
-            AddContent("material", new MaterialContent(m_scene), DockState.DockRight);
-            AddContent("node", new NodeContent(m_scene), DockState.DockLeft);
-            AddContent("primitive", new PrimitiveContent(m_scene), DockState.DockRight);
+            var document = new D3DContent(m_scene);
+            AddContent("selected", document, DockState.Document);
 
-            AddContent("jsonnode", new JsonNodeContent(m_scene), DockState.DockLeft);
+            AddContent("json", new JsonContent(m_scene), DockState.DockLeft);
+
+            var jsonNode = new JsonNodeContent(m_scene);
+            AddContent("jsonnode", jsonNode, DockState.DockLeft);
+            jsonNode.Selected.Subscribe(x =>
+            {
+                document.SetSelection(jsonNode.Source, x);
+            });
         }
 
+        #region FileDialog
         struct FileDialogFilter
         {
             public string Label;
@@ -84,7 +87,9 @@ namespace DXGLTF
 
             m_scene.Load(file);
         }
+        #endregion
 
+        #region Logger
         public RichTextBox RichTextBox
         {
             get;
@@ -118,5 +123,6 @@ namespace DXGLTF
             m_logger = new LoggerContent(richTextBox1);
             AddContent("logger", m_logger, DockState.DockBottom);
         }
+        #endregion
     }
 }

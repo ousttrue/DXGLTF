@@ -1,12 +1,16 @@
 ﻿using Reactive.Bindings;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
+using System;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 
 namespace D3DPanel
 {
-    public class D3D11Shader : System.IDisposable
+    public class D3D11Shader : IDisposable
     {
         CompilationResult m_vsCompiled;
         CompilationResult m_psCompiled;
@@ -93,6 +97,12 @@ namespace D3DPanel
                 GetFormat(desc.ComponentType, desc.UsageMask), 0);
         }
 
+        readonly Subject<Unit> m_updated = new Subject<Unit>();
+        public IObservable<Unit> Updated
+        {
+            get { return m_updated.AsObservable(); }
+        }
+
         public void SetShader(string vs, string ps)
         {
             Dispose();
@@ -110,6 +120,8 @@ namespace D3DPanel
                 .Select(x => ToInputElement(x))
                 .ToArray()
                 ;
+
+            m_updated.OnNext(Unit.Default);
         }
 
         public void SetupContext(Device device, DeviceContext context)

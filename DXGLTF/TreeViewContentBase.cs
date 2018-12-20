@@ -5,6 +5,9 @@ using System.Linq;
 using UniGLTF;
 using WeifenLuo.WinFormsUI.Docking;
 using UniJSON;
+using NLog;
+using System.Collections.Generic;
+using Reactive.Bindings;
 
 namespace DXGLTF
 {
@@ -24,6 +27,12 @@ namespace DXGLTF
         }
         protected abstract void OnUpdated(Source source);
         protected TreeView TreeView { get { return treeView1; } }
+
+        protected abstract void OnSelected(TreeNode node);
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            OnSelected(treeView1.SelectedNode);
+        }
     }
 
     class NodeContent : TreeViewContentBase
@@ -62,20 +71,35 @@ namespace DXGLTF
             TreeView.Nodes.Add(m_nodes[0]);
             TreeView.ExpandAll();
         }
+
+        protected override void OnSelected(TreeNode node)
+        {
+            //throw new NotImplementedException();
+        }
     }
 
     class JsonNodeContent : TreeViewContentBase
     {
-        public JsonNodeContent(Scene scene):base(scene)
+        static Logger Logger = LogManager.GetCurrentClassLogger();
+
+        ReactiveProperty<JsonNode> m_selected = new ReactiveProperty<JsonNode>();
+        public ReadOnlyReactiveProperty<JsonNode> Selected
+        {
+            get { return m_selected.ToReadOnlyReactiveProperty(); }
+        }
+
+        public JsonNodeContent(Scene scene) : base(scene)
         {
         }
 
+        Dictionary<TreeNode, JsonNode> m_nodeMap = new Dictionary<TreeNode, JsonNode>();
         void Traverse(TreeNodeCollection parent, string key, JsonNode node)
         {
             if (node.IsArray())
             {
                 var current = new TreeNode($"{key}({node.ValueCount})");
                 parent.Add(current);
+                m_nodeMap.Add(current, node);
 
                 int i = 0;
                 foreach (var x in node.ArrayItemsRaw)
@@ -87,6 +111,7 @@ namespace DXGLTF
             {
                 var current = new TreeNode(key);
                 parent.Add(current);
+                m_nodeMap.Add(current, node);
 
                 foreach (var kv in node.ObjectItemsRaw)
                 {
@@ -95,13 +120,25 @@ namespace DXGLTF
             }
             else
             {
-                parent.Add(new TreeNode($"{key}: {node.ToString()}"));
+                var current = new TreeNode($"{key}: {node.ToString()}");
+                parent.Add(current);
+                m_nodeMap.Add(current, node);
             }
+        }
+
+        Source m_source;
+        public Source Source
+        {
+            get { return m_source; }
         }
 
         protected override void OnUpdated(Source source)
         {
+            // clear
+            m_nodeMap.Clear();
             TreeView.Nodes.Clear();
+            m_source = source;
+
             glTF gltf = source.GlTF;
             if (gltf == null)
             {
@@ -110,10 +147,20 @@ namespace DXGLTF
 
             Traverse(TreeView.Nodes, "GLTF", source.JSON);
 
-            foreach(TreeNode x in TreeView.Nodes)
+            foreach (TreeNode x in TreeView.Nodes)
             {
                 x.Expand();
             }
+        }
+
+        protected override void OnSelected(TreeNode node)
+        {
+            var json = default(JsonNode);
+            if (!m_nodeMap.TryGetValue(node, out json))
+            {
+                Logger.Warn($"{node} not found");
+            }
+            m_selected.Value = json;
         }
     }
 }

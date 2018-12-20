@@ -1,12 +1,12 @@
 ﻿using D3DPanel;
 using GltfScene;
+using NLog;
 using SharpDX;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using UniJSON;
 using WeifenLuo.WinFormsUI.Docking;
 
 
@@ -14,126 +14,44 @@ namespace DXGLTF
 {
     public partial class D3DContent : DockContent
     {
+        static Logger Logger = LogManager.GetCurrentClassLogger();
+
         D3D11Renderer m_renderer = new D3D11Renderer();
-        List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
         Camera m_camera = new Camera
         {
             View = Matrix.Identity,
         };
-        ShaderLoader m_shaderLoader = new ShaderLoader();
+
+        JsonD3DConverter m_jsonD3D = new JsonD3DConverter();
 
         public D3DContent(Scene scene)
         {
             InitializeComponent();
 
-            scene.SourceObservableOnCurrent.Subscribe(OnSceneLoaded);
-
-            var drawable = new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(ShaderType.Gizmo));
-            drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
-                    new Vector3(0.0f, 0.5f, 0),
-                    new Vector3(0.5f, -0.5f, 0),
-                    new Vector3(-0.5f, -0.5f, 0),
-                }));
-            m_drawables.Add(drawable);
-        }
-
-        D3D11Shader CreateMaterial(ShaderType type)
-        {
-            var source = m_shaderLoader.GetShaderSource(type);
-            var shader = new D3D11Shader();
-
-            source
+            m_jsonD3D.UpdatedObservable
                 .ObserveOn(SynchronizationContext.Current)
-                .Subscribe(x =>
-            {
-                shader.SetShader(x, x);
-                Invalidate();
-            });
-
-            return shader;
-        }
-
-        /*
-        D3D11Shader CreateMaterial(UniGLTF.glTFMaterial material)
-        {
-            string vsPath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "shaders/shader.hlsl");
-            string psPath = vsPath;
-            var vsSource = File.ReadAllText(vsPath, Encoding.UTF8);
-            var psSource = default(string);
-            if (vsPath == psPath)
-            {
-                psSource = vsSource;
-            }
-            else
-            {
-                psSource = File.ReadAllText(psPath, Encoding.UTF8);
-            }
-            return new D3D11Shader(vsSource, psSource);
-        }
-        */
-
-        void OnSceneLoaded(Source source)
-        {
-            foreach (var x in m_drawables)
-            {
-                x.Dispose();
-            }
-            m_drawables.Clear();
-            var gltf = source.GlTF;
-            if (gltf == null)
-            {
-                return;
-            }
-
-            foreach (var mesh in gltf.meshes)
-            {
-                foreach (var primitive in mesh.primitives)
+                .Subscribe(_ =>
                 {
-                    var i = gltf.accessors[primitive.indices];
-                    int[] indices = null;
-                    if (i.componentType == UniGLTF.glComponentType.UNSIGNED_INT)
-                    {
-                        indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
-                    }
-                    else if (i.componentType == UniGLTF.glComponentType.UNSIGNED_SHORT)
-                    {
-                        indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
+                    Invalidate();
+                })
+                ;
+        }
 
-                    var material = CreateMaterial(ShaderType.Unlit);
-                    var drawable = new D3D11Drawable(indices, material);
-
-                    var attribs = primitive.attributes;
-                    
-                    var positions = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.POSITION);
-                    if (positions.Count == 0)
-                    {
-                        throw new Exception();
-                    }
-                    drawable.SetAttribute(Semantics.POSITION, new VertexAttribute(positions, 4 * 3));
-
-                    m_drawables.Add(drawable);
-                }
-            }
-            Invalidate();
+        public void SetSelection(Source source, JsonNode node)
+        {
+            m_jsonD3D.SetSelection(source, node);
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
+            // do nothing
         }
 
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
             m_camera.Update();
             m_renderer.Begin(Handle, m_camera);
-            foreach (var x in m_drawables)
-            {
-                x.Draw(m_renderer);
-            }
+            m_jsonD3D.Draw(m_renderer);
             m_renderer.End();
         }
 

@@ -1,9 +1,12 @@
-﻿using Reactive.Bindings;
+﻿using D3DPanel;
+using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -58,6 +61,21 @@ namespace DXGLTF
         public IObservable<string> GetShaderSource(ShaderType type)
         {
             return m_map[type].Source;
+        }
+
+        public D3D11Shader CreateMaterial(ShaderType type)
+        {
+            var source = GetShaderSource(type);
+            var shader = new D3D11Shader();
+
+            source
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(x =>
+                {
+                    shader.SetShader(x, x);
+                });
+
+            return shader;
         }
     }
 }
