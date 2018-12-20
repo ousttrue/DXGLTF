@@ -146,12 +146,14 @@ namespace D3DPanel
             m_vsCompiled = ShaderBytecode.Compile(vs, "VS", "vs_4_0", ShaderFlags.None, EffectFlags.None);
             m_psCompiled = ShaderBytecode.Compile(ps, "PS", "ps_4_0", ShaderFlags.None, EffectFlags.None);
 
-            var reflection = new ShaderReflection(m_vsCompiled.Bytecode);
-            InputElements.Value = Enumerable.Range(0, reflection.Description.InputParameters)
-                .Select(x => reflection.GetInputParameterDescription(x))
-                .Select(x => ToInputElement(x))
-                .ToArray()
-                ;
+            using (var reflection = new ShaderReflection(m_vsCompiled.Bytecode))
+            {
+                InputElements.Value = Enumerable.Range(0, reflection.Description.InputParameters)
+                    .Select(x => reflection.GetInputParameterDescription(x))
+                    .Select(x => ToInputElement(x))
+                    .ToArray()
+                    ;
+            }
 
             m_updated.OnNext(Unit.Default);
         }

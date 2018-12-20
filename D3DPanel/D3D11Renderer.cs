@@ -36,13 +36,16 @@ namespace D3DPanel
         DeviceContext m_context;
         public DeviceContext Context => m_context;
 
-        SharpDX.Direct3D11.Buffer m_constantBuffer;
+        Buffer m_constantBuffer;
 
         public void Dispose()
         {
-            m_swapChain.Dispose();
+            if (m_swapChain != null)
+            {
+                m_swapChain.Dispose();
+            }
 
-            if (m_constantBuffer == null)
+            if (m_constantBuffer != null)
             {
                 m_constantBuffer.Dispose();
                 m_constantBuffer = null;
@@ -92,6 +95,7 @@ namespace D3DPanel
             if (m_constantBuffer == null)
             {
                 m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref camera.ViewProjection);
+                m_constantBuffer.DebugName = "Constant";
             }
             m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
             m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
@@ -130,8 +134,10 @@ namespace D3DPanel
             m_swapChain = new DXGISwapChain(swapChain);
 
             // Ignore all windows events
-            var factory = swapChain.GetParent<Factory>();
-            factory.MakeWindowAssociation(hWnd, WindowAssociationFlags.IgnoreAll);
+            using (var factory = swapChain.GetParent<Factory>())
+            {
+                factory.MakeWindowAssociation(hWnd, WindowAssociationFlags.IgnoreAll);
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace D3DPanel
             m_swapChain = swapChain;
         }
 
-        Texture2D m_backBuffer;
+        //Texture2D m_backBuffer;
         RenderTargetView m_renderView;
 
         public void Dispose()
@@ -36,11 +36,6 @@ namespace D3DPanel
             {
                 m_renderView.Dispose();
                 m_renderView = null;
-            }
-            if (m_backBuffer != null)
-            {
-                m_backBuffer.Dispose();
-                m_backBuffer = null;
             }
         }
 
@@ -68,8 +63,11 @@ namespace D3DPanel
             if (m_renderView == null)
             {
                 // New RenderTargetView from the backbuffer
-                m_backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0);
-                m_renderView = new RenderTargetView(device, m_backBuffer);
+                using (var backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0))
+                {
+                    backBuffer.DebugName = "backBuffer";
+                    m_renderView = new RenderTargetView(device, backBuffer);
+                }
             }
 
             return m_renderView;

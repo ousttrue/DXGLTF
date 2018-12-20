@@ -27,6 +27,8 @@ namespace DXGLTF
             m_contentMap.Add(name, content);
         }
 
+        D3DContent m_d3d;
+
         LoggerContent m_logger;
         public Form1()
         {
@@ -45,8 +47,8 @@ namespace DXGLTF
                 }
             });
 
-            var document = new D3DContent(m_scene);
-            AddContent("selected", document, DockState.Document);
+            m_d3d = new D3DContent(m_scene);
+            AddContent("selected", m_d3d, DockState.Document);
 
             AddContent("json", new JsonContent(m_scene), DockState.DockLeft);
 
@@ -63,8 +65,13 @@ namespace DXGLTF
                 {
                     toolStripStatusLabel1.Text ="";
                 }
-                document.SetSelection(jsonNode.Source, x);
+                m_d3d.SetSelection(jsonNode.Source, x);
             });
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            m_d3d.Shutdown();
         }
 
         #region FileDialog

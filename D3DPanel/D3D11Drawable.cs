@@ -16,7 +16,7 @@ namespace D3DPanel
         COLOR,
     }
 
-    public class D3D11Drawable : System.IDisposable
+    public class D3D11Drawable : IDisposable
     {
         public PrimitiveTopology Topology => PrimitiveTopology.TriangleList;
 
@@ -63,6 +63,11 @@ namespace D3DPanel
 
         public void Dispose()
         {
+            if (m_shader != null)
+            {
+                m_shader.Dispose();
+            }
+
             if (m_indexBuffer != null)
             {
                 m_indexBuffer.Dispose();
@@ -115,6 +120,7 @@ namespace D3DPanel
                     offset += GetSize(input);
                 }
                 m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, BindFlags.VertexBuffer, buffer.Buffer);
+                m_vertexBuffer.DebugName = "VertexBuffer";
             }
             context.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(m_vertexBuffer, m_stride, 0));
 
@@ -127,6 +133,7 @@ namespace D3DPanel
                 if (m_indexBuffer == null)
                 {
                     m_indexBuffer = SharpDX.Direct3D11.Buffer.Create(device, BindFlags.IndexBuffer, m_indices);
+                    m_indexBuffer.DebugName = "IndexBuffer";
                 }
                 context.InputAssembler.SetIndexBuffer(m_indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
                 context.DrawIndexed(m_indices.Length, 0, 0);
