@@ -65,7 +65,7 @@ namespace GltfScene
             var bytes = File.ReadAllBytes(path);
             var parsed = JsonParser.Parse(new Utf8String(bytes));
 
-            Json.Value = parsed.ToString();
+            Json.Value = parsed.ToString("  ");
 
             glTF gltf = null;
             parsed.Deserialize(ref gltf);
@@ -96,7 +96,7 @@ namespace GltfScene
 
             var parsed = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
 
-            Json.Value = parsed.ToString();
+            Json.Value = parsed.ToString("  ");
 
             glTF gltf = null;
             parsed.Deserialize(ref gltf);
