@@ -1,14 +1,11 @@
 ﻿using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace D3DPanel
 {
-    class DXGISwapChain: IDisposable
+    class DXGISwapChain : IDisposable
     {
         SwapChain m_swapChain;
         public DXGISwapChain(SwapChain swapChain)
@@ -16,8 +13,8 @@ namespace D3DPanel
             m_swapChain = swapChain;
         }
 
-        //Texture2D m_backBuffer;
         RenderTargetView m_renderView;
+        DepthStencilView m_depthStencilView;
 
         public void Dispose()
         {
@@ -32,6 +29,11 @@ namespace D3DPanel
 
         void ClearRenderTarget()
         {
+            if (m_depthStencilView != null)
+            {
+                m_depthStencilView.Dispose();
+                m_depthStencilView = null;
+            }
             if (m_renderView != null)
             {
                 m_renderView.Dispose();
@@ -49,15 +51,15 @@ namespace D3DPanel
             ClearRenderTarget();
 
             var desc = m_swapChain.Description;
-            m_swapChain.ResizeBuffers(desc.BufferCount, width, height, 
+            m_swapChain.ResizeBuffers(desc.BufferCount, width, height,
                 desc.ModeDescription.Format, desc.Flags);
         }
 
-        public RenderTargetView GetRenderTarget(SharpDX.Direct3D11.Device device)
+        public (RenderTargetView, DepthStencilView) GetRenderTarget(SharpDX.Direct3D11.Device device)
         {
             if (m_swapChain == null)
             {
-                return null;
+                return (null, null);
             }
 
             if (m_renderView == null)
@@ -67,10 +69,40 @@ namespace D3DPanel
                 {
                     backBuffer.DebugName = "backBuffer";
                     m_renderView = new RenderTargetView(device, backBuffer);
+
+                    if (m_depthStencilView == null)
+                    {
+                        var desc = backBuffer.Description;
+                        using (var depthBuffer = new Texture2D(device, new Texture2DDescription
+                        {
+                            Format = Format.D24_UNorm_S8_UInt,
+                            ArraySize = 1,
+                            MipLevels = 1,
+                            Width = desc.Width,
+                            Height = desc.Height,
+                            SampleDescription = m_swapChain.Description.SampleDescription,
+                            BindFlags = BindFlags.DepthStencil
+                        }))
+                        {
+                            var depthDesc = new DepthStencilViewDescription
+                            {
+                            };
+                            if (m_swapChain.Description.SampleDescription.Count > 1 ||
+                                m_swapChain.Description.SampleDescription.Quality > 0)
+                            {
+                                depthDesc.Dimension = DepthStencilViewDimension.Texture2DMultisampled;
+                            }
+                            else
+                            {
+                                depthDesc.Dimension = DepthStencilViewDimension.Texture2D;
+                            }
+                            m_depthStencilView = new DepthStencilView(device, depthBuffer, depthDesc);
+                        }
+                    }
                 }
             }
 
-            return m_renderView;
+            return (m_renderView, m_depthStencilView);
         }
     }
 }

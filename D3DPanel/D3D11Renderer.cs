@@ -35,11 +35,18 @@ namespace D3DPanel
 
         DeviceContext m_context;
         public DeviceContext Context => m_context;
+        DepthStencilState m_ds;
 
         Buffer m_constantBuffer;
 
         public void Dispose()
         {
+            if (m_ds != null)
+            {
+                m_ds.Dispose();
+                m_ds = null;
+            }
+
             if (m_swapChain != null)
             {
                 m_swapChain.Dispose();
@@ -88,9 +95,12 @@ namespace D3DPanel
             }
 
             // Camera
-            var rtv = m_swapChain.GetRenderTarget(m_device);
+            var (rtv, dsv) = m_swapChain.GetRenderTarget(m_device);
             var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
             m_context.ClearRenderTargetView(rtv, clear);
+            m_context.ClearDepthStencilView(dsv,
+                DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil,
+                1.0f, 0);
 
             if (m_constantBuffer == null)
             {
@@ -100,7 +110,18 @@ namespace D3DPanel
             m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
             m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
 
-            m_context.OutputMerger.SetTargets(rtv);
+            m_context.OutputMerger.SetTargets(dsv, rtv);
+            if (m_ds == null)
+            {
+                m_ds = new DepthStencilState(m_device,
+                new DepthStencilStateDescription
+                {
+                    IsDepthEnabled = true,
+                    DepthWriteMask = DepthWriteMask.All,
+                    DepthComparison = Comparison.Less,
+                });
+            }
+            m_context.OutputMerger.SetDepthStencilState(m_ds);
             m_context.Rasterizer.SetViewport(Viewport);
         }
 

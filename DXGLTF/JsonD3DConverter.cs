@@ -116,16 +116,19 @@ namespace DXGLTF
                 foreach (var primitive in mesh.primitives)
                 {
                     var m = gltf.materials[primitive.material];
-                    var textureIndex = m.pbrMetallicRoughness.baseColorTexture.index;
 
                     var imageBytes = default(ImageBytes);
-                    if (textureIndex != -1)
+                    var colorTexture = m.pbrMetallicRoughness.baseColorTexture;
+                    if (colorTexture != null)
                     {
-                        var texture = gltf.textures[textureIndex];
-                        var image = gltf.images[texture.source];
-                        var bytes = source.GetImageBytes(image);
-                        var format = GetImageFormat(image.mimeType);
-                        imageBytes = new ImageBytes(format, bytes);
+                        if (colorTexture.index != -1)
+                        {
+                            var texture = gltf.textures[colorTexture.index];
+                            var image = gltf.images[texture.source];
+                            var bytes = source.GetImageBytes(image);
+                            var format = GetImageFormat(image.mimeType);
+                            imageBytes = new ImageBytes(format, bytes);
+                        }
                     }
                     var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, 
                         imageBytes);
@@ -175,7 +178,9 @@ namespace DXGLTF
                 case "image/png": return ImageFormat.Png;
                 case "image/jpeg": return ImageFormat.Jpeg;
             }
-            throw new NotImplementedException();
+
+            Logger.Warn($"unknown mime: {mime}");
+            return ImageFormat.Png;
         }
 
         void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images)

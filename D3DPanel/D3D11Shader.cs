@@ -39,6 +39,7 @@ namespace D3DPanel
         VertexShader m_vs;
         PixelShader m_ps;
         ShaderResourceView m_srv;
+        RasterizerState m_rs;
 
         ReactiveProperty<InputElement[]> m_inputElements = new ReactiveProperty<InputElement[]>();
         public ReactiveProperty<InputElement[]> InputElements
@@ -48,6 +49,12 @@ namespace D3DPanel
 
         public void Dispose()
         {
+            if (m_rs != null)
+            {
+                m_rs.Dispose();
+                m_rs = null;
+            }
+
             if (m_srv != null)
             {
                 m_srv.Dispose();
@@ -206,6 +213,17 @@ namespace D3DPanel
                 }
                 context.PixelShader.SetShaderResource(0, m_srv);
             }
+
+            if (m_rs == null)
+            {
+                m_rs = new RasterizerState(device, new RasterizerStateDescription
+                {
+                    CullMode = CullMode.None,
+                    FillMode = FillMode.Solid,
+                    IsDepthClipEnabled = true,
+                });
+           }
+            context.Rasterizer.State = m_rs;
         }
     }
 }

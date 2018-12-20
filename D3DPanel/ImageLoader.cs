@@ -27,6 +27,18 @@ namespace D3DPanel
                 return Format.B8G8R8A8_UNorm;
             }
 
+            if (guid == PixelFormat.Format24bppBGR)
+            {
+                // require conversion to 32bit
+                throw new NotImplementedException();
+            }
+
+            if(guid == PixelFormat.Format8bppIndexed)
+            {
+                // require conversion to 32bit
+                throw new NotImplementedException();
+            }
+
             throw new NotImplementedException();
         }
 
