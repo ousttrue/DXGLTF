@@ -17,12 +17,12 @@ namespace DXGLTF
 
             InitializeComponent();
 
-            m_scene.GltfObservableOnCurrent.Subscribe(x =>
+            m_scene.SourceObservableOnCurrent.Subscribe(x =>
             {
-                OnUpdated(x.Item1);
+                OnUpdated(x);
             });
         }
-        protected abstract void OnUpdated(glTF gltf);
+        protected abstract void OnUpdated(Source source);
         protected TreeView TreeView { get { return treeView1; } }
     }
 
@@ -35,9 +35,10 @@ namespace DXGLTF
         TreeNode[] m_nodes;
         glTF m_gltf;
 
-        protected override void OnUpdated(glTF gltf)
+        protected override void OnUpdated(Source source)
         {
             TreeView.Nodes.Clear();
+            glTF gltf = source.GlTF;
             m_gltf = gltf;
             if (gltf == null)
             {
@@ -62,6 +63,17 @@ namespace DXGLTF
 
             TreeView.Nodes.Add(m_nodes[0]);
             TreeView.ExpandAll();
+        }
+    }
+
+    class JsonNodeContent : TreeViewContentBase
+    {
+        public JsonNodeContent(Scene scene):base(scene)
+        {
+        }
+
+        protected override void OnUpdated(Source source)
+        {
         }
     }
 }

@@ -26,10 +26,7 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            scene.GltfObservableOnCurrent.Subscribe(x =>
-            {
-                OnSceneLoaded(x.Item1, x.Item2);
-            });
+            scene.SourceObservableOnCurrent.Subscribe(OnSceneLoaded);
 
             var drawable = new D3D11Drawable(new[] { 0, 1, 2 }, CreateMaterial(ShaderType.Gizmo));
             drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
@@ -75,13 +72,14 @@ namespace DXGLTF
         }
         */
 
-        void OnSceneLoaded(UniGLTF.glTF gltf, UniGLTF.IBufferIO io)
+        void OnSceneLoaded(Source source)
         {
             foreach (var x in m_drawables)
             {
                 x.Dispose();
             }
             m_drawables.Clear();
+            var gltf = source.GlTF;
             if (gltf == null)
             {
                 return;
@@ -95,11 +93,11 @@ namespace DXGLTF
                     int[] indices = null;
                     if (i.componentType == UniGLTF.glComponentType.UNSIGNED_INT)
                     {
-                        indices = gltf.GetArrayFromAccessor<int>(io, primitive.indices);
+                        indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
                     }
                     else if (i.componentType == UniGLTF.glComponentType.UNSIGNED_SHORT)
                     {
-                        indices = gltf.GetArrayFromAccessor<ushort>(io, primitive.indices).Select(x => (int)x).ToArray();
+                        indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
                     }
                     else
                     {
@@ -111,7 +109,7 @@ namespace DXGLTF
 
                     var attribs = primitive.attributes;
                     
-                    var positions = gltf.GetBytesFromAccessor(io, primitive.attributes.POSITION);
+                    var positions = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.POSITION);
                     if (positions.Count == 0)
                     {
                         throw new Exception();

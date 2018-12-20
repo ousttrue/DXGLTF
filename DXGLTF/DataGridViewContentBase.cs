@@ -18,10 +18,10 @@ namespace DXGLTF
             InitializeComponent();
             dataGridView1.DataSource = DataSource;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            scene.GltfObservableOnCurrent
+            scene.SourceObservableOnCurrent
                     .Subscribe(x =>
                     {
-                        OnUpdated(x.Item1);
+                        OnUpdated(x);
                         dataGridView1.Refresh();
                     });
         }
@@ -32,7 +32,7 @@ namespace DXGLTF
         }
 
         protected abstract object DataSource { get; }
-        protected abstract void OnUpdated(glTF gltf);
+        protected abstract void OnUpdated(Source source);
     }
 
     class BufferViewContent : DataGridViewContentBase
@@ -59,9 +59,10 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(glTF gltf)
+        protected override void OnUpdated(Source source)
         {
             m_items.Clear();
+            var gltf = source.GlTF;
             if (gltf == null)
             {
                 return;
@@ -99,9 +100,10 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(glTF gltf)
+        protected override void OnUpdated(Source source)
         {
             m_items.Clear();
+            var gltf = source.GlTF;
             if (gltf == null)
             {
                 return;
@@ -168,9 +170,10 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(glTF gltf)
+        protected override void OnUpdated(Source source)
         {
             m_items.Clear();
+            var gltf = source.GlTF;
             if (gltf == null)
             {
                 return;
@@ -202,9 +205,10 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(glTF gltf)
+        protected override void OnUpdated(Source source)
         {
             m_items.Clear();
+            var gltf = source.GlTF;
             if (gltf == null)
             {
                 return;

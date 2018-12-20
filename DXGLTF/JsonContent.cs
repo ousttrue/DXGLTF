@@ -13,12 +13,16 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            scene.Json
-                  .ObserveOn(SynchronizationContext.Current)
-                  .Subscribe(x =>
-                  {
-                      richTextBox1.Text = x;
-                  });
+            scene.SourceObservableOnCurrent
+                  .Subscribe(OnSource);
+        }
+
+        void OnSource(Source source)
+        {
+            if (source.GlTF == null) return;
+
+            // indent
+            richTextBox1.Text = source.JSON.ToString("  ");
         }
     }
 }

@@ -186,6 +186,10 @@
       <Project>{9afa370c-76d6-4dd0-9926-8039cb8b0366}</Project>
       <Name>GltfScene</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UniJSON\UniJSON.csproj">
+      <Project>{bc5de392-dc0f-49e9-81b2-04b1fafc1b67}</Project>
+      <Name>UniJSON</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="shaders\gizmo.hlsl">

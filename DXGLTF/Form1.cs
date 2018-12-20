@@ -12,7 +12,7 @@ namespace DXGLTF
 {
     public partial class Form1 : Form
     {
-        static Logger Logger = LogManager.GetLogger("Form1");
+        static Logger Logger = LogManager.GetCurrentClassLogger();
 
         Scene m_scene = new Scene();
 

@@ -6,26 +6,29 @@ using UniGLTF;
 using System.Threading;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using NLog;
 
 namespace GltfScene
 {
+    public struct Source
+    {
+        public IBufferIO IO;
+        public glTF GlTF;
+        public JsonNode JSON;
+    }
+
     public class Scene
     {
-        ReactiveProperty<string> m_loadPath = new ReactiveProperty<string>();
-        public ReactiveProperty<string> LoadPath { get { return m_loadPath; } }
+        static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        ReactiveProperty<string> m_json = new ReactiveProperty<string>();
-        public ReactiveProperty<string> Json { get { return m_json; } }
-
-        ReactiveProperty<(glTF, IBufferIO)> m_gltf = new ReactiveProperty<(glTF, IBufferIO)>();
-        public ReactiveProperty<(glTF, IBufferIO)> Gltf { get { return m_gltf; } }
-
-        public IObservable<(glTF, IBufferIO)> GltfObservableOnCurrent
+        ReactiveProperty<Source> m_source = new ReactiveProperty<Source>();
+        public ReadOnlyReactiveProperty<Source> Source { get { return m_source.ToReadOnlyReactiveProperty(); } }
+        public IObservable<Source> SourceObservableOnCurrent
         {
             get
             {
-                return Gltf
-                        .SkipWhile(x => x.Item1==null)
+                return Source
+                        .SkipWhile(x => x.GlTF==null)
                         .ObserveOn(SynchronizationContext.Current);
             }
         }
@@ -33,76 +36,63 @@ namespace GltfScene
         public async void Load(string path)
         {
             // clear
-            Json.Value = "";
-            Gltf.Value = (null, null);
+            m_source.Value = default(Source);
 
-            await Task.Run(() =>
+            // async load
+            try
             {
-                _Load(path);
-            });
-        }
-
-        void _Load(string path)
-        {
-            var ext = Path.GetExtension(path).ToLower();
-            switch (ext)
+                m_source.Value = await Task.Run(() =>
+                {
+                    return _Load(path);
+                });
+            }
+            catch(Exception ex)
             {
-                case ".gltf":
-                    LoadGltf(path);
-                    break;
-
-                case ".glb":
-                    LoadGlb(path);
-                    break;
-
-                default:
-                    throw new NotImplementedException();
+                Logger.Error($"fail to load: {path}: {ex}");
             }
         }
 
-        public void LoadGltf(string path)
-        {
-            var bytes = File.ReadAllBytes(path);
-            var parsed = JsonParser.Parse(new Utf8String(bytes));
-
-            Json.Value = parsed.ToString("  ");
-
-            glTF gltf = null;
-            parsed.Deserialize(ref gltf);
-
-            LoadPath.Value = path;
-            Gltf.Value = (gltf, FolderIO.FromFile(path));
-        }
-
-        public void LoadGlb(string path)
+        static Source _Load(string path)
         {
             var bytes = File.ReadAllBytes(path);
 
-            var it = glbImporter.ParseGlbChanks(bytes).GetEnumerator();
+            Source source;
 
-            if (!it.MoveNext()) throw new FormatException();
-            var jsonChunk = it.Current;
-            if (jsonChunk.ChunkType != GlbChunkType.JSON)
+            try
             {
-                throw new FormatException();
-            }
+                // try as GLB
 
-            if (!it.MoveNext()) throw new FormatException();
-            var bytesChunk = it.Current;
-            if (bytesChunk.ChunkType != GlbChunkType.BIN)
+                var it = glbImporter.ParseGlbChanks(bytes).GetEnumerator();
+
+                if (!it.MoveNext()) throw new FormatException();
+                var jsonChunk = it.Current;
+                if (jsonChunk.ChunkType != GlbChunkType.JSON)
+                {
+                    throw new FormatException();
+                }
+
+                if (!it.MoveNext()) throw new FormatException();
+                var bytesChunk = it.Current;
+                if (bytesChunk.ChunkType != GlbChunkType.BIN)
+                {
+                    throw new FormatException();
+                }
+
+                source.JSON = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
+                source.IO = new BytesIO(bytesChunk.Bytes);
+            }
+            catch (Exception ex)
             {
-                throw new FormatException();
+                // try as GLTF
+                source.JSON = JsonParser.Parse(new Utf8String(bytes));
+                source.IO = FolderIO.FromFile(path);
             }
-
-            var parsed = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
-
-            Json.Value = parsed.ToString("  ");
 
             glTF gltf = null;
-            parsed.Deserialize(ref gltf);
+            source.JSON.Deserialize(ref gltf);
+            source.GlTF = gltf;
 
-            LoadPath.Value = path;
-            Gltf.Value = (gltf, new BytesIO(bytesChunk.Bytes));
+            return source;
         }
     }
 }
