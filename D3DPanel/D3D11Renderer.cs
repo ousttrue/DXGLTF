@@ -31,6 +31,7 @@ namespace D3DPanel
         #region Resource
         SharpDX.Direct3D11.Device m_device;
         public SharpDX.Direct3D11.Device Device => m_device;
+        DXGISwapChain m_swapChain;
 
         DeviceContext m_context;
         public DeviceContext Context => m_context;
@@ -39,18 +40,12 @@ namespace D3DPanel
 
         public void Dispose()
         {
-            ClearRenderTarget();
+            m_swapChain.Dispose();
 
             if (m_constantBuffer == null)
             {
                 m_constantBuffer.Dispose();
                 m_constantBuffer = null;
-            }
-
-            if (m_swapChain != null)
-            {
-                m_swapChain.Dispose();
-                m_swapChain = null;
             }
 
             if (m_context != null)
@@ -63,36 +58,6 @@ namespace D3DPanel
                 m_device.Dispose();
                 m_device = null;
             }
-        }
-        #endregion
-
-        #region SwapChain
-        SwapChain m_swapChain;
-        Texture2D m_backBuffer;
-        RenderTargetView m_renderView;
-        void ClearRenderTarget()
-        {
-            if (m_renderView != null)
-            {
-                m_renderView.Dispose();
-                m_renderView = null;
-            }
-            if (m_backBuffer != null)
-            {
-                m_backBuffer.Dispose();
-                m_backBuffer = null;
-            }
-        }
-
-        void GetRenderTarget()
-        {
-            if (m_swapChain == null)
-            {
-                return;
-            }
-            // New RenderTargetView from the backbuffer
-            m_backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0);
-            m_renderView = new RenderTargetView(m_device, m_backBuffer);
         }
         #endregion
 
@@ -109,9 +74,7 @@ namespace D3DPanel
             {
                 return;
             }
-            ClearRenderTarget();
-            var desc = m_swapChain.Description;
-            m_swapChain.ResizeBuffers(desc.BufferCount, Width, Height, desc.ModeDescription.Format, desc.Flags);
+            m_swapChain.Resize(Width, Height);
         }
 
         public void Begin(System.IntPtr hWnd, Camera camera)
@@ -122,12 +85,9 @@ namespace D3DPanel
             }
 
             // Camera
-            if (m_renderView == null)
-            {
-                GetRenderTarget();
-            }
+            var rtv = m_swapChain.GetRenderTarget(m_device);
             var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
-            m_context.ClearRenderTargetView(m_renderView, clear);
+            m_context.ClearRenderTargetView(rtv, clear);
 
             if (m_constantBuffer == null)
             {
@@ -136,14 +96,13 @@ namespace D3DPanel
             m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
             m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
 
-            m_context.OutputMerger.SetTargets(m_renderView);
+            m_context.OutputMerger.SetTargets(rtv);
             m_context.Rasterizer.SetViewport(Viewport);
         }
 
         public void End()
         {
-            //m_context.Flush();
-            m_swapChain.Present(0, PresentFlags.None);
+            m_swapChain.Present();
         }
 
         void CreateDevice(System.IntPtr hWnd)
@@ -162,14 +121,16 @@ namespace D3DPanel
             };
 
             // Create Device and SwapChain
+            SwapChain swapChain;
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware,
                 DeviceCreationFlags.Debug,
                 desc,
-                out m_device, out m_swapChain);
+                out m_device, out swapChain);
             m_context = m_device.ImmediateContext;
+            m_swapChain = new DXGISwapChain(swapChain);
 
             // Ignore all windows events
-            var factory = m_swapChain.GetParent<Factory>();
+            var factory = swapChain.GetParent<Factory>();
             factory.MakeWindowAssociation(hWnd, WindowAssociationFlags.IgnoreAll);
         }
     }
