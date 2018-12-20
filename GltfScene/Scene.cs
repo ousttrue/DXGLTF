@@ -17,6 +17,18 @@ namespace GltfScene
         public IBufferIO IO;
         public glTF GlTF;
         public JsonNode JSON;
+
+        public ArraySegment<byte> GetImageBytes(glTFImage image)
+        {
+            if (string.IsNullOrEmpty(image.uri))
+            {
+                return GlTF.GetViewBytes(IO, image.bufferView);
+            }
+            else
+            {
+                return IO.GetBytes(image.uri);
+            }
+        }
     }
 
     public class Scene

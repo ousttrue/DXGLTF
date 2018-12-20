@@ -115,13 +115,27 @@ namespace DXGLTF
             {
                 foreach (var primitive in mesh.primitives)
                 {
-                    var i = gltf.accessors[primitive.indices];
+                    var m = gltf.materials[primitive.material];
+                    var textureIndex = m.pbrMetallicRoughness.baseColorTexture.index;
+
+                    var imageBytes = default(ImageBytes);
+                    if (textureIndex != -1)
+                    {
+                        var texture = gltf.textures[textureIndex];
+                        var image = gltf.images[texture.source];
+                        var bytes = source.GetImageBytes(image);
+                        var format = GetImageFormat(image.mimeType);
+                        imageBytes = new ImageBytes(format, bytes);
+                    }
+                    var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, 
+                        imageBytes);
+                    var accessor = gltf.accessors[primitive.indices];
                     int[] indices = null;
-                    if (i.componentType == UniGLTF.glComponentType.UNSIGNED_INT)
+                    if (accessor.componentType == UniGLTF.glComponentType.UNSIGNED_INT)
                     {
                         indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
                     }
-                    else if (i.componentType == UniGLTF.glComponentType.UNSIGNED_SHORT)
+                    else if (accessor.componentType == UniGLTF.glComponentType.UNSIGNED_SHORT)
                     {
                         indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
                     }
@@ -130,7 +144,6 @@ namespace DXGLTF
                         throw new NotImplementedException();
                     }
 
-                    var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, default(ImageBytes));
                     var drawable = new D3D11Drawable(indices, material);
 
                     var attribs = primitive.attributes;
@@ -162,15 +175,7 @@ namespace DXGLTF
             var gltf = source.GlTF;
             foreach (var image in images)
             {
-                var bytes = default(ArraySegment<byte>);
-                if (string.IsNullOrEmpty(image.uri))
-                {
-                    bytes = gltf.GetViewBytes(source.IO, image.bufferView);
-                }
-                else
-                {
-                    bytes = source.IO.GetBytes(image.uri);
-                }
+                var bytes = source.GetImageBytes(image);
                 var format = GetImageFormat(image.mimeType);
                 var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, new ImageBytes(format, bytes));
                
