@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using System.Linq;
 using UniGLTF;
 using WeifenLuo.WinFormsUI.Docking;
-
+using UniJSON;
 
 namespace DXGLTF
 {
@@ -33,13 +33,11 @@ namespace DXGLTF
         }
 
         TreeNode[] m_nodes;
-        glTF m_gltf;
 
         protected override void OnUpdated(Source source)
         {
             TreeView.Nodes.Clear();
             glTF gltf = source.GlTF;
-            m_gltf = gltf;
             if (gltf == null)
             {
                 return;
@@ -72,8 +70,50 @@ namespace DXGLTF
         {
         }
 
+        void Traverse(TreeNodeCollection parent, string key, JsonNode node)
+        {
+            if (node.IsArray())
+            {
+                var current = new TreeNode($"{key}({node.ValueCount})");
+                parent.Add(current);
+
+                int i = 0;
+                foreach (var x in node.ArrayItemsRaw)
+                {
+                    Traverse(current.Nodes, (i++).ToString(), x);
+                }
+            }
+            else if (node.IsMap())
+            {
+                var current = new TreeNode(key);
+                parent.Add(current);
+
+                foreach (var kv in node.ObjectItemsRaw)
+                {
+                    Traverse(current.Nodes, kv.Key.GetString(), kv.Value);
+                }
+            }
+            else
+            {
+                parent.Add(new TreeNode($"{key}: {node.ToString()}"));
+            }
+        }
+
         protected override void OnUpdated(Source source)
         {
+            TreeView.Nodes.Clear();
+            glTF gltf = source.GlTF;
+            if (gltf == null)
+            {
+                return;
+            }
+
+            Traverse(TreeView.Nodes, "GLTF", source.JSON);
+
+            foreach(TreeNode x in TreeView.Nodes)
+            {
+                x.Expand();
+            }
         }
     }
 }

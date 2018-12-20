@@ -37,6 +37,8 @@ namespace DXGLTF
             AddContent("material", new MaterialContent(m_scene), DockState.DockRight);
             AddContent("node", new NodeContent(m_scene), DockState.DockLeft);
             AddContent("primitive", new PrimitiveContent(m_scene), DockState.DockRight);
+
+            AddContent("jsonnode", new JsonNodeContent(m_scene), DockState.DockLeft);
         }
 
         struct FileDialogFilter
@@ -56,7 +58,7 @@ namespace DXGLTF
         }
         static FileDialogFilter[] filters = new FileDialogFilter[]
         {
-            new FileDialogFilter("glTF files", new string[]{"gltf","glb"}),
+            new FileDialogFilter("glTF files", new string[]{"gltf","glb", "vrm"}),
             new FileDialogFilter("All files", new string[]{"*"}),
         };
 
