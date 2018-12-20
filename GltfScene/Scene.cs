@@ -1,12 +1,13 @@
-﻿using Reactive.Bindings;
+﻿using NLog;
+using Reactive.Bindings;
 using System;
 using System.IO;
-using UniJSON;
-using UniGLTF;
-using System.Threading;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using NLog;
+using UniGLTF;
+using UniJSON;
+
 
 namespace GltfScene
 {
@@ -64,7 +65,7 @@ namespace GltfScene
 
             try
             {
-                // try as GLB
+                // try GLB
 
                 var it = glbImporter.ParseGlbChanks(bytes).GetEnumerator();
 
@@ -87,7 +88,7 @@ namespace GltfScene
             }
             catch (Exception ex)
             {
-                // try as GLTF
+                // try GLTF
                 source.JSON = JsonParser.Parse(new Utf8String(bytes));
                 source.IO = FolderIO.FromFile(path);
             }

@@ -107,7 +107,7 @@ namespace DXGLTF
 
         void OpenFile(string file)
         {
-            Logger.Info($"OpenFile: {file}");
+            Logger.Info($"OpenFile: {Path.GetFileName(file)}");
 
             m_scene.Load(file);
         }
