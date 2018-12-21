@@ -118,16 +118,18 @@ namespace DXGLTF
                     var m = gltf.materials[primitive.material];
 
                     var imageBytes = default(ImageBytes);
-                    var colorTexture = m.pbrMetallicRoughness.baseColorTexture;
-                    if (colorTexture != null)
+                    if (m.pbrMetallicRoughness != null)
                     {
-                        if (colorTexture.index != -1)
+                        var colorTexture = m.pbrMetallicRoughness.baseColorTexture;
+                        if (colorTexture != null)
                         {
-                            var texture = gltf.textures[colorTexture.index];
-                            var image = gltf.images[texture.source];
-                            var bytes = source.GetImageBytes(image);
-                            var format = GetImageFormat(image.mimeType);
-                            imageBytes = new ImageBytes(format, bytes);
+                            if (colorTexture.index != -1)
+                            {
+                                var texture = gltf.textures[colorTexture.index];
+                                var image = gltf.images[texture.source];
+                                var bytes = source.GetImageBytes(image);
+                                imageBytes = new ImageBytes(bytes);
+                            }
                         }
                     }
                     var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, 
@@ -171,26 +173,14 @@ namespace DXGLTF
             }
         }
 
-        static ImageFormat GetImageFormat(string mime)
-        {
-            switch(mime)
-            {
-                case "image/png": return ImageFormat.Png;
-                case "image/jpeg": return ImageFormat.Jpeg;
-            }
-
-            Logger.Warn($"unknown mime: {mime}");
-            return ImageFormat.Png;
-        }
-
         void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images)
         {
             var gltf = source.GlTF;
             foreach (var image in images)
             {
                 var bytes = source.GetImageBytes(image);
-                var format = GetImageFormat(image.mimeType);
-                var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit, new ImageBytes(format, bytes));
+                var material = m_shaderLoader.CreateMaterial(
+                    ShaderType.Unlit, new ImageBytes(bytes));
                
                 var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, material);
                 drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{

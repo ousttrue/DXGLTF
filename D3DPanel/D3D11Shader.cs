@@ -1,4 +1,5 @@
-﻿using Reactive.Bindings;
+﻿using NLog;
+using Reactive.Bindings;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
@@ -19,13 +20,29 @@ namespace D3DPanel
 
     public struct ImageBytes
     {
+        static Logger Logger = LogManager.GetCurrentClassLogger();
+
         public ImageFormat Format;
         public ArraySegment<byte> Bytes;
 
-        public ImageBytes(ImageFormat format, ArraySegment<byte> bytes)
+        public ImageBytes(ArraySegment<byte> bytes)
         {
-            Format = format;
             Bytes = bytes;
+
+            // detect
+            var sig = BitConverter.ToUInt32(bytes.Array, bytes.Offset);
+            if(sig== 0xE0FFD8FF)
+            {
+                Format = ImageFormat.Jpeg;
+            }
+            else if(sig == 0x474E5089)
+            {
+                Format = ImageFormat.Png;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 
@@ -201,15 +218,29 @@ namespace D3DPanel
             {
                 if (m_srv == null)
                 {
-                    var (buffer, desc, stride) = ImageLoader.LoadImage(m_textureBytes);
-                    using (buffer)
+                    ImageLoader.LoadImage(m_textureBytes, (buffer, format, w, h)=>
                     {
-                        var rect = new DataRectangle(buffer.DataPointer, stride);
+                        var desc = new Texture2DDescription
+                        {
+                            Width = w,
+                            Height = h,
+                            MipLevels = 1,
+                            ArraySize = 1,
+                            Format = format,
+                            SampleDescription = new SharpDX.DXGI.SampleDescription
+                            {
+                                Count = 1,
+                                Quality = 0
+                            },
+                            Usage = ResourceUsage.Default,
+                            BindFlags = BindFlags.ShaderResource
+                        };
+                        var rect = new DataRectangle(buffer.DataPointer, w * 4);
                         using (var texture = new Texture2D(device, desc, rect))
                         {
                             m_srv = new ShaderResourceView(device, texture);
                         }
-                    }
+                    });
                 }
                 context.PixelShader.SetShaderResource(0, m_srv);
             }

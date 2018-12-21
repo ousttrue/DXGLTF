@@ -20,32 +20,11 @@ namespace D3DPanel
             throw new NotImplementedException();
         }
 
-        static Format GetFormat(Guid guid)
-        {
-            if (guid == PixelFormat.Format32bppBGRA)
-            {
-                return Format.B8G8R8A8_UNorm;
-            }
-
-            if (guid == PixelFormat.Format24bppBGR)
-            {
-                // require conversion to 32bit
-                throw new NotImplementedException();
-            }
-
-            if(guid == PixelFormat.Format8bppIndexed)
-            {
-                // require conversion to 32bit
-                throw new NotImplementedException();
-            }
-
-            throw new NotImplementedException();
-        }
 
         //
         // https://docs.microsoft.com/en-us/windows/desktop/direct3d11/overviews-direct3d-11-resources-textures-how-to
         //
-        public static (DataStream, Texture2DDescription, int) LoadImage(ImageBytes image)
+        public static void LoadImage(ImageBytes image, Action<DataStream, Format, int, int> callback)
         {
             var bytes = image.Bytes;
             using (var s = new MemoryStream(bytes.Array, bytes.Offset, bytes.Count, false))
@@ -56,26 +35,28 @@ namespace D3DPanel
                 decoder.Initialize(stream, DecodeOptions.CacheOnDemand);
                 using (var frame = decoder.GetFrame(0))
                 {
-                    var desc = new Texture2DDescription
-                    {
-                        Width = frame.Size.Width,
-                        Height = frame.Size.Height,
-                        MipLevels = 1,
-                        ArraySize = 1,
-                        Format = GetFormat(frame.PixelFormat),
-                        SampleDescription = new SampleDescription
-                        {
-                            Count = 1,
-                            Quality = 0
-                        },
-                        Usage = ResourceUsage.Default,
-                        BindFlags = BindFlags.ShaderResource
-                    };
+                    var format = default(Format);
+                    var stride = frame.Size.Width * 4;
 
-                    var stride = desc.Width * FormatHelper.SizeOfInBytes(desc.Format);
-                    var buffer = new DataStream(desc.Height * stride, true, true);
-                    frame.CopyPixels(stride, buffer);
-                    return (buffer, desc, stride);
+                    using (var buffer = new DataStream(frame.Size.Height * stride, true, true))
+                    {
+                        if (frame.PixelFormat == PixelFormat.Format32bppBGRA)
+                        {
+                            // OK
+                            format = Format.B8G8R8A8_UNorm;
+                            frame.CopyPixels(stride, buffer);
+                        }
+                        else
+                        {
+                            // Convert
+                            var fc = new FormatConverter(factory);
+                            fc.Initialize(frame, PixelFormat.Format32bppBGR);
+                            fc.CopyPixels(stride, buffer);
+                            format = Format.B8G8R8A8_UNorm;
+                        }
+
+                        callback(buffer, format, frame.Size.Width, frame.Size.Height);
+                    }
                 };
             }
         }
