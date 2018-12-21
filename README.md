@@ -4,9 +4,9 @@ GLTF viewer using SharpDX
 
 ## ToDo
 
-* [ ] Logger
-* [ ] UnlitShader
-* [ ] TextureLoad
+* [x] Logger
+* [x] UnlitShader
+* [x] TextureLoad
 * [ ] CameraDock
 * [ ] ModelMatrix
 
