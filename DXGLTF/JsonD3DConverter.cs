@@ -136,17 +136,22 @@ namespace DXGLTF
                         imageBytes);
                     var accessor = gltf.accessors[primitive.indices];
                     int[] indices = null;
-                    if (accessor.componentType == UniGLTF.glComponentType.UNSIGNED_INT)
+                    switch (accessor.componentType)
                     {
-                        indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
-                    }
-                    else if (accessor.componentType == UniGLTF.glComponentType.UNSIGNED_SHORT)
-                    {
-                        indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
+                        case UniGLTF.glComponentType.BYTE:
+                            indices = gltf.GetArrayFromAccessor<byte>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
+                            break;
+
+                        case UniGLTF.glComponentType.UNSIGNED_SHORT:
+                            indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
+                            break;
+
+                        case UniGLTF.glComponentType.UNSIGNED_INT:
+                            indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
+                            break;
+
+                        default:
+                            throw new NotImplementedException();
                     }
 
                     var drawable = new D3D11Drawable(indices, material);
