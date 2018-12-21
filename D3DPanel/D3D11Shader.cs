@@ -56,6 +56,7 @@ namespace D3DPanel
         VertexShader m_vs;
         PixelShader m_ps;
         ShaderResourceView m_srv;
+        SamplerState m_ss;
         RasterizerState m_rs;
 
         ReactiveProperty<InputElement[]> m_inputElements = new ReactiveProperty<InputElement[]>();
@@ -70,6 +71,12 @@ namespace D3DPanel
             {
                 m_rs.Dispose();
                 m_rs = null;
+            }
+
+            if (m_ss != null)
+            {
+                m_ss.Dispose();
+                m_ss = null;
             }
 
             if (m_srv != null)
@@ -241,8 +248,19 @@ namespace D3DPanel
                             m_srv = new ShaderResourceView(device, texture);
                         }
                     });
+
+                    if (m_ss == null)
+                    {
+                        m_ss = new SamplerState(device, new SamplerStateDescription
+                        {
+                            AddressU = TextureAddressMode.Wrap,
+                            AddressV = TextureAddressMode.Wrap,
+                            AddressW = TextureAddressMode.Wrap,                            
+                        });
+                    }
                 }
                 context.PixelShader.SetShaderResource(0, m_srv);
+                context.PixelShader.SetSampler(0, m_ss);
             }
 
             if (m_rs == null)
