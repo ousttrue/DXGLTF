@@ -16,6 +16,8 @@ WIP
 * [ ] Rotation Gizmo
 * [ ] Scale Gizmo
 * [ ] Embedded nvim
+* [ ] LightDock
+* [ ] Lambert Shader
 * [x] Logger
 * [x] UnlitShader
 * [x] TextureLoad
