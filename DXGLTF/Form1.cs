@@ -4,6 +4,7 @@ using NLog.Windows.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -58,7 +59,7 @@ namespace DXGLTF
             {
                 if (x.IsValid)
                 {
-                    var p = new JsonPointer(x);
+                    var p = x.Pointer();
                     toolStripStatusLabel1.Text = $"{p}";
                 }
                 else
@@ -114,9 +115,11 @@ namespace DXGLTF
 
         void OpenFile(string file)
         {
-            Logger.Info($"OpenFile: {Path.GetFileName(file)}");
+            var sw = Stopwatch.StartNew();
 
             m_scene.Load(file);
+
+            Logger.Info($"OpenFile: parse {Path.GetFileName(file)} in {sw.Elapsed.TotalSeconds} sec");
         }
         #endregion
 

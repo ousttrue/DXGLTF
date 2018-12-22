@@ -55,7 +55,7 @@ namespace DXGLTF
             m_drawables.Add(drawable);
         }
 
-        public void SetSelection(Source source, JsonNode node)
+        public void SetSelection(Source source, ListTreeNode<JsonValue> node)
         {
             if (source.GlTF == null)
             {
@@ -67,7 +67,7 @@ namespace DXGLTF
                 return;
             }
 
-            var p = new JsonPointer(node);
+            var p = node.Pointer();
             if (p.Count == 0)
             {
                 // root

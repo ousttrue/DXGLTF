@@ -82,8 +82,8 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        ReactiveProperty<JsonNode> m_selected = new ReactiveProperty<JsonNode>();
-        public ReadOnlyReactiveProperty<JsonNode> Selected
+        ReactiveProperty<ListTreeNode<JsonValue>> m_selected = new ReactiveProperty<ListTreeNode<JsonValue>>();
+        public ReadOnlyReactiveProperty<ListTreeNode<JsonValue>> Selected
         {
             get { return m_selected.ToReadOnlyReactiveProperty(); }
         }
@@ -92,17 +92,17 @@ namespace DXGLTF
         {
         }
 
-        Dictionary<TreeNode, JsonNode> m_nodeMap = new Dictionary<TreeNode, JsonNode>();
-        void Traverse(TreeNodeCollection parent, string key, JsonNode node)
+        Dictionary<TreeNode, ListTreeNode<JsonValue>> m_nodeMap = new Dictionary<TreeNode, ListTreeNode<JsonValue>>();
+        void Traverse(TreeNodeCollection parent, string key, ListTreeNode<JsonValue> node)
         {
             if (node.IsArray())
             {
-                var current = new TreeNode($"{key}({node.ValueCount})");
+                var current = new TreeNode($"{key}({node.GetArrayCount()})");
                 parent.Add(current);
                 m_nodeMap.Add(current, node);
 
                 int i = 0;
-                foreach (var x in node.ArrayItemsRaw)
+                foreach (var x in node.ArrayItems())
                 {
                     Traverse(current.Nodes, (i++).ToString(), x);
                 }
@@ -113,7 +113,7 @@ namespace DXGLTF
                 parent.Add(current);
                 m_nodeMap.Add(current, node);
 
-                foreach (var kv in node.ObjectItemsRaw)
+                foreach (var kv in node.ObjectItems())
                 {
                     Traverse(current.Nodes, kv.Key.GetString(), kv.Value);
                 }
@@ -155,7 +155,7 @@ namespace DXGLTF
 
         protected override void OnSelected(TreeNode node)
         {
-            var json = default(JsonNode);
+            var json = default(ListTreeNode<JsonValue>);
             if (!m_nodeMap.TryGetValue(node, out json))
             {
                 Logger.Warn($"{node} not found");

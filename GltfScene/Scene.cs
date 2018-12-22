@@ -16,7 +16,7 @@ namespace GltfScene
         public string Path;
         public IBufferIO IO;
         public glTF GlTF;
-        public JsonNode JSON;
+        public ListTreeNode<JsonValue> JSON;
 
         public ArraySegment<byte> GetImageBytes(glTFImage image)
         {
@@ -98,7 +98,7 @@ namespace GltfScene
                 source.JSON = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
                 source.IO = new BytesIO(bytesChunk.Bytes);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // try GLTF
                 source.JSON = JsonParser.Parse(new Utf8String(bytes));

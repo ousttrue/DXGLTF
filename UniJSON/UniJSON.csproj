@@ -66,7 +66,12 @@
     <Compile Include="UniJSON\Scripts\IStore\IStore.cs" />
     <Compile Include="UniJSON\Scripts\IStore\StreamStore.cs" />
     <Compile Include="UniJSON\Scripts\IStore\StringBuilderStore.cs" />
-    <Compile Include="UniJSON\Scripts\IValueNode.cs" />
+    <Compile Include="UniJSON\Scripts\IValue.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\IValueNode.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\IValueNodeArrayExtensions.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\IValueNodeDeserializerExtensions.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\IValueNodeJsonPointerExtensions.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\IValueNodeObjectExtensions.cs" />
     <Compile Include="UniJSON\Scripts\JsonSchemaValidator\IJsonSchemaValidator.cs" />
     <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonArrayValidator.cs" />
     <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonBoolValidator.cs" />
@@ -80,7 +85,6 @@
     <Compile Include="UniJSON\Scripts\Json\Exceptions.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonDiff.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonFormatter.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonNode.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonParser.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonPointer.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonSchema.cs" />
@@ -88,10 +92,10 @@
     <Compile Include="UniJSON\Scripts\Json\JsonString.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonValue.cs" />
     <Compile Include="UniJSON\Scripts\Json\SimpleJSON.cs" />
+    <Compile Include="UniJSON\Scripts\IValueNode\ListTreeNode.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\EndianConverter.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\Exceptions.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\MsgPackFormatter.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackNode.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\MsgPackParser.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\MsgPackType.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\MsgPackTypeExtensions.cs" />

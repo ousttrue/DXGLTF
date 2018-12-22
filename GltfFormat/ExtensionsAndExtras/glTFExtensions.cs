@@ -34,7 +34,7 @@ namespace UniGLTF
         }
     }
 
-    [ItemJsonSchema(ValueType = JsonValueType.Object)]
+    [ItemJsonSchema(ValueType = ValueNodeType.Object)]
     public partial class ExtensionsBase<T> : PartialExtensionBase<T>
     {
     }

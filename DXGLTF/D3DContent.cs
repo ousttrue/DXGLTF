@@ -43,7 +43,7 @@ namespace DXGLTF
             m_renderer.Dispose();
         }
 
-        public void SetSelection(Source source, JsonNode node)
+        public void SetSelection(Source source, ListTreeNode<JsonValue> node)
         {
             m_jsonD3D.SetSelection(source, node);
         }
