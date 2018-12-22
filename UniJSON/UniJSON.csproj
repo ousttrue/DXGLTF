@@ -53,8 +53,7 @@
     <Compile Include="UniJSON\Scripts\Extensions\ByteExtensions.cs" />
     <Compile Include="UniJSON\Scripts\Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="UniJSON\Scripts\Extensions\EnumExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\ObjectExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\StringExtensions.cs" />
+    <Compile Include="UniJSON\Scripts\Extensions\ParserExtensions.cs" />
     <Compile Include="UniJSON\Scripts\Extensions\TypeExtensions.cs" />
     <Compile Include="UniJSON\Scripts\FormatterExtensions.cs" />
     <Compile Include="UniJSON\Scripts\FormatterExtensionsSerializer.cs" />
@@ -91,7 +90,6 @@
     <Compile Include="UniJSON\Scripts\Json\JsonSchemaAttribute.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonString.cs" />
     <Compile Include="UniJSON\Scripts\Json\JsonValue.cs" />
-    <Compile Include="UniJSON\Scripts\Json\SimpleJSON.cs" />
     <Compile Include="UniJSON\Scripts\IValueNode\ListTreeNode.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\EndianConverter.cs" />
     <Compile Include="UniJSON\Scripts\MsgPack\Exceptions.cs" />
