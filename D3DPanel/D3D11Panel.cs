@@ -46,7 +46,7 @@ namespace D3DPanel
 
         private void D3DPanel_Paint(object sender, PaintEventArgs e)
         {
-            m_renderer.Begin(Handle, m_camera);
+            m_renderer.Begin(Handle);
             foreach(var d in m_drawables)
             {
                 d.Draw(m_renderer);

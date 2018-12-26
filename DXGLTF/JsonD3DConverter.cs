@@ -13,23 +13,84 @@ using UniJSON;
 
 namespace DXGLTF
 {
+    class Node : ITreeNode<Node, D3D11Drawable>
+    {
+        List<Node> m_nodes = new List<Node>();
+
+        public bool IsValid => m_nodes != null;
+
+        int m_parentIndex = -1;
+        public int ParentIndex
+        {
+            get { return m_parentIndex; }
+        }
+
+        public bool HasParent => ParentIndex != -1;
+
+        public Node Parent
+        {
+            get
+            {
+                if (!HasParent) return null;
+                return m_nodes[ParentIndex];
+            }
+        }
+
+        public IEnumerable<Node> Children
+        {
+            get
+            {
+                foreach (var node in m_nodes)
+                {
+                    if (node.ParentIndex == ValueIndex)
+                    {
+                        yield return node;
+                    }
+                }
+            }
+        }
+
+        public int ValueIndex
+        {
+            get;
+            set;
+        }
+
+        D3D11Drawable m_value;
+        public D3D11Drawable Value { get { return m_value; } }
+        public void SetValue(D3D11Drawable value)
+        {
+            m_value = value;
+        }
+
+        Matrix m_matrix = Matrix.Identity;
+        public Matrix Matrix
+        {
+            get;
+        }
+
+        public Node(D3D11Drawable value)
+        {
+            m_value = value;
+        }
+    }
+
+
     class JsonD3DConverter : IDisposable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
-        public void Draw(D3D11Renderer renderer)
+        List<Node> m_drawables = new List<Node>();
+        public List<Node> Drawables
         {
-            foreach (var x in m_drawables)
-            {
-                x.Draw(renderer);
-            }
+            get { return m_drawables; }
         }
+
         public void Dispose()
         {
             foreach (var x in m_drawables)
             {
-                x.Dispose();
+                x.Value.Dispose();
             }
             m_drawables.Clear();
         }
@@ -52,7 +113,7 @@ namespace DXGLTF
                     new Vector3(0.5f, -0.5f, 0),
                     new Vector3(-0.5f, -0.5f, 0),
                 }));
-            m_drawables.Add(drawable);
+            m_drawables.Add(new Node(drawable));
         }
 
         public void SetSelection(Source source, ListTreeNode<JsonValue> node)
@@ -173,7 +234,7 @@ namespace DXGLTF
                         drawable.SetAttribute(Semantics.TEXCOORD, new VertexAttribute(uv, 4 * 2));
                     }
 
-                    m_drawables.Add(drawable);
+                    m_drawables.Add(new Node(drawable));
                 }
             }
         }
@@ -201,7 +262,7 @@ namespace DXGLTF
                     new Vector2(0, 1),
                 }));
 
-                m_drawables.Add(drawable);
+                m_drawables.Add(new Node(drawable));
 
                 break;
             }

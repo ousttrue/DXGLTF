@@ -56,8 +56,11 @@ namespace DXGLTF
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
             m_camera.Update();
-            m_renderer.Begin(Handle, m_camera);
-            m_jsonD3D.Draw(m_renderer);
+            m_renderer.Begin(Handle);
+            foreach(var node in m_jsonD3D.Drawables)
+            {
+                m_renderer.Draw(m_camera, node.Value, node.Matrix);
+            }
             m_renderer.End();
         }
 

@@ -87,28 +87,19 @@ namespace D3DPanel
             m_swapChain.Resize(Width, Height);
         }
 
-        public void Begin(System.IntPtr hWnd, Camera camera)
+        public void Begin(System.IntPtr hWnd)
         {
             if (m_device == null)
             {
                 CreateDevice(hWnd);
             }
 
-            // Camera
             var (rtv, dsv) = m_swapChain.GetRenderTarget(m_device);
             var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
             m_context.ClearRenderTargetView(rtv, clear);
             m_context.ClearDepthStencilView(dsv,
                 DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil,
                 1.0f, 0);
-
-            if (m_constantBuffer == null)
-            {
-                m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref camera.ViewProjection);
-                m_constantBuffer.DebugName = "Constant";
-            }
-            m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
-            m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
 
             m_context.OutputMerger.SetTargets(dsv, rtv);
             if (m_ds == null)
@@ -123,6 +114,20 @@ namespace D3DPanel
             }
             m_context.OutputMerger.SetDepthStencilState(m_ds);
             m_context.Rasterizer.SetViewport(Viewport);
+        }
+
+        public void Draw(Camera camera, D3D11Drawable drawable, Matrix modelMatrix)
+        {
+            if (m_constantBuffer == null)
+            {
+                var mvp = modelMatrix * camera.ViewProjection;
+                m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref mvp);
+                m_constantBuffer.DebugName = "Constant";
+            }
+            m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
+            m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
+
+            drawable.Draw(this);
         }
 
         public void End()
