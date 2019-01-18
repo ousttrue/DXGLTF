@@ -11,11 +11,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UniJSON</RootNamespace>
     <AssemblyName>UniJSON</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,87 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UniJSON\Editor\Tests\Toml\TomlParserTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\TreeTest.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNodeExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Toml\TomlValue.cs" />
-    <Compile Include="UniJSON\Scripts\ActionDisposer.cs" />
-    <Compile Include="UniJSON\Scripts\ByteBuffer.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\ArraySegmentExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\ByteExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\DateTimeOffsetExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\EnumExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\ParserExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\Extensions\TypeExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\FormatterExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\FormatterExtensionsSerializer.cs" />
-    <Compile Include="UniJSON\Scripts\GenericCast.cs" />
-    <Compile Include="UniJSON\Scripts\IFileSystemAccessor.cs" />
-    <Compile Include="UniJSON\Scripts\IFormatter.cs" />
-    <Compile Include="UniJSON\Scripts\IStore\BytesStore.cs" />
-    <Compile Include="UniJSON\Scripts\IStore\ByteUnion.cs" />
-    <Compile Include="UniJSON\Scripts\IStore\IStore.cs" />
-    <Compile Include="UniJSON\Scripts\IStore\StreamStore.cs" />
-    <Compile Include="UniJSON\Scripts\IStore\StringBuilderStore.cs" />
-    <Compile Include="UniJSON\Scripts\IValue.cs" />
-    <Compile Include="UniJSON\Scripts\ITreeNode.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNodeArrayExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNodeDeserializerExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNodeJsonPointerExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNodeObjectExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\IJsonSchemaValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonArrayValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonBoolValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonDictionaryValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonEnumValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonNumberValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonObjectValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonSchemaValidator.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonSchemaValidatorFactory.cs" />
-    <Compile Include="UniJSON\Scripts\JsonSchemaValidator\JsonStringValidator.cs" />
-    <Compile Include="UniJSON\Scripts\Exceptions.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonDiff.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonFormatter.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonParser.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonPointer.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonSchema.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonSchemaAttribute.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonString.cs" />
-    <Compile Include="UniJSON\Scripts\Json\JsonValue.cs" />
-    <Compile Include="UniJSON\Scripts\ListTreeNode\ListTreeNode.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\EndianConverter.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\Exceptions.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackFormatter.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackParser.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackType.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackTypeExtensions.cs" />
-    <Compile Include="UniJSON\Scripts\MsgPack\MsgPackValue.cs" />
-    <Compile Include="UniJSON\Scripts\Rpc\IRpc.cs" />
-    <Compile Include="UniJSON\Scripts\Rpc\RpcDispatcher.cs" />
-    <Compile Include="UniJSON\Scripts\Toml\TomlParser.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\IUtf8String.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\Utf8Iterator.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\Utf8String.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\Utf8StringBuilder.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\Utf8StringExtensions.cs" />
-    <Compile Include="UniJSON\Editor\Tests\IWriteStreamTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\JsonDiffTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\JsonFormatterTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\JsonParserTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\JsonSerializerTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\SchemaTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Json\ValidatorTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\ArrayTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\BooleanTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\FloatTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\IntTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\MapTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\RawTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\StringTest.cs" />
-    <Compile Include="UniJSON\Editor\Tests\MsgPack\TimeTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\RPCTests.cs" />
-    <Compile Include="UniJSON\Editor\Tests\Utf8StringTest.cs" />
-    <Compile Include="UniJSON\Scripts\Utf8String\Utf8StringSplitterExtensions.cs" />
+    <Compile Include="UniVRM\Assets/VRM/UniJSON/**/*.cs" />
     <Compile Include="UnityEngine.cs" />
   </ItemGroup>
   <ItemGroup>
