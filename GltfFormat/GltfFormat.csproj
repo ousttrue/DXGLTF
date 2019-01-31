@@ -68,8 +68,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UniJSON\UniJSON.csproj">
-      <Project>{bc5de392-dc0f-49e9-81b2-04b1fafc1b67}</Project>
+    <ProjectReference Include="..\UniJSON\UniVRM\UniJSON35\UniJSON\UniJSON.csproj">
+      <Project>{7df65fb7-fc53-4ef8-ac2f-1c825d67c767}</Project>
       <Name>UniJSON</Name>
     </ProjectReference>
   </ItemGroup>
