@@ -67,45 +67,42 @@ namespace GltfScene
             }
         }
 
+        static void LoadZip(ref IStorage folder, ref Byte[] fileBytes)
+        {
+            var zip = default(ZipArchiveStorage);
+            try
+            {
+                zip = ZipArchiveStorage.Parse(fileBytes);
+            }
+            catch (Exception)
+            {
+
+            }
+            foreach (var x in zip.Entries)
+            {
+                var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
+                switch (ext)
+                {
+                    case ".gltf":
+                    case ".glb":
+                    case ".vrm":
+                        folder = zip;
+                        fileBytes = zip.Extract(x);
+                        return;
+                }
+            }
+        }
+
         public static Source _Load(string path)
         {
             IStorage folder = new FileSystemStorage(System.IO.Path.GetDirectoryName(path));
             var fileBytes = File.ReadAllBytes(path);
+            LoadZip(ref folder, ref fileBytes);
 
             var source = new Source
             {
                 Path = path
             };
-
-
-            //
-            // try zip
-            //
-            try
-            {
-                var zip = ZipArchiveStorage.Parse(fileBytes);
-                foreach (var x in zip.Entries)
-                {
-                    var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
-                    switch (ext)
-                    {
-                        case ".gltf":
-                        case ".glb":
-                        case ".vrm":
-                            folder = zip;
-                            fileBytes = zip.Extract(x);
-                            break;
-                    }
-                }
-
-                Logger.Error("no gltf file included");
-                return default(Source);
-            }
-            catch (Exception)
-            {
-                // not zip. do nothing
-            }
-
             try
             {
                 // try GLB
