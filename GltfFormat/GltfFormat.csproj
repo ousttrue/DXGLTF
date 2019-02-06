@@ -66,6 +66,7 @@
     <Compile Include="IStorage.cs" />
     <Compile Include="JsonSerializableBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ZipArchiveStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UniJSON\UniVRM\UniJSON35\UniJSON\UniJSON.csproj">

@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UniGLTF;
+using UniGLTF.Zip;
 using UniJSON;
 
 
@@ -14,7 +15,7 @@ namespace GltfScene
     public struct Source
     {
         public string Path;
-        public IBufferIO IO;
+        public IStorage IO;
         public glTF GlTF;
         public ListTreeNode<JsonValue> JSON;
 
@@ -26,7 +27,7 @@ namespace GltfScene
             }
             else
             {
-                return IO.GetBytes(image.uri);
+                return IO.Get(image.uri);
             }
         }
     }
@@ -66,20 +67,50 @@ namespace GltfScene
             }
         }
 
-        static Source _Load(string path)
+        public static Source _Load(string path)
         {
-            var bytes = File.ReadAllBytes(path);
+            IStorage folder = new FileSystemStorage(System.IO.Path.GetDirectoryName(path));
+            var fileBytes = File.ReadAllBytes(path);
 
             var source = new Source
             {
                 Path = path
             };
 
+
+            //
+            // try zip
+            //
+            try
+            {
+                var zip = ZipArchiveStorage.Parse(fileBytes);
+                foreach (var x in zip.Entries)
+                {
+                    var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
+                    switch (ext)
+                    {
+                        case ".gltf":
+                        case ".glb":
+                        case ".vrm":
+                            folder = zip;
+                            fileBytes = zip.Extract(x);
+                            break;
+                    }
+                }
+
+                Logger.Error("no gltf file included");
+                return default(Source);
+            }
+            catch (Exception)
+            {
+                // not zip. do nothing
+            }
+
             try
             {
                 // try GLB
 
-                var it = glbImporter.ParseGlbChanks(bytes).GetEnumerator();
+                var it = glbImporter.ParseGlbChanks(fileBytes).GetEnumerator();
 
                 if (!it.MoveNext()) throw new FormatException();
                 var jsonChunk = it.Current;
@@ -96,13 +127,12 @@ namespace GltfScene
                 }
 
                 source.JSON = JsonParser.Parse(new Utf8String(jsonChunk.Bytes));
-                source.IO = new BytesIO(bytesChunk.Bytes);
+                source.IO = new SimpleStorage(bytesChunk.Bytes);
             }
             catch (Exception)
             {
                 // try GLTF
-                source.JSON = JsonParser.Parse(new Utf8String(bytes));
-                source.IO = FolderIO.FromFile(path);
+                source.JSON = JsonParser.Parse(new Utf8String(fileBytes));
             }
 
             glTF gltf = null;

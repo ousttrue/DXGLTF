@@ -4,6 +4,7 @@ using System.IO;
 
 namespace UniGLTF
 {
+#if false
     public interface IBufferIO
     {
         ArraySegment<Byte> GetBytes(string uri);
@@ -64,4 +65,5 @@ namespace UniGLTF
             return m_bytes;
         }
     }
+#endif
 }

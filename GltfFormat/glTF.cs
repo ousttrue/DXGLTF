@@ -52,24 +52,24 @@ namespace UniGLTF
         [JsonSchema(MinItems = 1)]
         public List<glTFAccessor> accessors = new List<glTFAccessor>();
 
-        T[] GetAttrib<T>(IBufferIO io, glTFAccessor accessor, glTFBufferView view) where T : struct
+        T[] GetAttrib<T>(IStorage io, glTFAccessor accessor, glTFBufferView view) where T : struct
         {
             return GetAttrib<T>(io, accessor.count, accessor.byteOffset, view);
         }
 
-        ArraySegment<Byte> GetBytes(IBufferIO io, glTFAccessor accessor, glTFBufferView view)
+        ArraySegment<Byte> GetBytes(IStorage io, glTFAccessor accessor, glTFBufferView view)
         {
             return GetBytes(io, accessor.ElementSize * accessor.count, accessor.byteOffset, view);
         }
 
-        ArraySegment<Byte> GetBytes(IBufferIO io, int size, int byteOffset, glTFBufferView view)
+        ArraySegment<Byte> GetBytes(IStorage io, int size, int byteOffset, glTFBufferView view)
         {
-            var segment = io.GetBytes(buffers[view.buffer].uri);
+            var segment = io.Get(buffers[view.buffer].uri);
             var bytes = new ArraySegment<Byte>(segment.Array, segment.Offset + view.byteOffset + byteOffset, size);
             return bytes;
         }
 
-        T[] GetAttrib<T>(IBufferIO io, int count, int byteOffset, glTFBufferView view) where T : struct
+        T[] GetAttrib<T>(IStorage io, int count, int byteOffset, glTFBufferView view) where T : struct
         {
             var attrib = new T[count];
             //
@@ -78,14 +78,14 @@ namespace UniGLTF
             return attrib;
         }
 
-        public ArraySegment<Byte> GetViewBytes(IBufferIO io, int bufferView)
+        public ArraySegment<Byte> GetViewBytes(IStorage io, int bufferView)
         {
             var view = bufferViews[bufferView];
-            var segment = io.GetBytes(buffers[view.buffer].uri);
+            var segment = io.Get(buffers[view.buffer].uri);
             return new ArraySegment<byte>(segment.Array, segment.Offset + view.byteOffset, view.byteLength);
         }
 
-        IEnumerable<int> _GetIndices(IBufferIO io, glTFAccessor accessor, out int count)
+        IEnumerable<int> _GetIndices(IStorage io, glTFAccessor accessor, out int count)
         {
             count = accessor.count;
             var view = bufferViews[accessor.bufferView];
@@ -109,7 +109,7 @@ namespace UniGLTF
             throw new NotImplementedException("GetIndices: unknown componenttype: " + accessor.componentType);
         }
 
-        IEnumerable<int> _GetIndices(IBufferIO io, glTFBufferView view, int count, int byteOffset, glComponentType componentType)
+        IEnumerable<int> _GetIndices(IStorage io, glTFBufferView view, int count, int byteOffset, glComponentType componentType)
         {
             switch (componentType)
             {
@@ -131,7 +131,7 @@ namespace UniGLTF
             throw new NotImplementedException("GetIndices: unknown componenttype: " + componentType);
         }
 
-        public int[] GetIndices(IBufferIO io, int accessorIndex)
+        public int[] GetIndices(IStorage io, int accessorIndex)
         {
             int count;
             var result = _GetIndices(io, accessors[accessorIndex], out count);
@@ -151,7 +151,7 @@ namespace UniGLTF
             return indices;
         }
 
-        public ArraySegment<Byte> GetBytesFromAccessor(IBufferIO io, int accessorIndex)
+        public ArraySegment<Byte> GetBytesFromAccessor(IStorage io, int accessorIndex)
         {
             var vertexAccessor = accessors[accessorIndex];
 
@@ -160,7 +160,7 @@ namespace UniGLTF
             return GetBytes(io, vertexAccessor, bufferViews[vertexAccessor.bufferView]);
         }
 
-        public T[] GetArrayFromAccessor<T>(IBufferIO io, int accessorIndex) where T : struct
+        public T[] GetArrayFromAccessor<T>(IStorage io, int accessorIndex) where T : struct
         {
             var vertexAccessor = accessors[accessorIndex];
 
@@ -188,7 +188,7 @@ namespace UniGLTF
             return result;
         }
 
-        public float[] GetArrayFromAccessorAsFloat(IBufferIO io, int accessorIndex)
+        public float[] GetArrayFromAccessorAsFloat(IStorage io, int accessorIndex)
         {
             var vertexAccessor = accessors[accessorIndex];
 
@@ -252,7 +252,7 @@ namespace UniGLTF
             return GetSampler(samplerIndex);
         }
 
-        public ArraySegment<Byte> GetImageBytes(IBufferIO io, int imageIndex, out string textureName)
+        public ArraySegment<Byte> GetImageBytes(IStorage io, int imageIndex, out string textureName)
         {
             var image = images[imageIndex];
             if (string.IsNullOrEmpty(image.uri))
@@ -274,7 +274,7 @@ namespace UniGLTF
                 {
                     textureName = !string.IsNullOrEmpty(image.name) ? image.name : Path.GetFileNameWithoutExtension(image.uri);
                 }
-                return io.GetBytes(image.uri);
+                return io.Get(image.uri);
             }
         }
 
