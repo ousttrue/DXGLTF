@@ -49,14 +49,30 @@ namespace UniGLTF
             m_root = Path.GetFullPath(root);
         }
 
+        class Cache
+        {
+            public string Path;
+            public Byte[] Bytes;
+        }
+        Cache _cache;
+
         public ArraySegment<byte> Get(string url)
         {
-            var bytes =
-                (url.StartsWith("data:"))
-                ? UriByteBuffer.ReadEmbeded(url)
-                : File.ReadAllBytes(Path.Combine(m_root, url))
-                ;
-            return new ArraySegment<byte>(bytes);
+            if (url.StartsWith("data:"))
+            {
+                return new ArraySegment<byte>(UriByteBuffer.ReadEmbeded(url));
+            }
+
+            var path = Path.Combine(m_root, url);
+            if(_cache==null || _cache.Path != path)
+            {
+                _cache = new Cache
+                {
+                    Path = path,
+                    Bytes = File.ReadAllBytes(path)
+                };
+            }
+            return new ArraySegment<byte>(_cache.Bytes);
         }
 
         public string GetPath(string url)
