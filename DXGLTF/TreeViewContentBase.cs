@@ -145,12 +145,18 @@ namespace DXGLTF
                 return;
             }
 
+#if true
+            foreach (var kv in source.JSON.ObjectItems())
+            {
+                Traverse(TreeView.Nodes, kv.Key.GetString(), kv.Value);
+            }
+#else
             Traverse(TreeView.Nodes, "GLTF", source.JSON);
-
             foreach (TreeNode x in TreeView.Nodes)
             {
                 x.Expand();
             }
+#endif
         }
 
         protected override void OnSelected(TreeNode node)

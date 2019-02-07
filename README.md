@@ -2,19 +2,58 @@
 
 GLTF viewer using SharpDX
 
-WIP
+## Support format
+
+* GLTF
+* GLB
+* VRM
+* GLTF in zip(experimental not all zip supported)
+* GLB in zip(experimental not all zip supported)
+* VRM in zip(experimental not all zip supported)
+
+## View
+
+### buffer
+`byte[]`
+
+### bufferView
+`ArraySegments<byte>`
+
+### accessor
+`T[]`
+
+### image
+Quad
+
+### sampler
+
+### texture
+Repeated
+
+### material
+
+### mesh
+3D View without transform
+* [ ] BlendShape
+
+### skin
+* [ ] Joint gizmo
+
+### node
+* [ ] ModelMatrix
+* [ ] Translation Gizmo
+* [ ] Rotation Gizmo
+* [ ] Scale Gizmo
+
+### scene
+[ ] ToDo
 
 ## ToDo
 
 * [ ] CameraDock
-* [ ] ModelMatrix
-* [ ] BlendShape
 * [ ] Primitive as submesh
 * [ ] Axis, Grid
 * [ ] BoundingBox
-* [ ] Translation Gizmo
-* [ ] Rotation Gizmo
-* [ ] Scale Gizmo
 * [ ] Embedded nvim
 * [ ] LightDock
 * [ ] Lambert Shader

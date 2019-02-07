@@ -48,7 +48,7 @@ namespace DXGLTF
                 }
             });
 
-            m_d3d = new D3DContent(m_scene);
+            m_d3d = new D3DContent();
             AddContent("selected", m_d3d, DockState.Document);
 
             AddContent("json", new JsonContent(m_scene), DockState.DockLeft);
@@ -97,7 +97,7 @@ namespace DXGLTF
             new FileDialogFilter("All files", new string[]{"*"}),
         };
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {

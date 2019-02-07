@@ -128,44 +128,49 @@ namespace DXGLTF
                 return;
             }
 
+            Dispose();
+
             var p = node.Pointer();
             if (p.Count == 0)
             {
                 // root
-                return;
+                // show all
+                ShowMesh(source, source.GlTF.meshes);
             }
-
-            Dispose();
-            switch (p[0].ToString())
+            else
             {
-                case "meshes":
-                    if (p.Count == 1)
-                    {
-                        ShowMesh(source, source.GlTF.meshes);
-                    }
-                    else
-                    {
-                        var index = p[1].ToInt32();
-                        ShowMesh(source, new[] { source.GlTF.meshes[index] });
-                    }
-                    break;
+                switch (p[0].ToString())
+                {
+                    case "meshes":
+                        if (p.Count == 1)
+                        {
+                            ShowMesh(source, source.GlTF.meshes);
+                        }
+                        else
+                        {
+                            var index = p[1].ToInt32();
+                            ShowMesh(source, new[] { source.GlTF.meshes[index] });
+                        }
+                        break;
 
-                case "images":
-                    if (p.Count == 1)
-                    {
-                        ShowImage(source, source.GlTF.images);
-                    }
-                    else
-                    {
-                        var index = p[1].ToInt32();
-                        ShowImage(source, new[] { source.GlTF.images[index] });
-                    }
-                    break;
+                    case "images":
+                        if (p.Count == 1)
+                        {
+                            ShowImage(source, source.GlTF.images);
+                        }
+                        else
+                        {
+                            var index = p[1].ToInt32();
+                            ShowImage(source, new[] { source.GlTF.images[index] });
+                        }
+                        break;
 
-                default:
-                    Logger.Debug($"selected: {p}");
-                    break;
+                    default:
+                        Logger.Debug($"selected: {p}");
+                        break;
+                }
             }
+
             m_updated.OnNext(Unit.Default);
         }
 

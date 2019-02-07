@@ -24,7 +24,7 @@ namespace DXGLTF
 
         JsonD3DConverter m_jsonD3D = new JsonD3DConverter();
 
-        public D3DContent(Scene scene)
+        public D3DContent()
         {
             InitializeComponent();
 
