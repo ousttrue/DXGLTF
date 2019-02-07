@@ -56,10 +56,14 @@ namespace DXGLTF.nodes
             m_value = value;
         }
 
-        Matrix m_matrix = Matrix.Identity;
+        Matrix _matrix = Matrix.Identity;
         public Matrix Matrix
         {
-            get;
+            get { return _matrix; }
+            set
+            {
+                _matrix = value;
+            }
         }
 
         public Node(D3D11Drawable value)

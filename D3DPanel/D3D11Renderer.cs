@@ -118,13 +118,13 @@ namespace D3DPanel
 
         public void Draw(Camera camera, D3D11Drawable drawable, Matrix modelMatrix)
         {
+            var mvp = modelMatrix * camera.ViewProjection;
             if (m_constantBuffer == null)
             {
-                var mvp = modelMatrix * camera.ViewProjection;
                 m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref mvp);
                 m_constantBuffer.DebugName = "Constant";
             }
-            m_context.UpdateSubresource(ref camera.ViewProjection, m_constantBuffer);
+            m_context.UpdateSubresource(ref mvp, m_constantBuffer);
             m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
 
             drawable.Draw(this);

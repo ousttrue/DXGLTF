@@ -9,7 +9,7 @@ namespace DXGLTF.nodes
 {
     class ImageVisualizer : IVisualizer
     {
-        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> nodes)
+        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> drawables)
         {
             if (p[0].ToString() != "images")
             {
@@ -17,12 +17,12 @@ namespace DXGLTF.nodes
             }
             if (p.Count == 1)
             {
-                ShowImage(source, source.GlTF.images, shaderLoader, nodes);
+                ShowImage(source, source.GlTF.images, shaderLoader, drawables);
             }
             else
             {
                 var index = p[1].ToInt32();
-                ShowImage(source, new[] { source.GlTF.images[index] }, shaderLoader, nodes);
+                ShowImage(source, new[] { source.GlTF.images[index] }, shaderLoader, drawables);
             }
             return false;
         }
