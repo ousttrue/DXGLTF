@@ -40,7 +40,7 @@ Repeated
 * [ ] Joint gizmo
 
 ### node
-* [ ] ModelMatrix
+* [x] ModelMatrix
 * [ ] Translation Gizmo
 * [ ] Rotation Gizmo
 * [ ] Scale Gizmo
