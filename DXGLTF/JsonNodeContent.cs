@@ -23,7 +23,7 @@ namespace DXGLTF
         }
 
         Dictionary<TreeNode, ListTreeNode<JsonValue>> m_nodeMap = new Dictionary<TreeNode, ListTreeNode<JsonValue>>();
-        void Traverse(TreeNodeCollection parent, string key, ListTreeNode<JsonValue> node)
+        TreeNode Traverse(TreeNodeCollection parent, string key, ListTreeNode<JsonValue> node)
         {
             if (node.IsArray())
             {
@@ -36,6 +36,8 @@ namespace DXGLTF
                 {
                     Traverse(current.Nodes, (i++).ToString(), x);
                 }
+
+                return current;
             }
             else if (node.IsMap())
             {
@@ -47,12 +49,16 @@ namespace DXGLTF
                 {
                     Traverse(current.Nodes, kv.Key.GetString(), kv.Value);
                 }
+
+                return current;
             }
             else
             {
                 var current = new TreeNode($"{key}: {node.ToString()}");
                 parent.Add(current);
                 m_nodeMap.Add(current, node);
+
+                return current;
             }
         }
 
@@ -75,12 +81,17 @@ namespace DXGLTF
                 return;
             }
 
+            var select = default(TreeNode);
             foreach (var kv in source.JSON.ObjectItems())
             {
-                Traverse(TreeView.Nodes, kv.Key.GetString(), kv.Value);
+                var node = Traverse(TreeView.Nodes, kv.Key.GetString(), kv.Value);
+                if (kv.Key.GetString() == "nodes")
+                {
+                    select = node;
+                }
             }
 
-            TreeView.SelectedNode = null;
+            TreeView.SelectedNode = select;
         }
 
         protected override void OnSelected(TreeNode node)

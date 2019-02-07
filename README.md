@@ -31,6 +31,7 @@ Quad
 Repeated
 
 ### material
+* [ ] pbrMetallicRoughness.baseColorFactor
 
 ### mesh
 3D View without transform
