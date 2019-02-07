@@ -1,63 +1,35 @@
 ﻿using D3DPanel;
 using SharpDX;
+using System;
 using System.Collections.Generic;
 using UniJSON;
 
 
 namespace DXGLTF.nodes
 {
-    class Node : ITreeNode<Node, D3D11Drawable>
+    class Node : IDisposable
     {
-        List<Node> m_nodes = new List<Node>();
+        public bool IsValid => true;
 
-        public bool IsValid => m_nodes != null;
+        public List<Node> Children = new List<Node>();
 
-        int m_parentIndex = -1;
-        public int ParentIndex
+        List<D3D11Drawable> m_value = new List<D3D11Drawable>();
+        public List<D3D11Drawable> Value
         {
-            get { return m_parentIndex; }
+            get { return m_value; }
         }
 
-        public bool HasParent => ParentIndex != -1;
-
-        public Node Parent
+        public void Dispose()
         {
-            get
+            foreach(var x in m_value)
             {
-                if (!HasParent) return null;
-                return m_nodes[ParentIndex];
+                x.Dispose();
             }
-        }
-
-        public IEnumerable<Node> Children
-        {
-            get
-            {
-                foreach (var node in m_nodes)
-                {
-                    if (node.ParentIndex == ValueIndex)
-                    {
-                        yield return node;
-                    }
-                }
-            }
-        }
-
-        public int ValueIndex
-        {
-            get;
-            set;
-        }
-
-        D3D11Drawable m_value;
-        public D3D11Drawable Value { get { return m_value; } }
-        public void SetValue(D3D11Drawable value)
-        {
-            m_value = value;
+            m_value.Clear();
         }
 
         Matrix _matrix = Matrix.Identity;
-        public Matrix Matrix
+        public Matrix LocalMatrix
         {
             get { return _matrix; }
             set
@@ -66,9 +38,12 @@ namespace DXGLTF.nodes
             }
         }
 
-        public Node(D3D11Drawable value)
+        public Node()
         {
-            m_value = value;
+        }
+        public Node(D3D11Drawable drawable)
+        {
+            m_value.Add(drawable);
         }
     }
 }

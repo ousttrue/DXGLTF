@@ -61,7 +61,6 @@ namespace D3DPanel
             //View = Matrix.RotationYawPitchRoll(Yaw, Pitch, 0) * Matrix.Translation(ShiftX, -ShiftY, -Distance);
             Projection = Matrix.PerspectiveFovRH(FovY, AspectRatio, ZNear, ZFar);
             ViewProjection = View * Projection;
-            ViewProjection.Transpose();
         }
     }
 }

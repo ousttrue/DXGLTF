@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Linq;
 using UniJSON;
 
 
@@ -17,7 +18,7 @@ namespace DXGLTF
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
         List<Node> m_drawables = new List<Node>();
-        public List<Node> Drawables
+        public IEnumerable<Node> Drawables
         {
             get { return m_drawables; }
         }
@@ -31,7 +32,7 @@ namespace DXGLTF
         {
             foreach (var x in m_drawables)
             {
-                x.Value.Dispose();
+                x.Dispose();
             }
             m_drawables.Clear();
         }

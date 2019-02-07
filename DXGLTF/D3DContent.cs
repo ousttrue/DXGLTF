@@ -59,9 +59,24 @@ namespace DXGLTF
             m_renderer.Begin(Handle);
             foreach(var node in m_jsonD3D.Drawables)
             {
-                m_renderer.Draw(m_camera, node.Value, node.Matrix);
+                RendererDraw(node, Matrix.Identity);
             }
             m_renderer.End();
+        }
+
+        void RendererDraw(nodes.Node node, Matrix accumulated)
+        {
+            var m = node.LocalMatrix * accumulated;
+            //Logger.Debug(m);
+            foreach (var x in node.Value)
+            {
+                m_renderer.Draw(m_camera, x, m);
+            }
+
+            foreach (var child in node.Children)
+            {
+                RendererDraw(child, m);
+            }
         }
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)

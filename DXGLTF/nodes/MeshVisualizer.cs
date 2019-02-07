@@ -45,59 +45,83 @@ namespace DXGLTF.nodes
             }
         }
 
+        static Node CreateDrawable(UniGLTF.glTFNode node)
+        {
+            var drawable = new Node();
+
+            if (node.matrix != null)
+            {
+                var m = new Matrix(node.matrix);
+                drawable.LocalMatrix = m;
+            }
+            else
+            {
+                var t = Vector3.Zero;
+                var r = Quaternion.Identity;
+                var s = Vector3.One;
+
+                if (node.translation != null)
+                {
+                    t.X = node.translation[0];
+                    t.Y = node.translation[1];
+                    t.Z = node.translation[2];
+                }
+
+                if (node.rotation != null)
+                {
+                    r.X = node.rotation[0];
+                    r.Y = node.rotation[1];
+                    r.Z = node.rotation[2];
+                    r.W = node.rotation[3];
+                }
+
+                if (node.scale != null)
+                {
+                    s.X = node.scale[0];
+                    s.Y = node.scale[1];
+                    s.Z = node.scale[2];
+                }
+
+                var m = Matrix.Transformation(Vector3.Zero, Quaternion.Identity, s, Vector3.Zero, r, t);
+                drawable.LocalMatrix = m;
+            }
+
+            return drawable;
+        }
+
         static void ShowNode(GltfScene.Source source, IEnumerable<UniGLTF.glTFNode> nodes,
             ShaderLoader shaderLoader, List<Node> drawables)
         {
             var gltf = source.GlTF;
-            foreach (var node in nodes)
+
+            var newNodes = gltf.nodes.Select(CreateDrawable).ToArray();
+
+            for(int i=0; i<gltf.nodes.Count; ++i)
             {
+                var node = gltf.nodes[i];
+                var drawable = newNodes[i];
+
+                if (node.children != null)
+                {
+                    // build hierarchy
+                    foreach (var j in node.children)
+                    {
+                        drawable.Children.Add(newNodes[j]);
+                    }
+                }
+
                 if (node.mesh >= 0)
                 {
-                    var mesh = gltf.meshes[node.mesh];
-                    foreach (var primitive in mesh.primitives)
+                    foreach (var primitive in gltf.meshes[node.mesh].primitives)
                     {
-                        var drawable = PrimitiveToDrawable(ref source, shaderLoader, gltf, primitive);
-
-                        if (node.matrix != null)
-                        {
-                            //drawable.Matrix = new Matrix(node.matrix);
-                        }
-                        else
-                        {
-                            var t = Vector3.Zero;
-                            var r = Quaternion.Identity;
-                            var s = Vector3.One;
-
-                            if (node.translation != null)
-                            {
-                                t.X = node.translation[0];
-                                t.Y = node.translation[1];
-                                t.Z = node.translation[2];
-                            }
-
-                            if (node.rotation != null)
-                            {
-                                r.X = node.rotation[0];
-                                r.Y = node.rotation[1];
-                                r.Z = node.rotation[2];
-                                r.W = node.rotation[3];
-                            }
-
-                            if (node.scale != null)
-                            {
-                                s.X = node.scale[0];
-                                s.Y = node.scale[1];
-                                s.Z = node.scale[2];
-                            }
-
-                            drawable.Matrix = Matrix.Transformation(Vector3.Zero, Quaternion.Identity, s, Vector3.Zero, r, t);
-                            drawable.Matrix.Transpose();
-                        }
-
-                        drawables.Add(drawable);
+                        var d3d = PrimitiveToD3D(ref source, shaderLoader, gltf, primitive);
+                        drawable.Value.Add(d3d);
                     }
                 }
             }
+
+            // add only no parent
+            drawables.AddRange(newNodes.Where(x => !newNodes.Any(y => y.Children.Contains(x))));
         }
 
         static void ShowMesh(GltfScene.Source source, IEnumerable<UniGLTF.glTFMesh> meshes,
@@ -108,13 +132,13 @@ namespace DXGLTF.nodes
             {
                 foreach (var primitive in mesh.primitives)
                 {
-                    var drawable = PrimitiveToDrawable(ref source, shaderLoader, gltf, primitive);
-                    drawables.Add(drawable);
+                    var drawable = PrimitiveToD3D(ref source, shaderLoader, gltf, primitive);
+                    drawables.Add(new Node(drawable));
                 }
             }
         }
 
-        static Node PrimitiveToDrawable(ref GltfScene.Source source, ShaderLoader m_shaderLoader, UniGLTF.glTF gltf, UniGLTF.glTFPrimitives primitive)
+        static D3D11Drawable PrimitiveToD3D(ref GltfScene.Source source, ShaderLoader m_shaderLoader, UniGLTF.glTF gltf, UniGLTF.glTFPrimitives primitive)
         {
             var m = gltf.materials[primitive.material];
 
@@ -174,7 +198,7 @@ namespace DXGLTF.nodes
                 drawable.SetAttribute(Semantics.TEXCOORD, new VertexAttribute(uv, 4 * 2));
             }
 
-            return new Node(drawable);
+            return drawable;
         }
     }
 }
