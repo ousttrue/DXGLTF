@@ -143,6 +143,7 @@ namespace DXGLTF.nodes
             var m = gltf.materials[primitive.material];
 
             var imageBytes = default(ImageBytes);
+            var color = Color4.White;
             if (m.pbrMetallicRoughness != null)
             {
                 var colorTexture = m.pbrMetallicRoughness.baseColorTexture;
@@ -156,9 +157,16 @@ namespace DXGLTF.nodes
                         imageBytes = new ImageBytes(bytes);
                     }
                 }
+
+                if (m.pbrMetallicRoughness.baseColorFactor != null)
+                {
+                    color.Red = m.pbrMetallicRoughness.baseColorFactor[0];
+                    color.Green = m.pbrMetallicRoughness.baseColorFactor[1];
+                    color.Blue = m.pbrMetallicRoughness.baseColorFactor[2];
+                    color.Alpha = m.pbrMetallicRoughness.baseColorFactor[3];
+                }
             }
-            var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit,
-                imageBytes);
+            var shader = m_shaderLoader.CreateShader(ShaderType.Unlit);
             var accessor = gltf.accessors[primitive.indices];
             int[] indices = null;
             switch (accessor.componentType)
@@ -179,7 +187,7 @@ namespace DXGLTF.nodes
                     throw new NotImplementedException();
             }
 
-            var drawable = new D3D11Drawable(indices, material);
+            var drawable = new D3D11Drawable(indices, shader, imageBytes, color);
 
             var attribs = primitive.attributes;
 

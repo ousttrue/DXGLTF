@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System;
 using System.Linq;
-
+using SharpDX;
 
 namespace D3DPanel
 {
@@ -18,6 +18,7 @@ namespace D3DPanel
 
     public class D3D11Drawable : IDisposable
     {
+        #region Mesh
         public PrimitiveTopology Topology => PrimitiveTopology.TriangleList;
 
         int[] m_indices;
@@ -39,9 +40,21 @@ namespace D3DPanel
 
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region Material
+        // texture0
+        ImageBytes m_textureBytes;
 
-        public D3D11Drawable(int[] indices, D3D11Shader shader)
+        // material color
+        public Color4 Color
+        {
+            get;
+            private set;
+        }
+        #endregion
+
+        public D3D11Drawable(int[] indices, D3D11Shader shader, ImageBytes texture, Color4 color)
         {
             m_shader = shader;
             m_indices = indices;
@@ -50,6 +63,9 @@ namespace D3DPanel
             {
                 Dispose();
             });
+
+            m_textureBytes = texture;
+            Color = color;
         }
 
         public void SetAttribute(Semantics semantics, VertexAttribute attribute)
@@ -86,7 +102,7 @@ namespace D3DPanel
         {
             var device = renderer.Device;
             var context = renderer.Context;
-            m_shader.SetupContext(device, context);
+            m_shader.SetupContext(device, context, m_textureBytes);
 
             var inputs = m_shader.InputElements.Value;
             if (inputs == null)

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-
+using System.Runtime.InteropServices;
 
 namespace D3DPanel
 {
@@ -50,7 +50,6 @@ namespace D3DPanel
     {
         CompilationResult m_vsCompiled;
         CompilationResult m_psCompiled;
-        ImageBytes m_textureBytes;
 
         InputLayout m_layout;
         VertexShader m_vs;
@@ -161,11 +160,6 @@ namespace D3DPanel
             get { return m_updated.AsObservable(); }
         }
 
-        public D3D11Shader(ImageBytes image)
-        {
-            m_textureBytes = image;
-        }
-
         public void SetShader(string vs, string ps)
         {
             Dispose();
@@ -189,7 +183,8 @@ namespace D3DPanel
             m_updated.OnNext(Unit.Default);
         }
 
-        public void SetupContext(SharpDX.Direct3D11.Device device, DeviceContext context)
+        public void SetupContext(SharpDX.Direct3D11.Device device, DeviceContext context,
+            ImageBytes textureBytes)
         {
             if (m_vsCompiled == null)
             {
@@ -221,11 +216,11 @@ namespace D3DPanel
             }
             context.InputAssembler.InputLayout = m_layout;
 
-            if (m_textureBytes.Bytes.Count > 0)
+            if (m_srv == null)
             {
-                if (m_srv == null)
+                if (textureBytes.Bytes.Count > 0)
                 {
-                    ImageLoader.LoadImage(m_textureBytes, (buffer, format, w, h)=>
+                    ImageLoader.LoadImage(textureBytes, (buffer, format, w, h) =>
                     {
                         var desc = new Texture2DDescription
                         {
@@ -248,20 +243,51 @@ namespace D3DPanel
                             m_srv = new ShaderResourceView(device, texture);
                         }
                     });
-
-                    if (m_ss == null)
+                }
+                else
+                {
+                    // default white2x2
+                    var desc = new Texture2DDescription
                     {
-                        m_ss = new SamplerState(device, new SamplerStateDescription
+                        Width = 2,
+                        Height = 2,
+                        MipLevels = 1,
+                        ArraySize = 1,
+                        Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
+                        SampleDescription = new SharpDX.DXGI.SampleDescription
                         {
-                            AddressU = TextureAddressMode.Wrap,
-                            AddressV = TextureAddressMode.Wrap,
-                            AddressW = TextureAddressMode.Wrap,                            
-                        });
+                            Count = 1,
+                            Quality = 0
+                        },
+                        Usage = ResourceUsage.Default,
+                        BindFlags = BindFlags.ShaderResource
+                    };
+
+                    var bytes = Enumerable.Repeat((byte)255, 2 * 2 * 4).ToArray();
+                    {
+                        var pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                        var ptr = pinnedArray.AddrOfPinnedObject();
+                        var rect = new DataRectangle(ptr, 2 * 4);
+                        using (var texture = new Texture2D(device, desc, rect))
+                        {
+                            m_srv = new ShaderResourceView(device, texture);
+                        }
+                        pinnedArray.Free();
                     }
                 }
-                context.PixelShader.SetShaderResource(0, m_srv);
-                context.PixelShader.SetSampler(0, m_ss);
             }
+            context.PixelShader.SetShaderResource(0, m_srv);
+
+            if (m_ss == null)
+            {
+                m_ss = new SamplerState(device, new SamplerStateDescription
+                {
+                    AddressU = TextureAddressMode.Wrap,
+                    AddressV = TextureAddressMode.Wrap,
+                    AddressW = TextureAddressMode.Wrap,
+                });
+            }
+            context.PixelShader.SetSampler(0, m_ss);
 
             if (m_rs == null)
             {

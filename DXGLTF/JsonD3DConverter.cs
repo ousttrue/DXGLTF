@@ -55,7 +55,10 @@ namespace DXGLTF
         {
             // default triangle
             var drawable = new D3D11Drawable(new[] { 0, 1, 2 },
-                m_shaderLoader.CreateMaterial(ShaderType.Gizmo, default(ImageBytes)));
+                m_shaderLoader.CreateShader(ShaderType.Unlit),
+                default(ImageBytes),
+                Color4.White
+                );
             drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(0.0f, 0.5f, 0),
                     new Vector3(0.5f, -0.5f, 0),

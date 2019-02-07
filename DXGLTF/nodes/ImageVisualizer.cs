@@ -34,10 +34,10 @@ namespace DXGLTF.nodes
             foreach (var image in images)
             {
                 var bytes = source.GetImageBytes(image);
-                var material = m_shaderLoader.CreateMaterial(
-                    ShaderType.Unlit, new ImageBytes(bytes));
+                var shader = m_shaderLoader.CreateShader(ShaderType.Unlit);
 
-                var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, material);
+                var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, shader, 
+                    new ImageBytes(bytes), Color4.White);
                 drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(-1, 1, 0),
                     new Vector3(1, 1, 0),

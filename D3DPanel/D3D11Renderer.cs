@@ -28,6 +28,16 @@ namespace D3DPanel
             }
         }
 
+        struct WorldConstants
+        {
+            public Matrix MVP;
+        }
+
+        struct ObjectConstants
+        { 
+            public Color4 Color;
+        }
+
         #region Resource
         SharpDX.Direct3D11.Device m_device;
         public SharpDX.Direct3D11.Device Device => m_device;
@@ -37,7 +47,33 @@ namespace D3DPanel
         public DeviceContext Context => m_context;
         DepthStencilState m_ds;
 
-        Buffer m_constantBuffer;
+        class Constants<T> : System.IDisposable where T : struct
+        {
+            Buffer m_constantBuffer;
+
+            public void Dispose()
+            {
+                if (m_constantBuffer != null)
+                {
+                    m_constantBuffer.Dispose();
+                    m_constantBuffer = null;
+                }
+            }
+
+            public Buffer Update(SharpDX.Direct3D11.Device m_device, DeviceContext context,
+                T value)
+            {
+                if (m_constantBuffer == null)
+                {
+                    m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref value);
+                    m_constantBuffer.DebugName = typeof(T).Name;
+                }
+                context.UpdateSubresource(ref value, m_constantBuffer);
+                return m_constantBuffer;
+            }
+        }
+        Constants<WorldConstants> m_worldConstants = new Constants<WorldConstants>();
+        Constants<ObjectConstants> m_objectConstants = new Constants<ObjectConstants>();
 
         public void Dispose()
         {
@@ -52,10 +88,16 @@ namespace D3DPanel
                 m_swapChain.Dispose();
             }
 
-            if (m_constantBuffer != null)
+            if (m_worldConstants != null)
             {
-                m_constantBuffer.Dispose();
-                m_constantBuffer = null;
+                m_worldConstants.Dispose();
+                m_worldConstants = null;
+            }
+
+            if (m_objectConstants != null)
+            {
+                m_objectConstants.Dispose();
+                m_objectConstants = null;
             }
 
             if (m_context != null)
@@ -120,13 +162,15 @@ namespace D3DPanel
         {
             var mvp = modelMatrix * camera.View * camera.Projection;
             mvp.Transpose();
-            if (m_constantBuffer == null)
+            m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context, new WorldConstants
             {
-                m_constantBuffer = Buffer.Create(m_device, BindFlags.ConstantBuffer, ref mvp);
-                m_constantBuffer.DebugName = "Constant";
-            }
-            m_context.UpdateSubresource(ref mvp, m_constantBuffer);
-            m_context.VertexShader.SetConstantBuffer(0, m_constantBuffer);
+                MVP = mvp
+            }));
+
+            m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context, new ObjectConstants
+            {
+                Color = drawable.Color
+            }));
 
             drawable.Draw(this);
         }

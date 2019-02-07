@@ -62,10 +62,10 @@ namespace DXGLTF
             return m_map[type].Source;
         }
 
-        public D3D11Shader CreateMaterial(ShaderType type, ImageBytes textureBytes)
+        public D3D11Shader CreateShader(ShaderType type)
         {
             var source = GetShaderSource(type);
-            var shader = new D3D11Shader(textureBytes);
+            var shader = new D3D11Shader();
 
             source
                 .ObserveOn(SynchronizationContext.Current)

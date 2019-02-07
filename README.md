@@ -2,6 +2,8 @@
 
 GLTF viewer using SharpDX
 
+![ss](ss.jpg)
+
 ## Support format
 
 * GLTF
@@ -31,7 +33,7 @@ Quad
 Repeated
 
 ### material
-* [ ] pbrMetallicRoughness.baseColorFactor
+* [x] pbrMetallicRoughness.baseColorFactor
 
 ### mesh
 3D View without transform
@@ -47,7 +49,6 @@ Repeated
 * [ ] Scale Gizmo
 
 ### scene
-[ ] ToDo
 
 ## ToDo
 

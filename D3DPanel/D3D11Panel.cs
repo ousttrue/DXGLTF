@@ -10,18 +10,10 @@ namespace D3DPanel
         D3D11Renderer m_renderer = new D3D11Renderer();
 
         List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
-        public void AddDrawable(string vs, string ps, ImageBytes textureBytes)
+        public void AddDrawable(string vs, string ps)
         {
-            var shader = new D3D11Shader(textureBytes);
+            var shader = new D3D11Shader();
             shader.SetShader(vs, ps);
-
-            /*
-            var positions = 
-            new Vector4(0.0f, 0.5f, 0.5f, 1.0f), new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-                                      new Vector4(0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 1.0f, 0.0f, 1.0f),
-                                      new Vector4(-0.5f, -0.5f, 0.5f, 1.0f), new Vector4(0.0f, 0.0f, 1.0f, 1.0f)
-            m_drawables.Add(new D3D11Drawable(shader, ));
-            */
         }
 
         Camera m_camera = new Camera

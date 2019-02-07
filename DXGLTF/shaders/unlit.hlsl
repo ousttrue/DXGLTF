@@ -16,10 +16,10 @@ struct PS_IN
 	float4 color: COLOR0;
 };
 
-cbuffer Camera: register(b0)
+cbuffer World
 {
 	float4x4 wvp;
-};
+}
 
 PS_IN VS( VS_IN input )
 {
@@ -32,8 +32,12 @@ PS_IN VS( VS_IN input )
 	return output;
 }
 
+cbuffer Object
+{
+	float4 color;
+};
+
 float4 PS( PS_IN input ) : SV_Target
 {
-	return ShaderTexture.Sample(Sampler, input.uv);
-	//return input.color;
+	return ShaderTexture.Sample(Sampler, input.uv) * color;
 }
