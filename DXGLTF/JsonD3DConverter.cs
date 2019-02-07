@@ -1,228 +1,17 @@
 ﻿using D3DPanel;
+using DXGLTF.nodes;
 using GltfScene;
 using NLog;
 using SharpDX;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using UniJSON;
 
 
 namespace DXGLTF
 {
-    class Node : ITreeNode<Node, D3D11Drawable>
-    {
-        List<Node> m_nodes = new List<Node>();
-
-        public bool IsValid => m_nodes != null;
-
-        int m_parentIndex = -1;
-        public int ParentIndex
-        {
-            get { return m_parentIndex; }
-        }
-
-        public bool HasParent => ParentIndex != -1;
-
-        public Node Parent
-        {
-            get
-            {
-                if (!HasParent) return null;
-                return m_nodes[ParentIndex];
-            }
-        }
-
-        public IEnumerable<Node> Children
-        {
-            get
-            {
-                foreach (var node in m_nodes)
-                {
-                    if (node.ParentIndex == ValueIndex)
-                    {
-                        yield return node;
-                    }
-                }
-            }
-        }
-
-        public int ValueIndex
-        {
-            get;
-            set;
-        }
-
-        D3D11Drawable m_value;
-        public D3D11Drawable Value { get { return m_value; } }
-        public void SetValue(D3D11Drawable value)
-        {
-            m_value = value;
-        }
-
-        Matrix m_matrix = Matrix.Identity;
-        public Matrix Matrix
-        {
-            get;
-        }
-
-        public Node(D3D11Drawable value)
-        {
-            m_value = value;
-        }
-    }
-
-    interface IVisualizer
-    {
-        bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> nodes);
-    }
-
-    class MeshVisualizer : IVisualizer
-    {
-        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> nodes)
-        {
-            if (p[0].ToString() != "meshes")
-            {
-                return false;
-            }
-            if (p.Count == 1)
-            {
-                ShowMesh(source, source.GlTF.meshes, shaderLoader, nodes);
-            }
-            else
-            {
-                var index = p[1].ToInt32();
-                ShowMesh(source, new[] { source.GlTF.meshes[index] }, shaderLoader, nodes);
-            }
-            return true;
-        }
-
-        static void ShowMesh(Source source, IEnumerable<UniGLTF.glTFMesh> meshes,
-            ShaderLoader m_shaderLoader, List<Node> drawables)
-        {
-            var gltf = source.GlTF;
-            foreach (var mesh in meshes)
-            {
-                foreach (var primitive in mesh.primitives)
-                {
-                    var m = gltf.materials[primitive.material];
-
-                    var imageBytes = default(ImageBytes);
-                    if (m.pbrMetallicRoughness != null)
-                    {
-                        var colorTexture = m.pbrMetallicRoughness.baseColorTexture;
-                        if (colorTexture != null)
-                        {
-                            if (colorTexture.index != -1)
-                            {
-                                var texture = gltf.textures[colorTexture.index];
-                                var image = gltf.images[texture.source];
-                                var bytes = source.GetImageBytes(image);
-                                imageBytes = new ImageBytes(bytes);
-                            }
-                        }
-                    }
-                    var material = m_shaderLoader.CreateMaterial(ShaderType.Unlit,
-                        imageBytes);
-                    var accessor = gltf.accessors[primitive.indices];
-                    int[] indices = null;
-                    switch (accessor.componentType)
-                    {
-                        case UniGLTF.glComponentType.BYTE:
-                            indices = gltf.GetArrayFromAccessor<byte>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                            break;
-
-                        case UniGLTF.glComponentType.UNSIGNED_SHORT:
-                            indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                            break;
-
-                        case UniGLTF.glComponentType.UNSIGNED_INT:
-                            indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
-                            break;
-
-                        default:
-                            throw new NotImplementedException();
-                    }
-
-                    var drawable = new D3D11Drawable(indices, material);
-
-                    var attribs = primitive.attributes;
-
-                    {
-                        var positions = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.POSITION);
-                        if (positions.Count == 0)
-                        {
-                            throw new Exception();
-                        }
-                        drawable.SetAttribute(Semantics.POSITION, new VertexAttribute(positions, 4 * 3));
-                    }
-
-                    if (primitive.attributes.TEXCOORD_0 != -1)
-                    {
-                        var uv = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.TEXCOORD_0);
-                        drawable.SetAttribute(Semantics.TEXCOORD, new VertexAttribute(uv, 4 * 2));
-                    }
-
-                    drawables.Add(new Node(drawable));
-                }
-            }
-        }
-    }
-
-    class ImageVisualizer : IVisualizer
-    {
-        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> nodes)
-        {
-            if (p[0].ToString() != "images")
-            {
-                return false;
-            }
-            if (p.Count == 1)
-            {
-                ShowImage(source, source.GlTF.images, shaderLoader, nodes);
-            }
-            else
-            {
-                var index = p[1].ToInt32();
-                ShowImage(source, new[] { source.GlTF.images[index] }, shaderLoader, nodes);
-            }
-            return false;
-        }
-
-        static void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images,
-            ShaderLoader m_shaderLoader, List<Node> m_drawables)
-        {
-            var gltf = source.GlTF;
-            foreach (var image in images)
-            {
-                var bytes = source.GetImageBytes(image);
-                var material = m_shaderLoader.CreateMaterial(
-                    ShaderType.Unlit, new ImageBytes(bytes));
-
-                var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, material);
-                drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
-                    new Vector3(-1, 1, 0),
-                    new Vector3(1, 1, 0),
-                    new Vector3(1, -1, 0),
-                    new Vector3(-1, -1, 0),
-                }));
-                drawable.SetAttribute(Semantics.TEXCOORD, VertexAttribute.Create(new Vector2[]{
-                    new Vector2(0, 0),
-                    new Vector2(1, 0),
-                    new Vector2(1, 1),
-                    new Vector2(0, 1),
-                }));
-
-                m_drawables.Add(new Node(drawable));
-
-                break;
-            }
-        }
-    }
-
     class JsonD3DConverter : IDisposable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
@@ -239,7 +28,7 @@ namespace DXGLTF
         }
 
         void ClearDrawables()
-        { 
+        {
             foreach (var x in m_drawables)
             {
                 x.Value.Dispose();
@@ -255,7 +44,11 @@ namespace DXGLTF
             get { return m_updated; }
         }
 
-        IVisualizer[] _visualizers;
+        IVisualizer[] _visualizers = new IVisualizer[]
+            {
+                new MeshVisualizer(),
+                new ImageVisualizer(),
+            };
 
         public JsonD3DConverter()
         {
@@ -268,12 +61,6 @@ namespace DXGLTF
                     new Vector3(-0.5f, -0.5f, 0),
                 }));
             m_drawables.Add(new Node(drawable));
-
-            _visualizers = new IVisualizer[]
-            {
-                new MeshVisualizer(),
-                new ImageVisualizer(),
-            };
         }
 
         public void SetSelection(Source source, ListTreeNode<JsonValue> node)
