@@ -68,11 +68,13 @@ namespace DXGLTF
         {
             if (source.GlTF == null)
             {
+                Logger.Debug("no GLTF");
                 return;
             }
 
             if (!node.IsValid)
             {
+                Logger.Debug("not valid");
                 return;
             }
 
@@ -81,6 +83,7 @@ namespace DXGLTF
             var p = node.Pointer();
             if (p.Count == 0)
             {
+                Logger.Debug("root");
                 // root
                 return;
             }

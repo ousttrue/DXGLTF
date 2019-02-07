@@ -111,11 +111,17 @@
       <DependentUpon>JsonContent.cs</DependentUpon>
     </Compile>
     <Compile Include="JsonD3DConverter.cs" />
+    <Compile Include="JsonNodeContent.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="LoggerContent.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="LoggerContent.Designer.cs">
       <DependentUpon>LoggerContent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NodeContent.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="nodes\ImageVisualizer.cs" />
     <Compile Include="nodes\MeshVisualizer.cs" />
