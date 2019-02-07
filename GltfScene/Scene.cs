@@ -76,7 +76,7 @@ namespace GltfScene
             }
             catch (Exception)
             {
-
+                return;
             }
             foreach (var x in zip.Entries)
             {
@@ -95,6 +95,8 @@ namespace GltfScene
 
         public static Source _Load(string path)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
             IStorage folder = new FileSystemStorage(System.IO.Path.GetDirectoryName(path));
             var fileBytes = File.ReadAllBytes(path);
             LoadZip(ref folder, ref fileBytes);
@@ -135,6 +137,8 @@ namespace GltfScene
             glTF gltf = null;
             source.JSON.Deserialize(ref gltf);
             source.GlTF = gltf;
+
+            Logger.Info($"OpenFile: parse {Path.GetFileName(path)} in {sw.Elapsed.TotalSeconds} sec");
 
             return source;
         }

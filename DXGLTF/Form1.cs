@@ -109,17 +109,8 @@ namespace DXGLTF
                 {
                     return;
                 }
-                OpenFile(openFileDialog.FileName);
+                m_scene.Load(openFileDialog.FileName);
             }
-        }
-
-        void OpenFile(string file)
-        {
-            var sw = Stopwatch.StartNew();
-
-            m_scene.Load(file);
-
-            Logger.Info($"OpenFile: parse {Path.GetFileName(file)} in {sw.Elapsed.TotalSeconds} sec");
         }
         #endregion
 
