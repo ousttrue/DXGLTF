@@ -132,6 +132,7 @@ namespace GltfScene
             {
                 // try GLTF
                 source.JSON = JsonParser.Parse(new Utf8String(fileBytes));
+                source.IO = folder;
             }
 
             glTF gltf = null;
