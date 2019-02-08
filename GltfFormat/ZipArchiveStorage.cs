@@ -125,6 +125,15 @@ namespace UniGLTF.Zip
 
         public UInt16 VersionNeededToExtract;
         public UInt16 GeneralPurposeBitFlag;
+
+        public bool HasDataDescriptor
+        {
+            get
+            {
+                return (GeneralPurposeBitFlag & 0x0008) != 0;
+            }
+        }
+
         public CompressionMethod CompressionMethod;
         public UInt16 FileLastModificationTime;
         public UInt16 FileLastModificationDate;
@@ -253,6 +262,29 @@ namespace UniGLTF.Zip
         }
     }
 
+    class DataDescriptor
+    {
+        public UInt32 CRC32;
+        public Int32 CompressedSize;
+        public Int32 UncompressedSize;
+        public DataDescriptor(Byte[] bytes, int pos)
+        {
+            var value = BitConverter.ToUInt32(bytes, pos);
+            if(value== 0x08074B50)
+            {
+                pos += 4;
+                value = BitConverter.ToUInt32(bytes, pos);
+            }
+            CRC32 = value;
+            pos += 4;
+
+            CompressedSize = BitConverter.ToInt32(bytes, pos);
+            pos += 4;
+
+            UncompressedSize = BitConverter.ToInt32(bytes, pos);
+        }
+    }
+
     class LocalFileHeader : CommonHeader
     {
         public override int FixedFieldLength
@@ -307,6 +339,7 @@ namespace UniGLTF.Zip
             var archive = new ZipArchiveStorage();
 
             var pos = eocd.OffsetOfStartOfCentralDirectory;
+
             for (int i = 0; i < eocd.NumberOfCentralDirectoryRecordsOnThisDisk; ++i)
             {
                 var file = new CentralDirectoryFileHeader(bytes, pos);
@@ -320,21 +353,33 @@ namespace UniGLTF.Zip
         public Byte[] Extract(CentralDirectoryFileHeader header)
         {
             var local = new LocalFileHeader(header.Bytes, header.RelativeOffsetOfLocalFileHeader);
-            var pos = local.Offset + local.Length;
+            var compressedSize = local.CompressedSize;
+            var uncompressedSize = local.UncompressedSize;
 
-            var dst = new Byte[local.UncompressedSize];
+            var pos = local.Offset + local.Length;
+            if (header.HasDataDescriptor)
+            {
+                var descriptor = new DataDescriptor(header.Bytes, pos + header.CompressedSize);
+                compressedSize = descriptor.CompressedSize;
+                uncompressedSize = descriptor.UncompressedSize;
+            }
+
+            if (compressedSize != header.CompressedSize) throw new Exception();
+            if (uncompressedSize != header.UncompressedSize) throw new Exception();
+
+            var dst = new Byte[uncompressedSize];
 
             switch(header.CompressionMethod)
             {
                 case CompressionMethod.Stored:
                     {
-                        Buffer.BlockCopy(header.Bytes, pos, dst, 0, local.CompressedSize);
+                        Buffer.BlockCopy(header.Bytes, pos, dst, 0, compressedSize);
                     }
                     break;
 
                 case CompressionMethod.Deflated:
                     {
-                        using (var s = new MemoryStream(header.Bytes, pos, local.CompressedSize, false))
+                        using (var s = new MemoryStream(header.Bytes, pos, compressedSize, false))
                         using (var deflateStream = new DeflateStream(s, CompressionMode.Decompress))
                         {
                             int dst_pos = 0;

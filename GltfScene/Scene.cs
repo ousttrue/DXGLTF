@@ -93,19 +93,18 @@ namespace GltfScene
                 foreach (var x in zip.Entries)
                 {
                     var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
-                    switch (ext)
+                    if (ext == ".gltf"
+                        || ext == ".glb"
+                        || ext == ".vrm")
                     {
-                        case ".gltf":
-                        case ".glb":
-                        case ".vrm":
-                            folder = zip;
-                            fileBytes = zip.Extract(x);
-                            if (fileBytes.Length == 0)
-                            {
-                                throw new Exception("empty bytes");
-                            }
-                            found = true;
-                            break;
+                        folder = zip;
+                        fileBytes = zip.Extract(x);
+                        if (fileBytes.Length == 0)
+                        {
+                            throw new Exception("empty bytes");
+                        }
+                        found = true;
+                        break;
                     }
                 }
 
