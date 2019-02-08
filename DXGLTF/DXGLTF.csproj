@@ -110,7 +110,6 @@
     <Compile Include="JsonContent.Designer.cs">
       <DependentUpon>JsonContent.cs</DependentUpon>
     </Compile>
-    <Compile Include="JsonD3DConverter.cs" />
     <Compile Include="JsonNodeContent.cs">
       <SubType>Form</SubType>
     </Compile>

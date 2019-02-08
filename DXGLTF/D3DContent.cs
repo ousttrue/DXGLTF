@@ -1,9 +1,13 @@
 ﻿using D3DPanel;
+using DXGLTF.nodes;
 using GltfScene;
 using NLog;
 using SharpDX;
 using System;
+using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Windows.Forms;
 using UniJSON;
@@ -16,37 +20,100 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        D3D11Renderer m_renderer = new D3D11Renderer();
-        Camera m_camera = new Camera
+        D3D11Renderer _renderer = new D3D11Renderer();
+        Camera _camera = new Camera
         {
             View = Matrix.Identity,
         };
 
-        JsonD3DConverter m_jsonD3D = new JsonD3DConverter();
+        ShaderLoader _shaderLoader = new ShaderLoader();
+
+        IVisualizer[] _visualizers = new IVisualizer[]
+            {
+                new MeshVisualizer(),
+                new ImageVisualizer(),
+            };
+
+        List<Node> _drawables = new List<Node>();
+        void ClearDrawables()
+        {
+            foreach (var x in _drawables)
+            {
+                x.Dispose();
+            }
+            _drawables.Clear();
+        }
+
+        Subject<Unit> _updated = new Subject<Unit>();
 
         public D3DContent()
         {
             InitializeComponent();
 
-            m_jsonD3D.UpdatedObservable
+            _updated
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ =>
                 {
                     Invalidate();
                 })
                 ;
+
+            // default triangle
+            var drawable = new D3D11Drawable(new[] { 0, 1, 2 },
+                _shaderLoader.CreateShader(ShaderType.Unlit),
+                default(ImageBytes),
+                Color4.White
+                );
+            drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
+                    new Vector3(0.0f, 0.5f, 0),
+                    new Vector3(0.5f, -0.5f, 0),
+                    new Vector3(-0.5f, -0.5f, 0),
+                }));
+            _drawables.Add(new Node(drawable));
         }
 
         public void Shutdown()
         {
-            m_jsonD3D.Dispose();
-            m_renderer.Dispose();
+            ClearDrawables();
+            _renderer.Dispose();
         }
 
         public void SetSelection(Source source, ListTreeNode<JsonValue> node)
         {
-            m_jsonD3D.SetSelection(source, node);
+            if (source.GlTF == null)
+            {
+                Logger.Debug("no GLTF");
+                return;
+            }
+
+            if (!node.IsValid)
+            {
+                Logger.Debug("not valid");
+                return;
+            }
+
+            ClearDrawables();
+
+            var p = node.Pointer();
+            if (p.Count == 0)
+            {
+                Logger.Debug("root");
+                // root
+                return;
+            }
+            Logger.Debug($"selected: {p}");
+
+            foreach (var v in _visualizers)
+            {
+                if (v.BuildNode(source, p, _shaderLoader, _drawables))
+                {
+                    break;
+                }
+            }
+
+            _updated.OnNext(Unit.Default);
         }
+
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
@@ -55,13 +122,13 @@ namespace DXGLTF
 
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
-            m_camera.Update();
-            m_renderer.Begin(Handle);
-            foreach(var node in m_jsonD3D.Drawables)
+            _camera.Update();
+            _renderer.Begin(Handle);
+            foreach(var node in _drawables)
             {
                 RendererDraw(node, Matrix.Identity);
             }
-            m_renderer.End();
+            _renderer.End();
         }
 
         void RendererDraw(nodes.Node node, Matrix accumulated)
@@ -70,7 +137,7 @@ namespace DXGLTF
             //Logger.Debug(m);
             foreach (var x in node.Value)
             {
-                m_renderer.Draw(m_camera, x, m);
+                _renderer.Draw(_camera, x, m);
             }
 
             foreach (var child in node.Children)
@@ -81,8 +148,8 @@ namespace DXGLTF
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            m_renderer.Resize(ClientSize.Width, ClientSize.Height);
-            m_camera.Resize(ClientSize.Width, ClientSize.Height);
+            _renderer.Resize(ClientSize.Width, ClientSize.Height);
+            _camera.Resize(ClientSize.Width, ClientSize.Height);
             Invalidate();
         }
 
@@ -97,13 +164,13 @@ namespace DXGLTF
 
                 if (m_rightDown)
                 {
-                    m_camera.YawPitch(deltaX, deltaY);
+                    _camera.YawPitch(deltaX, deltaY);
                     Invalidate();
                 }
 
                 if (m_middleDown)
                 {
-                    m_camera.Shift(deltaX, deltaY);
+                    _camera.Shift(deltaX, deltaY);
                     Invalidate();
                 }
             }
@@ -164,7 +231,7 @@ namespace DXGLTF
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            m_camera.Dolly(e.Delta);
+            _camera.Dolly(e.Delta);
             Invalidate();
         }
     }
