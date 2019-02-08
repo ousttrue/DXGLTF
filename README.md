@@ -13,7 +13,16 @@ GLTF viewer using SharpDX
 * GLB in zip(experimental not all zip supported)
 * VRM in zip(experimental not all zip supported)
 
-## View
+## Dock
+* [ ] CameraDock
+* [ ] LightDock
+
+## Gizmo
+* [x] Axis
+* [ ] Grid
+* [ ] BoundingBox
+
+## GLTF
 
 ### buffer
 `byte[]`
@@ -31,13 +40,17 @@ Quad
 
 ### texture
 Repeated
+* [x] TextureLoad
 
 ### material
 * [x] pbrMetallicRoughness.baseColorFactor
+* [x] UnlitShader
 
 ### mesh
 3D View without transform
 * [ ] BlendShape
+* [ ] Primitive as submesh
+* [ ] Lambert Shader
 
 ### skin
 * [ ] Joint gizmo
@@ -52,14 +65,5 @@ Repeated
 
 ## ToDo
 
-* [ ] CameraDock
-* [ ] Primitive as submesh
-* [ ] Axis, Grid
-* [ ] BoundingBox
-* [ ] Embedded nvim
-* [ ] LightDock
-* [ ] Lambert Shader
 * [x] Logger
-* [x] UnlitShader
-* [x] TextureLoad
 

@@ -60,7 +60,12 @@ namespace DXGLTF
                 ;
 
             // default triangle
-            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(_shaderLoader.CreateShader(ShaderType.Unlit))));
+            var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
+            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(unlit)));
+
+            // gizmos
+            var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
+            _gizmos.Add(new Node(D3D11DrawableFactory.CreateAxis(gizmo, 0.1f, 10.0f)));
         }
 
         public void Shutdown()
@@ -114,8 +119,16 @@ namespace DXGLTF
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
             _camera.Update();
-            _renderer.Begin(Handle);
-            foreach(var node in _drawables)
+            _renderer.Begin(Handle, new Color4(0.5f, 0.5f, 0.5f, 0));
+            foreach (var node in _gizmos)
+            {
+                RendererDraw(node, Matrix.Identity);
+            }
+
+            // clear depth
+            _renderer.ClearDepth();
+
+            foreach (var node in _drawables)
             {
                 RendererDraw(node, Matrix.Identity);
             }

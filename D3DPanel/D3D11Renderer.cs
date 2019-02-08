@@ -129,21 +129,29 @@ namespace D3DPanel
             m_swapChain.Resize(Width, Height);
         }
 
-        public void Begin(System.IntPtr hWnd)
+        RenderTargetView _rtv;
+        DepthStencilView _dsv;
+
+        public void ClearDepth()
+        {
+            m_context.ClearDepthStencilView(_dsv,
+                DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil,
+                1.0f, 0);
+        }
+
+        public void Begin(System.IntPtr hWnd, Color4 clear)
         {
             if (m_device == null)
             {
                 CreateDevice(hWnd);
             }
 
-            var (rtv, dsv) = m_swapChain.GetRenderTarget(m_device);
-            var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
-            m_context.ClearRenderTargetView(rtv, clear);
-            m_context.ClearDepthStencilView(dsv,
-                DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil,
-                1.0f, 0);
+            (_rtv, _dsv) = m_swapChain.GetRenderTarget(m_device);
+            //var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
+            m_context.ClearRenderTargetView(_rtv, clear);
+            ClearDepth();
 
-            m_context.OutputMerger.SetTargets(dsv, rtv);
+            m_context.OutputMerger.SetTargets(_dsv, _rtv);
             if (m_ds == null)
             {
                 m_ds = new DepthStencilState(m_device,

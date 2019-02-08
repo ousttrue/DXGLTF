@@ -37,7 +37,7 @@ namespace D3DPanel
 
         private void D3DPanel_Paint(object sender, PaintEventArgs e)
         {
-            m_renderer.Begin(Handle);
+            m_renderer.Begin(Handle, new SharpDX.Color4(0.5f, 0.5f, 0.5f, 0));
             foreach(var d in m_drawables)
             {
                 d.Draw(m_renderer);

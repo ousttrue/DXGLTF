@@ -1,6 +1,7 @@
 struct VS_IN
 {
 	float3 position : POSITION;
+	float4 color: COLOR0;
 };
 
 struct PS_IN
@@ -19,7 +20,7 @@ PS_IN VS( VS_IN input )
 	PS_IN output = (PS_IN)0;
 	
 	output.position = mul(float4(input.position, 1), wvp);
-	//output.color = input.color; 
+	output.color = input.color; 
 	
 	return output;
 }
