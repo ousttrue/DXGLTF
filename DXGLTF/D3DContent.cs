@@ -73,6 +73,13 @@ namespace DXGLTF
         public void Shutdown()
         {
             ClearDrawables();
+
+            foreach (var x in _gizmos)
+            {
+                x.Dispose();
+            }
+            _gizmos.Clear();
+
             _renderer.Dispose();
         }
 

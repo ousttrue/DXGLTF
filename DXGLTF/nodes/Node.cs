@@ -21,11 +21,17 @@ namespace DXGLTF.nodes
 
         public void Dispose()
         {
-            foreach(var x in m_value)
+            foreach (var x in m_value)
             {
                 x.Dispose();
             }
             m_value.Clear();
+
+            foreach (var x in Children)
+            {
+                x.Dispose();
+            }
+            Children.Clear();
         }
 
         Matrix _matrix = Matrix.Identity;
