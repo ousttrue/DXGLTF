@@ -68,7 +68,6 @@ namespace DXGLTF
             var shader = new D3D11Shader();
 
             source
-                .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(x =>
                 {
                     shader.SetShader(x, x);

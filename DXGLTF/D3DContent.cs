@@ -34,6 +34,7 @@ namespace DXGLTF
                 new ImageVisualizer(),
             };
 
+        List<Node> _gizmos = new List<Node>();
         List<Node> _drawables = new List<Node>();
         void ClearDrawables()
         {
@@ -59,17 +60,7 @@ namespace DXGLTF
                 ;
 
             // default triangle
-            var drawable = new D3D11Drawable(new[] { 0, 1, 2 },
-                _shaderLoader.CreateShader(ShaderType.Unlit),
-                default(ImageBytes),
-                Color4.White
-                );
-            drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
-                    new Vector3(0.0f, 0.5f, 0),
-                    new Vector3(0.5f, -0.5f, 0),
-                    new Vector3(-0.5f, -0.5f, 0),
-                }));
-            _drawables.Add(new Node(drawable));
+            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(_shaderLoader.CreateShader(ShaderType.Unlit))));
         }
 
         public void Shutdown()
