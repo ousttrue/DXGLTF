@@ -187,7 +187,8 @@ namespace DXGLTF.nodes
                     throw new NotImplementedException();
             }
 
-            var drawable = new D3D11Drawable(indices, shader, imageBytes, color);
+            var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+                indices, shader, imageBytes, color);
 
             var attribs = primitive.attributes;
 

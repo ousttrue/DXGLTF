@@ -19,8 +19,12 @@ namespace D3DPanel
     public class D3D11Drawable : IDisposable
     {
         #region Mesh
-        public PrimitiveTopology Topology => PrimitiveTopology.TriangleList;
-
+        public PrimitiveTopology Topology
+        {
+            get;
+            private set;
+        }
+            
         int[] m_indices;
         Dictionary<Semantics, VertexAttribute> m_attributes = new Dictionary<Semantics, VertexAttribute>();
 
@@ -54,7 +58,7 @@ namespace D3DPanel
         }
         #endregion
 
-        public D3D11Drawable(int[] indices, D3D11Shader shader, ImageBytes texture, Color4 color)
+        public D3D11Drawable(PrimitiveTopology topology, int[] indices, D3D11Shader shader, ImageBytes texture, Color4 color)
         {
             m_shader = shader;
             m_indices = indices;
@@ -66,6 +70,8 @@ namespace D3DPanel
 
             m_textureBytes = texture;
             Color = color;
+
+            Topology = topology;
         }
 
         public void SetAttribute(Semantics semantics, VertexAttribute attribute)

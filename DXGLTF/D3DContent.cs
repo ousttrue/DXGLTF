@@ -59,13 +59,15 @@ namespace DXGLTF
                 })
                 ;
 
-            // default triangle
             var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
-            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(unlit)));
+            var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
+
+            // default triangle
+            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(gizmo)));
 
             // gizmos
-            var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
             _gizmos.Add(new Node(D3D11DrawableFactory.CreateAxis(gizmo, 0.1f, 10.0f)));
+            _gizmos.Add(new Node(D3D11DrawableFactory.CreateGrid(gizmo, 1.0f, 10)));
         }
 
         public void Shutdown()
@@ -126,7 +128,7 @@ namespace DXGLTF
             }
 
             // clear depth
-            _renderer.ClearDepth();
+            //_renderer.ClearDepth();
 
             foreach (var node in _drawables)
             {

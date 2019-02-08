@@ -15,6 +15,7 @@ GLTF viewer using SharpDX
 
 ## Dock
 * [ ] CameraDock
+    * [ ] Auto near far
 * [ ] LightDock
 
 ## Gizmo

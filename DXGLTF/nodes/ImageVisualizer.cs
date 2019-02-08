@@ -36,7 +36,8 @@ namespace DXGLTF.nodes
                 var bytes = source.GetImageBytes(image);
                 var shader = m_shaderLoader.CreateShader(ShaderType.Unlit);
 
-                var drawable = new D3D11Drawable(new int[] { 0, 1, 2, 2, 3, 0 }, shader, 
+                var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+                    new int[] { 0, 1, 2, 2, 3, 0 }, shader, 
                     new ImageBytes(bytes), Color4.White);
                 drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(-1, 1, 0),
