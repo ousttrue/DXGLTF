@@ -63,7 +63,7 @@ namespace GltfScene
             }
             catch (Exception ex)
             {
-                Logger.Error($"fail to load: {path}: {ex}");
+                Logger.Error($"fail to load: {path}: {ex.Message}");
             }
         }
 
@@ -91,6 +91,8 @@ namespace GltfScene
                         return;
                 }
             }
+
+            throw new Exception("no model file in zip");
         }
 
         public static Source _Load(string path)
@@ -99,6 +101,7 @@ namespace GltfScene
 
             IStorage folder = new FileSystemStorage(System.IO.Path.GetDirectoryName(path));
             var fileBytes = File.ReadAllBytes(path);
+
             LoadZip(ref folder, ref fileBytes);
 
             var source = new Source
