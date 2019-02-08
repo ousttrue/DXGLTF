@@ -67,32 +67,16 @@ namespace GltfScene
             }
         }
 
-        static void LoadZip(ref IStorage folder, ref Byte[] fileBytes)
+        static ZipArchiveStorage LoadZip(Byte[] fileBytes)
         {
-            var zip = default(ZipArchiveStorage);
             try
             {
-                zip = ZipArchiveStorage.Parse(fileBytes);
+                return ZipArchiveStorage.Parse(fileBytes);
             }
             catch (Exception)
             {
-                return;
+                return null;
             }
-            foreach (var x in zip.Entries)
-            {
-                var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
-                switch (ext)
-                {
-                    case ".gltf":
-                    case ".glb":
-                    case ".vrm":
-                        folder = zip;
-                        fileBytes = zip.Extract(x);
-                        return;
-                }
-            }
-
-            throw new Exception("no model file in zip");
         }
 
         public static Source _Load(string path)
@@ -102,7 +86,34 @@ namespace GltfScene
             IStorage folder = new FileSystemStorage(System.IO.Path.GetDirectoryName(path));
             var fileBytes = File.ReadAllBytes(path);
 
-            LoadZip(ref folder, ref fileBytes);
+            var zip = LoadZip(fileBytes);
+            if (zip != null)
+            {
+                var found = false;
+                foreach (var x in zip.Entries)
+                {
+                    var ext = System.IO.Path.GetExtension(x.FileName).ToLower();
+                    switch (ext)
+                    {
+                        case ".gltf":
+                        case ".glb":
+                        case ".vrm":
+                            folder = zip;
+                            fileBytes = zip.Extract(x);
+                            if (fileBytes.Length == 0)
+                            {
+                                throw new Exception("empty bytes");
+                            }
+                            found = true;
+                            break;
+                    }
+                }
+
+                if (!found)
+                {
+                    throw new Exception("no model file in zip");
+                }
+            }
 
             var source = new Source
             {

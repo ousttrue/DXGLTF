@@ -334,7 +334,6 @@ namespace UniGLTF.Zip
 
                 case CompressionMethod.Deflated:
                     {
-#if true
                         using (var s = new MemoryStream(header.Bytes, pos, local.CompressedSize, false))
                         using (var deflateStream = new DeflateStream(s, CompressionMode.Decompress))
                         {
@@ -346,10 +345,6 @@ namespace UniGLTF.Zip
                                 remain -= readSize;
                             }
                         }
-#else
-            var size=RawInflate.RawInflateImport.RawInflate(dst, 0, dst.Length,
-                header.Bytes, pos, header.CompressedSize);
-#endif
                     }
                     break;
 
