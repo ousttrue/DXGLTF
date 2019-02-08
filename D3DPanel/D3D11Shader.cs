@@ -31,7 +31,7 @@ namespace D3DPanel
 
             // detect
             var sig = BitConverter.ToUInt32(bytes.Array, bytes.Offset);
-            if(sig== 0xE0FFD8FF)
+            if ((sig & 0x00FFFFFF) == 0x00FFD8FF)
             {
                 Format = ImageFormat.Jpeg;
             }
