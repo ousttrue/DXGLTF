@@ -324,22 +324,38 @@ namespace UniGLTF.Zip
 
             var dst = new Byte[local.UncompressedSize];
 
-#if true
-            using (var s = new MemoryStream(header.Bytes, pos, local.CompressedSize, false))
-            using (var deflateStream = new DeflateStream(s, CompressionMode.Decompress))
+            switch(header.CompressionMethod)
             {
-                int dst_pos = 0;
-                for (int remain = dst.Length; remain > 0;)
-                {
-                    var readSize = deflateStream.Read(dst, dst_pos, remain);
-                    dst_pos += readSize;
-                    remain -= readSize;
-                }
-            }
+                case CompressionMethod.Stored:
+                    {
+                        Buffer.BlockCopy(header.Bytes, pos, dst, 0, local.CompressedSize);
+                    }
+                    break;
+
+                case CompressionMethod.Deflated:
+                    {
+#if true
+                        using (var s = new MemoryStream(header.Bytes, pos, local.CompressedSize, false))
+                        using (var deflateStream = new DeflateStream(s, CompressionMode.Decompress))
+                        {
+                            int dst_pos = 0;
+                            for (int remain = dst.Length; remain > 0;)
+                            {
+                                var readSize = deflateStream.Read(dst, dst_pos, remain);
+                                dst_pos += readSize;
+                                remain -= readSize;
+                            }
+                        }
 #else
             var size=RawInflate.RawInflateImport.RawInflate(dst, 0, dst.Length,
                 header.Bytes, pos, header.CompressedSize);
 #endif
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
 
             return dst;
         }
