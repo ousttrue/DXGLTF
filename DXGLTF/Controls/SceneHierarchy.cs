@@ -6,6 +6,7 @@ using NLog;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -95,7 +96,14 @@ namespace DXGLTF
                 return;
             }
 
-            Asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
+            var asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
+
+            ClearDrawables();
+
+            // build nodes
+            _drawables.AddRange(asset.BuildHierarchy());
+
+            Asset = asset;
 
             _updated.OnNext(Unit.Default);
         }

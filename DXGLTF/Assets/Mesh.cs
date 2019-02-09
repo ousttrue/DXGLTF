@@ -7,13 +7,13 @@ using System.Linq;
 
 namespace DXGLTF.Assets
 {
-    public class Mesh: IDisposable
+    public class Mesh : IDisposable
     {
         public List<Submesh> Submeshes = new List<Submesh>();
 
         public void Dispose()
         {
-            foreach(var sm in Submeshes)
+            foreach (var sm in Submeshes)
             {
                 sm.Dispose();
             }
@@ -34,11 +34,12 @@ namespace DXGLTF.Assets
         {
             var mesh = new Mesh();
 
-            foreach(var prim in m.primitives)
+            foreach (var prim in m.primitives)
             {
                 mesh.Submeshes.Add(new Submesh
                 {
                     Mesh = FromGLTF(source, prim),
+                    Material = materials[prim.material],
                 });
             }
 
@@ -89,7 +90,6 @@ namespace DXGLTF.Assets
             }
 
             return drawable;
-
         }
     }
 }

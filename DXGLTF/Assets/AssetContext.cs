@@ -1,9 +1,10 @@
 ﻿using D3DPanel;
+using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 
 namespace DXGLTF.Assets
@@ -11,6 +12,12 @@ namespace DXGLTF.Assets
     class AssetContext : IDisposable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
+
+        Source _source;
+        AssetContext(Source source)
+        {
+            _source = source;
+        }
 
         List<ImageBytes> _textureImages = new List<ImageBytes>();
         List<D3D11Material> _materials = new List<D3D11Material>();
@@ -24,7 +31,7 @@ namespace DXGLTF.Assets
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            var asset = new AssetContext();
+            var asset = new AssetContext(source);
 
             var gltf = source.GlTF;
 
@@ -56,6 +63,36 @@ namespace DXGLTF.Assets
             Logger.Info($"LoadAsset: {sw.Elapsed.TotalSeconds} sec");
 
             return asset;
+        }
+
+        public IEnumerable<Node> BuildHierarchy()
+        {
+            var gltf = _source.GlTF;
+
+            var newNodes = gltf.nodes.Select(MeshVisualizer.CreateDrawable).ToArray();
+
+            for (int i = 0; i < gltf.nodes.Count; ++i)
+            {
+                var node = gltf.nodes[i];
+                var drawable = newNodes[i];
+
+                if (node.children != null)
+                {
+                    // build hierarchy
+                    foreach (var j in node.children)
+                    {
+                        drawable.Children.Add(newNodes[j]);
+                    }
+                }
+
+                if (node.mesh >= 0)
+                {
+                    drawable.Mesh = _meshes[node.mesh];
+                }
+            }
+
+            // return only no parent
+            return newNodes.Where(x => !newNodes.Any(y => y.Children.Contains(x)));
         }
     }
 }

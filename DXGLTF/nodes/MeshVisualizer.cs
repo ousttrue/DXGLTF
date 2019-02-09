@@ -45,7 +45,7 @@ namespace DXGLTF.Nodes
             }
         }
 
-        static Node CreateDrawable(UniGLTF.glTFNode node)
+        public static Node CreateDrawable(UniGLTF.glTFNode node)
         {
             var drawable = new Node();
 
