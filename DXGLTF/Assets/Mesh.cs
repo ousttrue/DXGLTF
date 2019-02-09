@@ -53,6 +53,7 @@ namespace DXGLTF.Assets
             int[] indices = null;
             switch (accessor.componentType)
             {
+                case UniGLTF.glComponentType.UNSIGNED_BYTE:
                 case UniGLTF.glComponentType.BYTE:
                     indices = gltf.GetArrayFromAccessor<byte>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
                     break;
