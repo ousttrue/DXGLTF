@@ -49,7 +49,10 @@ namespace D3DPanel
         public void Resize(int width, int height)
         {
             ClearRenderTarget();
-
+            if (m_swapChain == null)
+            {
+                return;
+            }
             var desc = m_swapChain.Description;
             m_swapChain.ResizeBuffers(desc.BufferCount, width, height,
                 desc.ModeDescription.Format, desc.Flags);

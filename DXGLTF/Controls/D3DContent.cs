@@ -26,60 +26,25 @@ namespace DXGLTF
             View = Matrix.Identity,
         };
 
-        IVisualizer[] _visualizers = new IVisualizer[]
-            {
-                new MeshVisualizer(),
-                new ImageVisualizer(),
-            };
+        SceneHierarchy _hierarchy;
 
-        List<Node> _gizmos = new List<Node>();
-        List<Node> _drawables = new List<Node>();
-        void ClearDrawables()
-        {
-            foreach (var x in _drawables)
-            {
-                x.Dispose();
-            }
-            _drawables.Clear();
-        }
-
-        Subject<Unit> _updated = new Subject<Unit>();
-
-        public D3DContent()
+        public D3DContent(SceneHierarchy hierarchy)
         {
             InitializeComponent();
 
-            _updated
+            _hierarchy = hierarchy;
+
+            _hierarchy.Updated
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ =>
                 {
                     Invalidate();
                 })
                 ;
-
-            /*
-            var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
-            var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
-
-            // default triangle
-            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(gizmo)));
-
-            // gizmos
-            _gizmos.Add(new Node(D3D11DrawableFactory.CreateAxis(gizmo, 0.1f, 10.0f)));
-            _gizmos.Add(new Node(D3D11DrawableFactory.CreateGrid(gizmo, 1.0f, 10)));
-            */
         }
 
         public void Shutdown()
         {
-            ClearDrawables();
-
-            foreach (var x in _gizmos)
-            {
-                x.Dispose();
-            }
-            _gizmos.Clear();
-
             _renderer.Dispose();
         }
 
@@ -130,6 +95,7 @@ namespace DXGLTF
         {
             _camera.Update();
             _renderer.Begin(Handle, new Color4(0.5f, 0.5f, 0.5f, 0));
+            /*
             foreach (var node in _gizmos)
             {
                 RendererDraw(node, Matrix.Identity);
@@ -142,6 +108,7 @@ namespace DXGLTF
             {
                 RendererDraw(node, Matrix.Identity);
             }
+            */
             _renderer.End();
         }
 

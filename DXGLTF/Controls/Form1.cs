@@ -28,6 +28,7 @@ namespace DXGLTF
             m_contentMap.Add(name, content);
         }
 
+        SceneHierarchy m_hierarchy;
         D3DContent m_d3d;
 
         LoggerContent m_logger;
@@ -48,7 +49,10 @@ namespace DXGLTF
                 }
             });
 
-            m_d3d = new D3DContent();
+            m_hierarchy = new SceneHierarchy(m_scene);
+            AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
+
+            m_d3d = new D3DContent(m_hierarchy);
             AddContent("selected", m_d3d, DockState.Document);
 
             AddContent("json", new JsonContent(m_scene), DockState.DockLeft);
@@ -68,13 +72,11 @@ namespace DXGLTF
                 }
                 //m_d3d.SetSelection(jsonNode.Source, x);
             });
-
-            var hierarchy = new SceneHierarchy(m_scene);
-            AddContent("scene hierarchy", hierarchy, DockState.DockRight);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            m_hierarchy.Shutdown();
             m_d3d.Shutdown();
         }
 
