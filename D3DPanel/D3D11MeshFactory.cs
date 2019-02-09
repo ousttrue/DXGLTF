@@ -5,7 +5,7 @@ namespace D3DPanel
 {
     public static class D3D11MeshFactory
     {
-        public static D3D11Mesh CreateTriangle(D3D11Shader shader, float size = 0.5f)
+        public static D3D11Mesh CreateTriangle(float size = 0.5f)
         {
             var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
                 new[] { 0, 1, 2 });
@@ -22,7 +22,7 @@ namespace D3DPanel
             return drawable;
         }
 
-        public static D3D11Mesh CreateAxis(D3D11Shader shader, float w, float h)
+        public static D3D11Mesh CreateAxis(float w, float h)
         {
             var offset = 0.001f;
             var arrow = w * 2;
@@ -80,7 +80,7 @@ namespace D3DPanel
             return drawable;
         }
 
-        public static D3D11Mesh CreateGrid(D3D11Shader shader, float size, int count)
+        public static D3D11Mesh CreateGrid(float size, int count)
         {
             var positions = new List<Vector3>();
             var colors = new List<Color4>();

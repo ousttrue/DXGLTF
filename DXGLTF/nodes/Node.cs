@@ -48,5 +48,10 @@ namespace DXGLTF.Nodes
         public Node()
         {
         }
+
+        public Node(D3D11Shader shader, D3D11Mesh mesh)
+        {
+            Mesh = new Mesh(new Submesh(shader, mesh));
+        }
     }
 }

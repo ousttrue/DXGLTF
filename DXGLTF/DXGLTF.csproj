@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Mesh.cs" />
+    <Compile Include="Assets\Submesh.cs" />
     <Compile Include="Controls\D3DContent.cs">
       <SubType>Form</SubType>
     </Compile>

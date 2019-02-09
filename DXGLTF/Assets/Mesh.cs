@@ -9,35 +9,25 @@ namespace DXGLTF.Assets
 {
     public class Mesh: IDisposable
     {
-        public struct SubMesh: IDisposable
-        {
-            public D3D11Material Material;
-            public D3D11Mesh Drawable;
-
-            public void Dispose()
-            {
-                if (Material != null)
-                {
-                    Material.Dispose();
-                    Material = null;
-                }
-                if (Drawable != null)
-                {
-                    Drawable.Dispose();
-                    Drawable = null;
-                }
-            }
-        }
-
-        public List<SubMesh> SubMeshes = new List<SubMesh>();
+        public List<Submesh> Submeshes = new List<Submesh>();
 
         public void Dispose()
         {
-            foreach(var sm in SubMeshes)
+            foreach(var sm in Submeshes)
             {
                 sm.Dispose();
             }
-            SubMeshes.Clear();
+            Submeshes.Clear();
+        }
+
+        public Mesh()
+        {
+
+        }
+
+        public Mesh(Submesh subMesh)
+        {
+            Submeshes.Add(subMesh);
         }
 
         public static Mesh FromGLTF(Source source, UniGLTF.glTFMesh m, List<D3D11Material> materials)
@@ -46,9 +36,9 @@ namespace DXGLTF.Assets
 
             foreach(var prim in m.primitives)
             {
-                mesh.SubMeshes.Add(new SubMesh
+                mesh.Submeshes.Add(new Submesh
                 {
-                    Drawable = FromGLTF(source, prim),
+                    Mesh = FromGLTF(source, prim),
                 });
             }
 

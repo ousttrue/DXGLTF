@@ -22,11 +22,6 @@ namespace D3DPanel
         public D3D11Material(D3D11Shader shader, ImageBytes texture, Color4 color)
         {
             m_shader = shader;
-            m_shader.InputElements.Subscribe(x =>
-            {
-                Dispose();
-            });
-
             m_textureBytes = texture;
             Color = color;
         }

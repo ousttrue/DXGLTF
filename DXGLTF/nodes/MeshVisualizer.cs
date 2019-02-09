@@ -115,8 +115,8 @@ namespace DXGLTF.Nodes
                     foreach (var primitive in gltf.meshes[node.mesh].primitives)
                     {
                         var d3d = PrimitiveToD3D(ref source, shaderLoader, gltf, primitive);
-                        drawable.Mesh.SubMeshes.Add(new Assets.Mesh.SubMesh{
-                            Drawable=d3d
+                        drawable.Mesh.Submeshes.Add(new Assets.Submesh{
+                            Mesh=d3d
                         });
                     }
                 }

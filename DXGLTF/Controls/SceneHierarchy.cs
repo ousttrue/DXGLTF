@@ -71,17 +71,15 @@ namespace DXGLTF
 
         public SceneHierarchy(Scene scene) : base(scene)
         {
-            /*
             var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
             var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
 
             // default triangle
-            _drawables.Add(new Node(D3D11DrawableFactory.CreateTriangle(gizmo)));
+            _drawables.Add(new Node(gizmo, D3D11MeshFactory.CreateTriangle()));
 
             // gizmos
-            _gizmos.Add(new Node(D3D11DrawableFactory.CreateAxis(gizmo, 0.1f, 10.0f)));
-            _gizmos.Add(new Node(D3D11DrawableFactory.CreateGrid(gizmo, 1.0f, 10)));
-            */
+            _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 10.0f)));
+            _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateGrid(1.0f, 10)));
         }
 
         protected override void OnUpdated(Source source)
@@ -98,6 +96,8 @@ namespace DXGLTF
             }
 
             Asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
+
+            _updated.OnNext(Unit.Default);
         }
 
         protected override void OnSelected(TreeNode node)
@@ -126,9 +126,9 @@ namespace DXGLTF
             //Logger.Debug(m);
             if (node.Mesh != null)
             {
-                foreach (var x in node.Mesh.SubMeshes)
+                foreach (var x in node.Mesh.Submeshes)
                 {
-                    renderer.Draw(camera, x.Material, x.Drawable, m);
+                    renderer.Draw(camera, x.Material, x.Mesh, m);
                 }
             }
 
