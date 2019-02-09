@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 
-namespace DXGLTF.nodes
+namespace DXGLTF.Nodes
 {
     interface IVisualizer
     {

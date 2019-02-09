@@ -1,5 +1,5 @@
 ﻿using D3DPanel;
-using DXGLTF.nodes;
+using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
 using SharpDX;
@@ -144,7 +144,7 @@ namespace DXGLTF
             _renderer.End();
         }
 
-        void RendererDraw(nodes.Node node, Matrix accumulated)
+        void RendererDraw(Nodes.Node node, Matrix accumulated)
         {
             var m = node.LocalMatrix * accumulated;
             //Logger.Debug(m);

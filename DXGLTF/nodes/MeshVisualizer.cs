@@ -6,7 +6,7 @@ using System.Linq;
 using UniJSON;
 
 
-namespace DXGLTF.nodes
+namespace DXGLTF.Nodes
 {
     class MeshVisualizer : IVisualizer
     {

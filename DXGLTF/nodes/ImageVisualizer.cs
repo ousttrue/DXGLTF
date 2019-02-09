@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UniJSON;
 
 
-namespace DXGLTF.nodes
+namespace DXGLTF.Nodes
 {
     class ImageVisualizer : IVisualizer
     {
