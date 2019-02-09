@@ -42,7 +42,7 @@ namespace DXGLTF.Assets
                 asset._textureImages.Add(new ImageBytes(bytes));
             }
 
-            foreach(var material in gltf.materials)
+            foreach (var material in gltf.materials)
             {
                 var shader = material.IsUnlit
                     ? shaderLoader.CreateShader(ShaderType.Unlit)
@@ -50,8 +50,23 @@ namespace DXGLTF.Assets
                     ;
 
                 var texture = default(ImageBytes);
-                //asset._textureImages
                 var color = SharpDX.Color4.White;
+                var pbr = material.pbrMetallicRoughness;
+                if (pbr != null)
+                {
+                    if (pbr.baseColorTexture != null)
+                    {
+                        texture = asset._textureImages[pbr.baseColorTexture.index];
+                    }
+
+                    if (pbr.baseColorFactor != null)
+                    {
+                        color.Red = pbr.baseColorFactor[0];
+                        color.Green = pbr.baseColorFactor[1];
+                        color.Blue = pbr.baseColorFactor[2];
+                        color.Alpha = pbr.baseColorFactor[3];
+                    }
+                }
                 asset._materials.Add(new D3D11Material(shader, texture, color));
             }
 

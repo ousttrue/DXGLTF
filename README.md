@@ -9,19 +9,23 @@ GLTF viewer using SharpDX
 * GLTF
 * GLB
 * VRM
-* GLTF in zip(experimental not all zip supported)
-* GLB in zip(experimental not all zip supported)
-* VRM in zip(experimental not all zip supported)
+* GLTF in zip
+* GLB in zip
+* VRM in zip
 
 ## Dock
 * [ ] CameraDock
     * [ ] Auto near far
 * [ ] LightDock
+* [ ] HierarchyDock
 
 ## Gizmo
 * [x] Axis
-* [ ] Grid
+* [x] Grid
 * [ ] BoundingBox
+* [ ] Translation Gizmo
+* [ ] Rotation Gizmo
+* [ ] Scale Gizmo
 
 ## GLTF
 
@@ -56,13 +60,9 @@ Repeated
 * [ ] Lambert Shader
 
 ### skin
-* [ ] Joint gizmo
 
 ### node
 * [x] ModelMatrix
-* [ ] Translation Gizmo
-* [ ] Rotation Gizmo
-* [ ] Scale Gizmo
 
 ### scene
 
