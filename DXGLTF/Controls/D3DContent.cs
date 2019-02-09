@@ -1,16 +1,10 @@
 ﻿using D3DPanel;
-using DXGLTF.Nodes;
-using GltfScene;
 using NLog;
 using SharpDX;
 using System;
-using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Windows.Forms;
-using UniJSON;
 using WeifenLuo.WinFormsUI.Docking;
 
 
@@ -48,44 +42,6 @@ namespace DXGLTF
             _renderer.Dispose();
         }
 
-        /*
-        public void SetSelection(Source source, ListTreeNode<JsonValue> node)
-        {
-            if (source.GlTF == null)
-            {
-                Logger.Debug("no GLTF");
-                return;
-            }
-
-            if (!node.IsValid)
-            {
-                Logger.Debug("not valid");
-                return;
-            }
-
-            ClearDrawables();
-
-            var p = node.Pointer();
-            if (p.Count == 0)
-            {
-                Logger.Debug("root");
-                // root
-                return;
-            }
-            Logger.Debug($"selected: {p}");
-
-            foreach (var v in _visualizers)
-            {
-                if (v.BuildNode(source, p, _shaderLoader, _drawables))
-                {
-                    break;
-                }
-            }
-
-            _updated.OnNext(Unit.Default);
-        }
-        */
-
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
             // do nothing
@@ -95,39 +51,10 @@ namespace DXGLTF
         {
             _camera.Update();
             _renderer.Begin(Handle, new Color4(0.5f, 0.5f, 0.5f, 0));
-            /*
-            foreach (var node in _gizmos)
-            {
-                RendererDraw(node, Matrix.Identity);
-            }
 
-            // clear depth
-            //_renderer.ClearDepth();
+            _hierarchy.Draw(_renderer, _camera);
 
-            foreach (var node in _drawables)
-            {
-                RendererDraw(node, Matrix.Identity);
-            }
-            */
             _renderer.End();
-        }
-
-        void RendererDraw(Nodes.Node node, Matrix accumulated)
-        {
-            var m = node.LocalMatrix * accumulated;
-            //Logger.Debug(m);
-            if (node.Mesh != null)
-            {
-                foreach (var x in node.Mesh.SubMeshes)
-                {
-                    _renderer.Draw(_camera, x.Material, x.Drawable ,m);
-                }
-            }
-
-            foreach (var child in node.Children)
-            {
-                RendererDraw(child, m);
-            }
         }
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
@@ -137,6 +64,7 @@ namespace DXGLTF
             Invalidate();
         }
 
+        #region MouseEvents
         int m_mouseX;
         int m_mouseY;
         private void D3DContent_MouseMove(object sender, MouseEventArgs e)
@@ -218,5 +146,6 @@ namespace DXGLTF
             _camera.Dolly(e.Delta);
             Invalidate();
         }
+        #endregion
     }
 }

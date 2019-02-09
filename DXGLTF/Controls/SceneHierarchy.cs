@@ -1,7 +1,9 @@
-﻿using DXGLTF.Assets;
+﻿using D3DPanel;
+using DXGLTF.Assets;
 using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Reactive;
@@ -100,6 +102,40 @@ namespace DXGLTF
 
         protected override void OnSelected(TreeNode node)
         {
+        }
+
+        public void Draw(D3D11Renderer renderer, Camera camera)
+        {
+            foreach (var node in _gizmos)
+            {
+                RendererDraw(renderer, camera, node, Matrix.Identity);
+            }
+
+            // clear depth
+            //_renderer.ClearDepth();
+
+            foreach (var node in _drawables)
+            {
+                RendererDraw(renderer, camera, node, Matrix.Identity);
+            }
+        }
+
+        void RendererDraw(D3D11Renderer renderer, Camera camera, Node node, Matrix accumulated)
+        {
+            var m = node.LocalMatrix * accumulated;
+            //Logger.Debug(m);
+            if (node.Mesh != null)
+            {
+                foreach (var x in node.Mesh.SubMeshes)
+                {
+                    renderer.Draw(camera, x.Material, x.Drawable, m);
+                }
+            }
+
+            foreach (var child in node.Children)
+            {
+                RendererDraw(renderer, camera, child, m);
+            }
         }
     }
 }
