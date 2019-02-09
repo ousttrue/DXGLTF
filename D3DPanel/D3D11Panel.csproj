@@ -99,8 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
-    <Compile Include="D3D11Drawable.cs" />
-    <Compile Include="D3D11DrawableFactory.cs" />
+    <Compile Include="D3D11Mesh.cs" />
+    <Compile Include="D3D11MeshFactory.cs" />
+    <Compile Include="D3D11Material.cs" />
     <Compile Include="D3D11Shader.cs" />
     <Compile Include="D3D11Panel.cs">
       <SubType>UserControl</SubType>

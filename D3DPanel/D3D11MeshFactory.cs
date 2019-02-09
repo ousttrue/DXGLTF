@@ -3,16 +3,12 @@ using System.Collections.Generic;
 
 namespace D3DPanel
 {
-    public static class D3D11DrawableFactory
+    public static class D3D11MeshFactory
     {
-        public static D3D11Drawable CreateTriangle(D3D11Shader shader, float size = 0.5f)
+        public static D3D11Mesh CreateTriangle(D3D11Shader shader, float size = 0.5f)
         {
-            var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
-                new[] { 0, 1, 2 },
-                shader,
-                default(ImageBytes),
-                Color4.White
-                );
+            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+                new[] { 0, 1, 2 });
             drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
                     new Vector3(0.0f, size, 0),
                     new Vector3(size, -size, 0),
@@ -26,11 +22,11 @@ namespace D3DPanel
             return drawable;
         }
 
-        public static D3D11Drawable CreateAxis(D3D11Shader shader, float w, float h)
+        public static D3D11Mesh CreateAxis(D3D11Shader shader, float w, float h)
         {
             var offset = 0.001f;
             var arrow = w * 2;
-            var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
                 new[] {
                     0, 1, 2,
                     2, 3, 0,
@@ -39,11 +35,7 @@ namespace D3DPanel
                     7, 8, 9,
                     9, 10, 7,
                     11, 12, 13
-                },
-                shader,
-                default(ImageBytes),
-                Color4.White
-            );
+                });
 
             {
                 // X
@@ -88,7 +80,7 @@ namespace D3DPanel
             return drawable;
         }
 
-        public static D3D11Drawable CreateGrid(D3D11Shader shader, float size, int count)
+        public static D3D11Mesh CreateGrid(D3D11Shader shader, float size, int count)
         {
             var positions = new List<Vector3>();
             var colors = new List<Color4>();
@@ -140,12 +132,8 @@ namespace D3DPanel
                 }
             }
 
-            var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.LineList,
-                indices.ToArray(),
-                shader,
-                default(ImageBytes),
-                Color4.White
-                );
+            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.LineList,
+                indices.ToArray());
             drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(positions.ToArray()));
             drawable.SetAttribute(Semantics.COLOR, VertexAttribute.Create(colors.ToArray()));
             return drawable;

@@ -146,6 +146,15 @@ namespace UniGLTF
     [Serializable]
     public class glTFMaterial : JsonSerializableBase
     {
+        public bool IsUnlit
+        {
+            get
+            {
+                if (extensions == null) return false;
+                return extensions.KHR_materials_unlit != null;
+            }
+        }
+
         public string name;
         public glTFPbrMetallicRoughness pbrMetallicRoughness;
         public glTFMaterialNormalTextureInfo normalTexture = null;
@@ -168,6 +177,7 @@ namespace UniGLTF
 
         [JsonSchema(SkipSchemaComparison = true)]
         public glTFMaterial_extensions extensions;
+
         public object extras;
 
         protected override void SerializeMembers(GLTFJsonFormatter f)

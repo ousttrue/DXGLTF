@@ -166,7 +166,7 @@ namespace D3DPanel
             m_context.Rasterizer.SetViewport(Viewport);
         }
 
-        public void Draw(Camera camera, D3D11Drawable drawable, Matrix modelMatrix)
+        public void Draw(Camera camera, D3D11Material material, D3D11Mesh drawable, Matrix modelMatrix)
         {
             var mvp = modelMatrix * camera.View * camera.Projection;
             mvp.Transpose();
@@ -177,10 +177,10 @@ namespace D3DPanel
 
             m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context, new ObjectConstants
             {
-                Color = drawable.Color
+                Color = material.Color
             }));
 
-            drawable.Draw(this);
+            material.Draw(this, drawable);
         }
 
         public void End()

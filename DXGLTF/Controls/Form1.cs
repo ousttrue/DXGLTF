@@ -66,8 +66,11 @@ namespace DXGLTF
                 {
                     toolStripStatusLabel1.Text ="";
                 }
-                m_d3d.SetSelection(jsonNode.Source, x);
+                //m_d3d.SetSelection(jsonNode.Source, x);
             });
+
+            var hierarchy = new SceneHierarchy(m_scene);
+            AddContent("scene hierarchy", hierarchy, DockState.DockRight);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)

@@ -46,6 +46,8 @@ Repeated
 ### material
 * [x] pbrMetallicRoughness.baseColorFactor
 * [x] UnlitShader
+* [ ] BackfaceCulling
+* [ ] AlphaBlend
 
 ### mesh
 3D View without transform

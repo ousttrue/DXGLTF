@@ -1,13 +1,8 @@
 ﻿using GltfScene;
 using System;
 using System.Windows.Forms;
-using System.Linq;
-using UniGLTF;
 using WeifenLuo.WinFormsUI.Docking;
-using UniJSON;
-using NLog;
-using System.Collections.Generic;
-using Reactive.Bindings;
+
 
 namespace DXGLTF
 {
@@ -16,19 +11,32 @@ namespace DXGLTF
         Scene m_scene;
         public TreeViewContentBase(Scene scene)
         {
-            m_scene = scene;
-
             InitializeComponent();
 
-            m_scene.SourceObservableOnCurrent.Subscribe(x =>
+            if (scene != null)
             {
-                OnUpdated(x);
-            });
+                m_scene = scene;
+                m_scene.SourceObservableOnCurrent.Subscribe(x =>
+                {
+                    OnUpdated(x);
+                });
+            }
         }
+
+        /// <summary>
+        /// 新しいファイルが読まれた
+        /// </summary>
+        /// <param name="source"></param>
         protected abstract void OnUpdated(Source source);
+
         protected TreeView TreeView { get { return treeView1; } }
 
+        /// <summary>
+        /// ツリーノードが選択された
+        /// </summary>
+        /// <param name="node"></param>
         protected abstract void OnSelected(TreeNode node);
+
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             OnSelected(treeView1.SelectedNode);

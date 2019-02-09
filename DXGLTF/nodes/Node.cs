@@ -1,4 +1,5 @@
 ﻿using D3DPanel;
+using DXGLTF.Assets;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -13,19 +14,19 @@ namespace DXGLTF.Nodes
 
         public List<Node> Children = new List<Node>();
 
-        List<D3D11Drawable> m_value = new List<D3D11Drawable>();
-        public List<D3D11Drawable> Value
+        public Mesh Mesh
         {
-            get { return m_value; }
+            get;
+            set;
         }
 
         public void Dispose()
         {
-            foreach (var x in m_value)
+            if (Mesh != null)
             {
-                x.Dispose();
+                Mesh.Dispose();
+                Mesh = null;
             }
-            m_value.Clear();
 
             foreach (var x in Children)
             {
@@ -46,10 +47,6 @@ namespace DXGLTF.Nodes
 
         public Node()
         {
-        }
-        public Node(D3D11Drawable drawable)
-        {
-            m_value.Add(drawable);
         }
     }
 }

@@ -54,6 +54,7 @@ namespace DXGLTF
         {
             var shaderDir = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "shaders");
             m_map.Add(ShaderType.Unlit, new SourceWatcher(shaderDir, "unlit.hlsl"));
+            m_map.Add(ShaderType.Standard, new SourceWatcher(shaderDir, "unlit.hlsl"));
             m_map.Add(ShaderType.Gizmo, new SourceWatcher(shaderDir, "gizmo.hlsl"));
         }
 

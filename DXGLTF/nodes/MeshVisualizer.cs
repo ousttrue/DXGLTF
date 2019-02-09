@@ -115,7 +115,9 @@ namespace DXGLTF.Nodes
                     foreach (var primitive in gltf.meshes[node.mesh].primitives)
                     {
                         var d3d = PrimitiveToD3D(ref source, shaderLoader, gltf, primitive);
-                        drawable.Value.Add(d3d);
+                        drawable.Mesh.SubMeshes.Add(new Assets.Mesh.SubMesh{
+                            Drawable=d3d
+                        });
                     }
                 }
             }
@@ -133,12 +135,12 @@ namespace DXGLTF.Nodes
                 foreach (var primitive in mesh.primitives)
                 {
                     var drawable = PrimitiveToD3D(ref source, shaderLoader, gltf, primitive);
-                    drawables.Add(new Node(drawable));
+                    drawables.Add(new Node());
                 }
             }
         }
 
-        static D3D11Drawable PrimitiveToD3D(ref GltfScene.Source source, ShaderLoader m_shaderLoader, UniGLTF.glTF gltf, UniGLTF.glTFPrimitives primitive)
+        static D3D11Mesh PrimitiveToD3D(ref GltfScene.Source source, ShaderLoader m_shaderLoader, UniGLTF.glTF gltf, UniGLTF.glTFPrimitives primitive)
         {
             var m = gltf.materials[primitive.material];
 
@@ -187,8 +189,7 @@ namespace DXGLTF.Nodes
                     throw new NotImplementedException();
             }
 
-            var drawable = new D3D11Drawable(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
-                indices, shader, imageBytes, color);
+            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList, indices);
 
             var attribs = primitive.attributes;
 

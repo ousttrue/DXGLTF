@@ -26,8 +26,6 @@ namespace DXGLTF
             View = Matrix.Identity,
         };
 
-        ShaderLoader _shaderLoader = new ShaderLoader();
-
         IVisualizer[] _visualizers = new IVisualizer[]
             {
                 new MeshVisualizer(),
@@ -59,6 +57,7 @@ namespace DXGLTF
                 })
                 ;
 
+            /*
             var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
             var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
 
@@ -68,6 +67,7 @@ namespace DXGLTF
             // gizmos
             _gizmos.Add(new Node(D3D11DrawableFactory.CreateAxis(gizmo, 0.1f, 10.0f)));
             _gizmos.Add(new Node(D3D11DrawableFactory.CreateGrid(gizmo, 1.0f, 10)));
+            */
         }
 
         public void Shutdown()
@@ -83,6 +83,7 @@ namespace DXGLTF
             _renderer.Dispose();
         }
 
+        /*
         public void SetSelection(Source source, ListTreeNode<JsonValue> node)
         {
             if (source.GlTF == null)
@@ -118,7 +119,7 @@ namespace DXGLTF
 
             _updated.OnNext(Unit.Default);
         }
-
+        */
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
@@ -148,9 +149,12 @@ namespace DXGLTF
         {
             var m = node.LocalMatrix * accumulated;
             //Logger.Debug(m);
-            foreach (var x in node.Value)
+            if (node.Mesh != null)
             {
-                _renderer.Draw(_camera, x, m);
+                foreach (var x in node.Mesh.SubMeshes)
+                {
+                    _renderer.Draw(_camera, x.Material, x.Drawable ,m);
+                }
             }
 
             foreach (var child in node.Children)

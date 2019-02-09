@@ -92,6 +92,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AssetContext.cs" />
+    <Compile Include="Assets\Mesh.cs" />
     <Compile Include="Controls\D3DContent.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,6 +122,9 @@
       <DependentUpon>LoggerContent.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\NodeContent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\SceneHierarchy.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Nodes\ImageVisualizer.cs" />

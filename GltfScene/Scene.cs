@@ -152,7 +152,7 @@ namespace GltfScene
             source.JSON.Deserialize(ref gltf);
             source.GlTF = gltf;
 
-            Logger.Info($"OpenFile: parse {Path.GetFileName(path)} in {sw.Elapsed.TotalSeconds} sec");
+            Logger.Info($"Parse: {Path.GetFileName(path)}: {sw.Elapsed.TotalSeconds} sec");
 
             return source;
         }

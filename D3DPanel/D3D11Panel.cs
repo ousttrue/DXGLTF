@@ -9,7 +9,7 @@ namespace D3DPanel
     {
         D3D11Renderer m_renderer = new D3D11Renderer();
 
-        List<D3D11Drawable> m_drawables = new List<D3D11Drawable>();
+        List<D3D11Mesh> m_drawables = new List<D3D11Mesh>();
         public void AddDrawable(string vs, string ps)
         {
             var shader = new D3D11Shader();
@@ -40,7 +40,7 @@ namespace D3DPanel
             m_renderer.Begin(Handle, new SharpDX.Color4(0.5f, 0.5f, 0.5f, 0));
             foreach(var d in m_drawables)
             {
-                d.Draw(m_renderer);
+                //d.Draw(m_renderer);
             }           
             m_renderer.End();
         }
