@@ -50,6 +50,9 @@ namespace GltfScene
 
         public async void Load(string path)
         {
+            Logger.Info("----------------------------------------------------------");
+            Logger.Info($"Load: { Path.GetFileName(path)}");
+
             // clear
             m_source.Value = default(Source);
 
@@ -147,12 +150,14 @@ namespace GltfScene
                 source.JSON = JsonParser.Parse(new Utf8String(fileBytes));
                 source.IO = folder;
             }
+            Logger.Info($"Parse: {sw.Elapsed.TotalSeconds} sec");
+            sw = System.Diagnostics.Stopwatch.StartNew();
 
             glTF gltf = null;
             source.JSON.Deserialize(ref gltf);
             source.GlTF = gltf;
 
-            Logger.Info($"Parse: {Path.GetFileName(path)}: {sw.Elapsed.TotalSeconds} sec");
+            Logger.Info($"Deserialize: {sw.Elapsed.TotalSeconds} sec");
 
             return source;
         }
