@@ -3,6 +3,7 @@ using DXGLTF.Assets;
 using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
+using Reactive.Bindings;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,12 @@ namespace DXGLTF
     public class SceneHierarchy : TreeViewContentBase
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
+
+        ReactiveProperty<Node> _selected = new ReactiveProperty<Node>();
+        public ReadOnlyReactiveProperty<Node> Selected
+        {
+            get { return _selected.ToReadOnlyReactiveProperty(); }
+        }
 
         ShaderLoader _shaderLoader = new ShaderLoader();
 
@@ -42,6 +49,7 @@ namespace DXGLTF
 
         List<Node> _gizmos = new List<Node>();
         List<Node> _drawables = new List<Node>();
+        Mesh _manipulator;
         void ClearDrawables()
         {
             foreach (var x in _drawables)
@@ -60,6 +68,12 @@ namespace DXGLTF
                 x.Dispose();
             }
             _gizmos.Clear();
+
+            if (_manipulator != null)
+            {
+                _manipulator.Dispose();
+                _manipulator = null;
+            }
         }
 
         Subject<Unit> _updated = new Subject<Unit>();
@@ -79,6 +93,8 @@ namespace DXGLTF
             // gizmos
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 10.0f)));
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateGrid(1.0f, 10)));
+
+            _manipulator = new Mesh(new Submesh(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 1.0f)));
         }
 
         protected override void OnUpdated(Source source)
@@ -97,11 +113,14 @@ namespace DXGLTF
             Asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
         }
 
+        Dictionary<TreeNode, Node> _map = new Dictionary<TreeNode, Node>();
+
         void Traverse(TreeNodeCollection parent, Node node)
         {
             var viewNode = new TreeNode(node.Name);
             parent.Add(viewNode);
-            foreach(var child in node.Children)
+            _map.Add(viewNode, node);
+            foreach (var child in node.Children)
             {
                 Traverse(viewNode.Nodes, child);
             }
@@ -111,17 +130,19 @@ namespace DXGLTF
         {
             TreeView.Nodes.Clear();
             ClearDrawables();
+            _map.Clear();
+            _selected.Value = null;
             if (asset == null)
             {
                 return;
             }
 
-            var nodes  = asset.BuildHierarchy();
+            var nodes = asset.BuildHierarchy();
 
             var roots = nodes.Where(x => !nodes.Any(y => y.Children.Contains(x)));
 
             // treeview
-            foreach(var root in roots)
+            foreach (var root in roots)
             {
                 Traverse(TreeView.Nodes, root);
             }
@@ -132,15 +153,22 @@ namespace DXGLTF
             _updated.OnNext(Unit.Default);
         }
 
-        protected override void OnSelected(TreeNode node)
+        protected override void OnSelected(TreeNode viewNode)
         {
+            var node = default(Node);
+            if (!_map.TryGetValue(viewNode, out node))
+            {
+                Logger.Warn($"{viewNode} not found");
+            }
+            _selected.Value = node;
+            _updated.OnNext(Unit.Default);
         }
 
         public void Draw(D3D11Renderer renderer, Camera camera)
         {
             foreach (var node in _gizmos)
             {
-                RendererDraw(renderer, camera, node, Matrix.Identity);
+                DrawNode(renderer, camera, node, Matrix.Identity);
             }
 
             // clear depth
@@ -148,25 +176,37 @@ namespace DXGLTF
 
             foreach (var node in _drawables)
             {
-                RendererDraw(renderer, camera, node, Matrix.Identity);
+                DrawNode(renderer, camera, node, Matrix.Identity);
+            }
+
+            if (Selected.Value != null)
+            {
+                DrawMesh(renderer, camera, _manipulator, Selected.Value.WorldMatrix);
             }
         }
 
-        void RendererDraw(D3D11Renderer renderer, Camera camera, Node node, Matrix accumulated)
+        static void DrawNode(D3D11Renderer renderer, Camera camera, Node node, Matrix accumulated)
         {
-            var m = node.LocalMatrix * accumulated;
-            //Logger.Debug(m);
-            if (node.Mesh != null)
-            {
-                foreach (var x in node.Mesh.Submeshes)
-                {
-                    renderer.Draw(camera, x.Material, x.Mesh, m);
-                }
-            }
+            node.WorldMatrix = node.LocalMatrix * accumulated;
+            
+            DrawMesh(renderer, camera, node.Mesh, node.WorldMatrix);
 
             foreach (var child in node.Children)
             {
-                RendererDraw(renderer, camera, child, m);
+                DrawNode(renderer, camera, child, node.WorldMatrix);
+            }
+        }
+
+        static void DrawMesh(D3D11Renderer renderer, Camera camera, Mesh mesh, Matrix m)
+        {
+            if (mesh == null)
+            {
+                return;
+            }
+
+            foreach (var x in mesh.Submeshes)
+            {
+                renderer.Draw(camera, x.Material, x.Mesh, m);
             }
         }
     }

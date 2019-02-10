@@ -8,7 +8,7 @@ using UniJSON;
 
 namespace DXGLTF.Nodes
 {
-    class Node : IDisposable
+    public class Node : IDisposable
     {
         public bool IsValid => true;
 
@@ -43,6 +43,12 @@ namespace DXGLTF.Nodes
             {
                 _matrix = value;
             }
+        }
+
+        public Matrix WorldMatrix
+        {
+            get;
+            set;
         }
 
         public string Name
