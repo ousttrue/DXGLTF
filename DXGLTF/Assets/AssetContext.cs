@@ -5,7 +5,7 @@ using NLog;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-
+using SharpDX;
 
 namespace DXGLTF.Assets
 {
@@ -80,11 +80,11 @@ namespace DXGLTF.Assets
             return asset;
         }
 
-        public IEnumerable<Node> BuildHierarchy()
+        public Node[] BuildHierarchy()
         {
             var gltf = _source.GlTF;
 
-            var newNodes = gltf.nodes.Select(MeshVisualizer.CreateDrawable).ToArray();
+            var newNodes = gltf.nodes.Select((x, i)=>CreateDrawable(i, x)).ToArray();
 
             for (int i = 0; i < gltf.nodes.Count; ++i)
             {
@@ -107,7 +107,53 @@ namespace DXGLTF.Assets
             }
 
             // return only no parent
-            return newNodes.Where(x => !newNodes.Any(y => y.Children.Contains(x)));
+            return newNodes;
         }
+
+        public static Node CreateDrawable(int i, UniGLTF.glTFNode node)
+        {
+            var name = $"[{i}]{node.name}";
+            var drawable = new Node(name);
+
+            if (node.matrix != null)
+            {
+                var m = new Matrix(node.matrix);
+                drawable.LocalMatrix = m;
+            }
+            else
+            {
+                var t = Vector3.Zero;
+                var r = Quaternion.Identity;
+                var s = Vector3.One;
+
+                if (node.translation != null)
+                {
+                    t.X = node.translation[0];
+                    t.Y = node.translation[1];
+                    t.Z = node.translation[2];
+                }
+
+                if (node.rotation != null)
+                {
+                    r.X = node.rotation[0];
+                    r.Y = node.rotation[1];
+                    r.Z = node.rotation[2];
+                    r.W = node.rotation[3];
+                }
+
+                if (node.scale != null)
+                {
+                    s.X = node.scale[0];
+                    s.Y = node.scale[1];
+                    s.Z = node.scale[2];
+                }
+
+                var m = Matrix.Transformation(Vector3.Zero, Quaternion.Identity, s, Vector3.Zero, r, t);
+                drawable.LocalMatrix = m;
+            }
+
+            return drawable;
+        }
+
     }
 }

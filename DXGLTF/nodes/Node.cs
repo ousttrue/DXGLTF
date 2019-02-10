@@ -45,8 +45,15 @@ namespace DXGLTF.Nodes
             }
         }
 
-        public Node()
+        public string Name
         {
+            get;
+            private set;
+        }
+
+        public Node(string name)
+        {
+            Name = name;
         }
 
         public Node(D3D11Shader shader, D3D11Mesh mesh)

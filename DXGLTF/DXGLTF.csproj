@@ -129,7 +129,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Nodes\ImageVisualizer.cs" />
-    <Compile Include="Nodes\MeshVisualizer.cs" />
     <Compile Include="Nodes\IVisualizer.cs" />
     <Compile Include="Nodes\Node.cs" />
     <Compile Include="Program.cs" />

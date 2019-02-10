@@ -17,7 +17,7 @@ GLTF viewer using SharpDX
 * [ ] CameraDock
     * [ ] Auto near far
 * [ ] LightDock
-* [ ] HierarchyDock
+* [x] HierarchyDock
 
 ## Gizmo
 * [x] Axis

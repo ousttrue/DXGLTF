@@ -28,17 +28,15 @@ namespace DXGLTF
             get { return _asset; }
             set
             {
-                var tmp = default(AssetContext);
-                lock (this)
-                {
-                    tmp = _asset;
-                    _asset = value;
-                }
+                if (_asset == value) return;
 
-                if (tmp != null)
+                if (_asset != null)
                 {
-                    tmp.Dispose();
+                    _asset.Dispose();
                 }
+                _asset = value;
+
+                SetTreeNode(value);
             }
         }
 
@@ -96,14 +94,40 @@ namespace DXGLTF
                 return;
             }
 
-            var asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
+            Asset = await Task.Run(() => AssetContext.Load(source, _shaderLoader));
+        }
 
+        void Traverse(TreeNodeCollection parent, Node node)
+        {
+            var viewNode = new TreeNode(node.Name);
+            parent.Add(viewNode);
+            foreach(var child in node.Children)
+            {
+                Traverse(viewNode.Nodes, child);
+            }
+        }
+
+        void SetTreeNode(AssetContext asset)
+        {
+            TreeView.Nodes.Clear();
             ClearDrawables();
+            if (asset == null)
+            {
+                return;
+            }
 
-            // build nodes
-            _drawables.AddRange(asset.BuildHierarchy());
+            var nodes  = asset.BuildHierarchy();
 
-            Asset = asset;
+            var roots = nodes.Where(x => !nodes.Any(y => y.Children.Contains(x)));
+
+            // treeview
+            foreach(var root in roots)
+            {
+                Traverse(TreeView.Nodes, root);
+            }
+
+            // drawables
+            _drawables.AddRange(roots);
 
             _updated.OnNext(Unit.Default);
         }

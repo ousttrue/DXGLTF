@@ -51,7 +51,7 @@ namespace DXGLTF.Nodes
                     new Vector2(0, 1),
                 }));
 
-                m_drawables.Add(new Node());
+                m_drawables.Add(new Node(image.name));
 
                 break;
             }
