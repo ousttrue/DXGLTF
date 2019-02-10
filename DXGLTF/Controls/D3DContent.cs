@@ -100,6 +100,12 @@ namespace DXGLTF
             switch (e.Button)
             {
                 case MouseButtons.Left:
+                    if (!m_leftDown)
+                    {
+                        // left down
+                        var ray = _camera.GetRay(e.X, e.Y);
+                        _hierarchy.Intersect(ray);
+                    }
                     m_leftDown = true;
                     Capture = true;
                     break;

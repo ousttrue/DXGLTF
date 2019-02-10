@@ -62,5 +62,21 @@ namespace D3DPanel
             Projection = Matrix.PerspectiveFovRH(FovY, AspectRatio, ZNear, ZFar);
             ViewProjection = View * Projection;
         }
+
+        public Ray GetRay(float x, float y)
+        {
+            // convert screen pixel to view space
+            var vx = (2.0f * x / m_screenWidth - 1.0f) / Projection.M11;
+            var vy = (-2.0f * y / m_screenHeight + 1.0f) / Projection.M22;
+
+            var ray = new Ray(new Vector3(), new Vector3(vx, vy, -1.0f));
+            var toWorld = View;
+            toWorld.Invert();
+
+            ray = new Ray((Vector3)toWorld.Row4, Vector3.TransformNormal(ray.Direction, toWorld));
+
+            ray.Direction.Normalize();
+            return ray;
+        }
     }
 }

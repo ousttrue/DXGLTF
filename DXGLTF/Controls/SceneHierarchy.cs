@@ -164,6 +164,18 @@ namespace DXGLTF
             _updated.OnNext(Unit.Default);
         }
 
+        public void Intersect(Ray ray)
+        {
+            Logger.Debug(ray);
+            foreach(var kv in _map)
+            {
+                foreach(var t in kv.Value.Intersect(ray))
+                {
+                    Logger.Debug($"{kv.Value.Name} Intersect {t}");
+                }
+            }
+        }
+
         public void Draw(D3D11Renderer renderer, Camera camera)
         {
             foreach (var node in _gizmos)

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System;
 using System.Linq;
-
+using SharpDX;
+using System.Runtime.InteropServices;
 
 namespace D3DPanel
 {
@@ -149,6 +150,82 @@ namespace D3DPanel
             {
                 m_vertexBuffer.Dispose();
                 m_vertexBuffer = null;
+            }
+        }
+
+        Vector3[] _positions;
+        Vector3[] Positions
+        {
+            get
+            {
+                if (_positions == null)
+                {
+                    _positions = new Vector3[VertexCount];
+                    var pinnedArray = GCHandle.Alloc(_positions, GCHandleType.Pinned);
+                    {
+                        var ptr = pinnedArray.AddrOfPinnedObject();
+                        var positions = m_attributes[Semantics.POSITION].Value;
+                        Marshal.Copy(positions.Array, positions.Offset, ptr, positions.Count);
+                    }
+                    pinnedArray.Free();
+                }
+                return _positions;
+            }
+        }
+
+        public IEnumerable<TriangleIntersection> Intersect(Ray ray)
+        {
+            if (Topology != PrimitiveTopology.TriangleList)
+            {
+                yield break;
+            }
+
+            if (m_indices == null)
+            {
+                for (int i = 0; i < VertexCount; i += 2)
+                {
+                    var i1 = i + 1;
+                    var i2 = i + 2;
+                    var d = default(float);
+                    if (ray.Intersects(
+                        ref Positions[i],
+                        ref Positions[i1],
+                        ref Positions[i2],
+                        out d))
+                    {
+                        yield return new TriangleIntersection
+                        {
+                            I0 = i,
+                            I1 = i1,
+                            I2 = i2,
+                            Distance = d
+                        };
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < m_indices.Length; i += 3)
+                {
+                    var i0 = m_indices[i];
+                    var i1 = m_indices[i + 1];
+                    var i2 = m_indices[i + 2];
+                    var d = default(float);
+                    if (ray.Intersects(
+                        ref Positions[i0],
+                        ref Positions[i1],
+                        ref Positions[i2],
+                        out d))
+                    {
+                        yield return new TriangleIntersection
+                        {
+                            I0 = i0,
+                            I1 = i1,
+                            I2 = i2,
+                            Distance = d
+                        };
+                    }
+                }
             }
         }
     }
