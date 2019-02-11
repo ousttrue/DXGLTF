@@ -12,11 +12,24 @@ namespace D3DPanel
             List<int> _indices = new List<int>();
             List<Vector3> _positions = new List<Vector3>();
             List<Color4> _colors = new List<Color4>();
+            SharpDX.Direct3D.PrimitiveTopology _topology;
 
             public void AddLine(Vector3 p0, Vector3 p1,
                Color4 c0, Color4 c1)
             {
                 var i = _positions.Count;
+                if (i == 0)
+                {
+                    _topology = SharpDX.Direct3D.PrimitiveTopology.LineList;
+                }
+                else
+                {
+                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.LineList)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+
                 _positions.Add(p0);
                 _positions.Add(p1);
                 _colors.Add(c0);
@@ -29,6 +42,17 @@ namespace D3DPanel
                Color4 c0, Color4 c1, Color4 c2)
             {
                 var i = _positions.Count;
+                if (i == 0)
+                {
+                    _topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+                }
+                else
+                {
+                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.TriangleList)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
                 _positions.Add(p0);
                 _positions.Add(p1);
                 _positions.Add(p2);
@@ -44,6 +68,17 @@ namespace D3DPanel
                Color4 c0, Color4 c1, Color4 c2, Color4 c3)
             {
                 var i = _positions.Count;
+                if (i == 0)
+                {
+                    _topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+                }
+                else
+                {
+                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.TriangleList)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
                 _positions.Add(p0);
                 _positions.Add(p1);
                 _positions.Add(p2);
@@ -60,9 +95,9 @@ namespace D3DPanel
                 _indices.Add(i);
             }
 
-            public D3D11Mesh ToMesh(SharpDX.Direct3D.PrimitiveTopology topology)
+            public D3D11Mesh ToMesh()
             {
-                var drawable = new D3D11Mesh(topology, _indices.ToArray());
+                var drawable = new D3D11Mesh(_topology, _indices.ToArray());
                 drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(_positions.ToArray()));
                 drawable.SetAttribute(Semantics.COLOR, VertexAttribute.Create(_colors.ToArray()));
                 return drawable;
@@ -80,7 +115,7 @@ namespace D3DPanel
                     new Color4(0, 1.0f, 0, 1.0f),
                     new Color4(0, 0, 1.0f, 1.0f)
                 );
-            return builder.ToMesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+            return builder.ToMesh();
         }
 
         public static D3D11Mesh CreateAxis(float w, float h)
@@ -127,7 +162,7 @@ namespace D3DPanel
                     blue,
                     blue
                 );
-            return builder.ToMesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+            return builder.ToMesh();
         }
 
         public static D3D11Mesh CreateGrid(float size, int count)
@@ -168,12 +203,50 @@ namespace D3DPanel
                     );
             }
 
-            return builder.ToMesh(SharpDX.Direct3D.PrimitiveTopology.LineList);
+            return builder.ToMesh();
+        }
+
+        static Vector3 GetX(int axis, bool positive)
+        {
+            switch (axis)
+            {
+                case 0: return Vector3.UnitY;
+                case 1: return Vector3.UnitZ;
+                case 2: return Vector3.UnitX;
+                default: throw new NotImplementedException();
+            }
+        }
+
+        static Vector3 GetY(int axis, bool positive)
+        {
+            switch (axis)
+            {
+                case 0: return Vector3.UnitZ;
+                case 1: return Vector3.UnitX;
+                case 2: return Vector3.UnitY;
+                default: throw new NotImplementedException();
+            }
+        }
+
+        static Vector3 GetZ(int axis, bool positive)
+        {
+            switch (axis)
+            {
+                case 0: return positive ? Vector3.UnitX : -Vector3.UnitX;
+                case 1: return positive ? Vector3.UnitY : -Vector3.UnitY;
+                case 2: return positive ? Vector3.UnitZ : -Vector3.UnitZ;
+                default: throw new NotImplementedException();
+            }
         }
 
         public static D3D11Mesh CreateArrow(float width, float length, int axis, bool positive)
         {
-            throw new NotImplementedException();
+            var x = GetX(axis, positive);
+            var y = GetY(axis, positive);
+            var z = GetZ(axis, positive);
+
+            var builder = new MeshBuilder();
+            return builder.ToMesh();
         }
     }
 }
