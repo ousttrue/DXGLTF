@@ -4,15 +4,6 @@ GLTF viewer using SharpDX
 
 ![ss](ss.jpg)
 
-## Support format
-
-* GLTF
-* GLB
-* VRM
-* GLTF in zip
-* GLB in zip
-* VRM in zip
-
 ## Dock
 * [ ] CameraDock
     * [ ] Auto near far
