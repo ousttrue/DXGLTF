@@ -94,14 +94,18 @@ namespace DXGLTF
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 10.0f)));
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateGrid(1.0f, 10)));
 
-            _manipulator = new Mesh(
-                new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 0, true, new Color4(1, 0, 0, 1)))
-                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 0, false, new Color4(0.5f, 0, 0, 1)))
-                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 1, true, new Color4(0, 1, 0, 1)))
-                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 1, false, new Color4(0, 0.5f, 0, 1)))
-                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 2, true, new Color4(0, 0, 1.0f, 1)))
-                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 2, false, new Color4(0, 0, 0.5f, 1)))
-                );
+            {
+                var radius = 0.005f;
+                var length = 0.3f;
+                _manipulator = new Mesh(
+                    new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 0, true, new Color4(1, 0, 0, 1)))
+                    , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 0, false, new Color4(0.5f, 0, 0, 1)))
+                    , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 1, true, new Color4(0, 1, 0, 1)))
+                    , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 1, false, new Color4(0, 0.5f, 0, 1)))
+                    , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 2, true, new Color4(0, 0, 1.0f, 1)))
+                    , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(radius, length, 2, false, new Color4(0, 0, 0.5f, 1)))
+                    );
+            }
         }
 
         protected override void OnUpdated(Source source)

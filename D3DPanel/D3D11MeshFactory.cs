@@ -89,6 +89,24 @@ namespace D3DPanel
                 _indices.AddMany(4, 5, 1, 1, 0, 4);
             }
 
+            public void AddPyramid(Matrix m, float size, Color4 color)
+            {
+                var i = GetIndex(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+                _positions.AddMany(
+                    Vector3.TransformCoordinate(new Vector3(-size, 0, -size), m),
+                    Vector3.TransformCoordinate(new Vector3(size, 0, -size), m),
+                    Vector3.TransformCoordinate(new Vector3(size, 0, size), m),
+                    Vector3.TransformCoordinate(new Vector3(-size, 0, size), m),
+                    Vector3.TransformCoordinate(new Vector3(0, size*2, 0), m)
+                    );
+                _colors.AddMany(color, color, color, color, color);
+                _indices.AddMany(i, i + 1, i + 2, i + 2, i + 3, i);
+                _indices.AddMany(i, i + 1, i + 4);
+                _indices.AddMany(i + 1, i + 2, i + 4);
+                _indices.AddMany(i + 2, i + 3, i + 4);
+                _indices.AddMany(i + 3, i, i + 4);
+            }
+
             public D3D11Mesh ToMesh()
             {
                 var drawable = new D3D11Mesh(_topology, _indices.ToArray());
@@ -201,67 +219,35 @@ namespace D3DPanel
             return builder.ToMesh();
         }
 
-        static Vector3 GetX(int axis, bool positive)
-        {
-            switch (axis)
-            {
-                case 0: return Vector3.UnitY;
-                case 1: return Vector3.UnitZ;
-                case 2: return Vector3.UnitX;
-                default: throw new NotImplementedException();
-            }
-        }
-
-        static Vector3 GetY(int axis, bool positive)
-        {
-            switch (axis)
-            {
-                case 0: return Vector3.UnitZ;
-                case 1: return Vector3.UnitX;
-                case 2: return Vector3.UnitY;
-                default: throw new NotImplementedException();
-            }
-        }
-
-        static Vector3 GetZ(int axis, bool positive)
-        {
-            switch (axis)
-            {
-                case 0: return positive ? Vector3.UnitX : -Vector3.UnitX;
-                case 1: return positive ? Vector3.UnitY : -Vector3.UnitY;
-                case 2: return positive ? Vector3.UnitZ : -Vector3.UnitZ;
-                default: throw new NotImplementedException();
-            }
-        }
-
         public static D3D11Mesh CreateArrow(float width, float length, int axis, bool positive, Color4 color)
         {
-            /*
-            var x = GetX(axis, positive);
-            var y = GetY(axis, positive);
-            var z = GetZ(axis, positive);
-            */
             var builder = new MeshBuilder();
             switch (axis)
             {
                 case 0:
                     {
-                        var center = Vector3.UnitX * (length / 2);
-                        builder.AddCube(positive ? center : -center, (length / 2), width, width, color);
+                        var end = Vector3.UnitX * (positive ? length : -length);
+                        builder.AddCube(end/2, (length / 2), width, width, color);
+                        var r = Matrix.RotationZ(MathUtil.DegreesToRadians(positive ? -90 : 90));
+                        builder.AddPyramid(r * Matrix.Translation(end), width * 2, color);
                     }
                     break;
 
                 case 1:
                     {
-                        var center = Vector3.UnitY * (length / 2);
-                        builder.AddCube(positive ? center : -center, width, (length / 2), width, color);
+                        var end = Vector3.UnitY * (positive ? length : -length);
+                        builder.AddCube(end/2, width, (length / 2), width, color);
+                        var r = positive ? Matrix.Identity : Matrix.RotationX(MathUtil.DegreesToRadians(180));
+                        builder.AddPyramid(r * Matrix.Translation(end), width * 2, color);
                     }
                     break;
 
                 case 2:
                     {
-                        var center = Vector3.UnitZ * (length / 2);
-                        builder.AddCube(positive ? center : -center, width, width, (length / 2), color);
+                        var end = Vector3.UnitZ * (positive ? length : -length);
+                        builder.AddCube(end/2, width, width, (length / 2), color);
+                        var r = Matrix.RotationX(MathUtil.DegreesToRadians(positive ? 90 : -90));
+                        builder.AddPyramid(r * Matrix.Translation(end), width * 2, color);
                     }
                     break;
 
