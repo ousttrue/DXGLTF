@@ -1,10 +1,18 @@
 ﻿using SharpDX;
 using System.Collections.Generic;
 using System;
-
+using System.Linq;
 
 namespace D3DPanel
 {
+    static class ListExtensions
+    {
+        public static void AddMany<T>(this List<T> list, params T[] many)
+        {
+            list.AddRange(many);
+        }
+    }
+
     public static class D3D11MeshFactory
     {
         public class MeshBuilder
@@ -14,85 +22,71 @@ namespace D3DPanel
             List<Color4> _colors = new List<Color4>();
             SharpDX.Direct3D.PrimitiveTopology _topology;
 
-            public void AddLine(Vector3 p0, Vector3 p1,
-               Color4 c0, Color4 c1)
+            int GetIndex(SharpDX.Direct3D.PrimitiveTopology topology)
             {
                 var i = _positions.Count;
                 if (i == 0)
                 {
-                    _topology = SharpDX.Direct3D.PrimitiveTopology.LineList;
+                    _topology = topology;
                 }
                 else
                 {
-                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.LineList)
+                    if (_topology != topology)
                     {
                         throw new InvalidOperationException();
                     }
                 }
+                return i;
+            }
 
-                _positions.Add(p0);
-                _positions.Add(p1);
-                _colors.Add(c0);
-                _colors.Add(c1);
-                _indices.Add(i);
-                _indices.Add(i + 1);
+            public void AddLine(Vector3 p0, Vector3 p1,
+               Color4 c0, Color4 c1)
+            {
+                var i = GetIndex(SharpDX.Direct3D.PrimitiveTopology.LineList);
+                _positions.AddMany(p0, p1);
+                _colors.AddMany(c0, c1);
+                _indices.AddMany(i, i + 1);
             }
 
             public void AddTriangle(Vector3 p0, Vector3 p1, Vector3 p2,
                Color4 c0, Color4 c1, Color4 c2)
             {
-                var i = _positions.Count;
-                if (i == 0)
-                {
-                    _topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-                }
-                else
-                {
-                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.TriangleList)
-                    {
-                        throw new InvalidOperationException();
-                    }
-                }
-                _positions.Add(p0);
-                _positions.Add(p1);
-                _positions.Add(p2);
-                _colors.Add(c0);
-                _colors.Add(c1);
-                _colors.Add(c2);
-                _indices.Add(i);
-                _indices.Add(i + 1);
-                _indices.Add(i + 2);
+                var i = GetIndex(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+                _positions.AddMany(p0, p1, p2);
+                _colors.AddMany(c0, c1, c2);
+                _indices.AddMany(i, i + 1, i + 2);
             }
 
             public void AddQuadrangle(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3,
                Color4 c0, Color4 c1, Color4 c2, Color4 c3)
             {
-                var i = _positions.Count;
-                if (i == 0)
-                {
-                    _topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-                }
-                else
-                {
-                    if (_topology != SharpDX.Direct3D.PrimitiveTopology.TriangleList)
-                    {
-                        throw new InvalidOperationException();
-                    }
-                }
-                _positions.Add(p0);
-                _positions.Add(p1);
-                _positions.Add(p2);
-                _positions.Add(p3);
-                _colors.Add(c0);
-                _colors.Add(c1);
-                _colors.Add(c2);
-                _colors.Add(c3);
-                _indices.Add(i);
-                _indices.Add(i + 1);
-                _indices.Add(i + 2);
-                _indices.Add(i + 2);
-                _indices.Add(i + 3);
-                _indices.Add(i);
+                var i = GetIndex(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+                _positions.AddMany(p0, p1, p2, p3);
+                _colors.AddMany(c0, c1, c2, c3);
+                _indices.AddMany(i, i + 1, i + 2);
+                _indices.AddMany(i + 2, i + 3, i);
+            }
+
+            public void AddCube(Vector3 center, float w, float h, float d, Color4 color)
+            {
+                var i = GetIndex(SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+                _positions.AddMany(
+                    center + new Vector3(-w, -h, d),
+                    center + new Vector3(w, -h, d),
+                    center + new Vector3(w, h, d),
+                    center + new Vector3(-w, h, d),
+                    center + new Vector3(-w, -h, -d),
+                    center + new Vector3(w, -h, -d),
+                    center + new Vector3(w, h, -d),
+                    center + new Vector3(-w, h, -d)
+                    );
+                _colors.AddRange(Enumerable.Repeat(color, 8));
+                _indices.AddMany(0, 1, 2, 2, 3, 0);
+                _indices.AddMany(1, 5, 6, 6, 2, 1);
+                _indices.AddMany(5, 4, 7, 7, 6, 5);
+                _indices.AddMany(4, 0, 3, 3, 7, 4);
+                _indices.AddMany(3, 2, 6, 6, 7, 3);
+                _indices.AddMany(4, 5, 1, 1, 0, 4);
             }
 
             public D3D11Mesh ToMesh()
@@ -122,8 +116,9 @@ namespace D3DPanel
         {
             var offset = 0.001f;
             var arrow = w * 2;
-            var red = new Color4(1.0f, 0, 0, 1.0f);
-            var blue = new Color4(0, 0, 1.0f, 1.0f);
+            var sub = 0.6f;
+            var red = new Color4(1.0f, sub, sub, 1.0f);
+            var blue = new Color4(sub, sub, 1.0f, 1.0f);
 
             var builder = new MeshBuilder();
             builder.AddQuadrangle(
@@ -239,13 +234,40 @@ namespace D3DPanel
             }
         }
 
-        public static D3D11Mesh CreateArrow(float width, float length, int axis, bool positive)
+        public static D3D11Mesh CreateArrow(float width, float length, int axis, bool positive, Color4 color)
         {
+            /*
             var x = GetX(axis, positive);
             var y = GetY(axis, positive);
             var z = GetZ(axis, positive);
-
+            */
             var builder = new MeshBuilder();
+            switch (axis)
+            {
+                case 0:
+                    {
+                        var center = Vector3.UnitX * (length / 2);
+                        builder.AddCube(positive ? center : -center, (length / 2), width, width, color);
+                    }
+                    break;
+
+                case 1:
+                    {
+                        var center = Vector3.UnitY * (length / 2);
+                        builder.AddCube(positive ? center : -center, width, (length / 2), width, color);
+                    }
+                    break;
+
+                case 2:
+                    {
+                        var center = Vector3.UnitZ * (length / 2);
+                        builder.AddCube(positive ? center : -center, width, width, (length / 2), color);
+                    }
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
             return builder.ToMesh();
         }
     }

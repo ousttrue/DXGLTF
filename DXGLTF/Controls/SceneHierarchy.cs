@@ -94,7 +94,14 @@ namespace DXGLTF
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 10.0f)));
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateGrid(1.0f, 10)));
 
-            _manipulator = new Mesh(new Submesh(gizmo, D3D11MeshFactory.CreateAxis(0.1f, 1.0f)));
+            _manipulator = new Mesh(
+                new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 0, true, new Color4(1, 0, 0, 1)))
+                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 0, false, new Color4(0.5f, 0, 0, 1)))
+                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 1, true, new Color4(0, 1, 0, 1)))
+                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 1, false, new Color4(0, 0.5f, 0, 1)))
+                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 2, true, new Color4(0, 0, 1.0f, 1)))
+                , new Submesh(gizmo, D3D11MeshFactory.CreateArrow(0.01f, 0.3f, 2, false, new Color4(0, 0, 0.5f, 1)))
+                );
         }
 
         protected override void OnUpdated(Source source)
@@ -166,13 +173,15 @@ namespace DXGLTF
 
         public void Intersect(Ray ray)
         {
-            Logger.Debug(ray);
-            foreach(var kv in _map)
+            if (Selected.Value == null)
             {
-                foreach(var t in kv.Value.Intersect(ray))
-                {
-                    Logger.Debug($"{kv.Value.Name} Intersect {t}");
-                }
+                return;
+            }
+            Logger.Debug(ray);
+
+            foreach(var t in _manipulator.Intersect(Selected.Value.WorldMatrix, ray))
+            {
+                Logger.Debug($"Intersect {t}");
             }
         }
 

@@ -3,6 +3,7 @@ using DXGLTF.Assets;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UniJSON;
 
 
@@ -67,34 +68,14 @@ namespace DXGLTF.Nodes
             Mesh = new Mesh(new Submesh(shader, mesh));
         }
 
-        public struct SubmeshIntersection
-        {
-            public int SubmeshIndex;
-            public TriangleIntersection Triangle;
-        }
-
         public IEnumerable<SubmeshIntersection> Intersect(Ray ray)
         {
-            // transform the picking ray into the object space of the mesh
-            var invWorld = Matrix.Invert(WorldMatrix);
-            ray.Direction = Vector3.TransformNormal(ray.Direction, invWorld);
-            ray.Position = Vector3.TransformCoordinate(ray.Position, invWorld);
-            ray.Direction.Normalize();
-
-            if (Mesh != null)
+            if (Mesh == null)
             {
-                for(int i=0; i<Mesh.Submeshes.Count; ++i)
-                {
-                    foreach(var intersection in Mesh.Submeshes[i].Mesh.Intersect(ray))
-                    {
-                        yield return new SubmeshIntersection
-                        {
-                            SubmeshIndex = i,
-                            Triangle = intersection
-                        };
-                    }
-                }
+                return Enumerable.Empty<SubmeshIntersection>();
             }
+
+            return Mesh.Intersect(WorldMatrix, ray);
         }
     }
 }

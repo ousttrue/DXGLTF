@@ -1,5 +1,6 @@
 ﻿using D3DPanel;
 using GltfScene;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,41 @@ using System.Linq;
 
 namespace DXGLTF.Assets
 {
+    public struct SubmeshIntersection
+    {
+        public int SubmeshIndex;
+        public TriangleIntersection Triangle;
+
+        public override string ToString()
+        {
+            return $"[{SubmeshIndex}]";
+        }
+    }
+
     public class Mesh : IDisposable
     {
         public List<Submesh> Submeshes = new List<Submesh>();
+
+        public IEnumerable<SubmeshIntersection> Intersect(Matrix world, Ray ray)
+        {
+            // transform the picking ray into the object space of the mesh
+            var invWorld = Matrix.Invert(world);
+            ray.Direction = Vector3.TransformNormal(ray.Direction, invWorld);
+            ray.Position = Vector3.TransformCoordinate(ray.Position, invWorld);
+            ray.Direction.Normalize();
+
+            for (int i = 0; i < Submeshes.Count; ++i)
+            {
+                foreach (var intersection in Submeshes[i].Mesh.Intersect(ray))
+                {
+                    yield return new SubmeshIntersection
+                    {
+                        SubmeshIndex = i,
+                        Triangle = intersection
+                    };
+                }
+            }
+        }
 
         public void Dispose()
         {
@@ -25,9 +58,9 @@ namespace DXGLTF.Assets
 
         }
 
-        public Mesh(Submesh subMesh)
+        public Mesh(params Submesh[] subMesh)
         {
-            Submeshes.Add(subMesh);
+            Submeshes.AddRange(subMesh);
         }
 
         public static Mesh FromGLTF(Source source, UniGLTF.glTFMesh m, List<D3D11Material> materials)
