@@ -7,6 +7,7 @@ using System.Linq;
 using SharpDX;
 using System.Runtime.InteropServices;
 
+
 namespace D3DPanel
 {
     public enum Semantics
@@ -171,6 +172,38 @@ namespace D3DPanel
                 }
                 return _positions;
             }
+        }
+
+        public void Draw(Device device, DeviceContext context, InputElement[] inputs)
+        {
+            //var inputs = m_shader.InputElements.Value;
+            if (inputs == null)
+            {
+                return;
+            }
+
+            if (!HasPositionAttribute)
+            {
+                return;
+            }
+
+            context.InputAssembler.PrimitiveTopology = Topology;
+
+
+            context.InputAssembler.SetVertexBuffers(0,
+                new VertexBufferBinding(GetVertexBuffer(device, inputs), Stride, 0));
+
+            var indexBuffer = GetIndexBuffer(device);
+            if (indexBuffer == null)
+            {
+                context.Draw(VertexCount, 0);
+            }
+            else
+            {
+                context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+                context.DrawIndexed(IndexCount, 0, 0);
+            }
+
         }
 
         public IEnumerable<TriangleIntersection> Intersect(Ray ray)
