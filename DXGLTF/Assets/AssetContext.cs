@@ -67,7 +67,7 @@ namespace DXGLTF.Assets
                         color.Alpha = pbr.baseColorFactor[3];
                     }
                 }
-                asset._materials.Add(new D3D11Material(shader, texture, color));
+                asset._materials.Add(new D3D11Material(shader, true, texture, color));
             }
 
             foreach(var mesh in gltf.meshes)

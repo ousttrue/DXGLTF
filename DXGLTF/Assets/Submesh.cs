@@ -1,5 +1,4 @@
 ﻿using D3DPanel;
-using SharpDX;
 using System;
 
 
@@ -24,9 +23,9 @@ namespace DXGLTF.Assets
             }
         }
 
-        public Submesh(D3D11Shader shader, D3D11Mesh mesh)
+        public Submesh(D3D11Material material, D3D11Mesh mesh)
         {
-            Material = new D3D11Material(shader, default(ImageBytes), Color4.White);
+            Material = material;
             Mesh = mesh;
         }
     }

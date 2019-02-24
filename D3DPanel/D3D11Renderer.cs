@@ -45,7 +45,6 @@ namespace D3DPanel
 
         DeviceContext m_context;
         public DeviceContext Context => m_context;
-        DepthStencilState m_ds;
 
         class Constants<T> : System.IDisposable where T : struct
         {
@@ -77,12 +76,6 @@ namespace D3DPanel
 
         public void Dispose()
         {
-            if (m_ds != null)
-            {
-                m_ds.Dispose();
-                m_ds = null;
-            }
-
             if (m_swapChain != null)
             {
                 m_swapChain.Dispose();
@@ -152,17 +145,6 @@ namespace D3DPanel
             ClearDepth();
 
             m_context.OutputMerger.SetTargets(_dsv, _rtv);
-            if (m_ds == null)
-            {
-                m_ds = new DepthStencilState(m_device,
-                new DepthStencilStateDescription
-                {
-                    IsDepthEnabled = true,
-                    DepthWriteMask = DepthWriteMask.All,
-                    DepthComparison = Comparison.Less,
-                });
-            }
-            m_context.OutputMerger.SetDepthStencilState(m_ds);
             m_context.Rasterizer.SetViewport(Viewport);
         }
 

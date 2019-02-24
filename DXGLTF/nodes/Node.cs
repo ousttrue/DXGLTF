@@ -63,9 +63,13 @@ namespace DXGLTF.Nodes
             Name = name;
         }
 
-        public Node(D3D11Shader shader, D3D11Mesh mesh)
+        public Node(D3D11Shader shader, D3D11Mesh mesh):this(new D3D11Material(shader), mesh)
         {
-            Mesh = new Mesh(new Submesh(shader, mesh));
+        }
+
+        public Node(D3D11Material material, D3D11Mesh mesh)
+        {
+            Mesh = new Mesh(new Submesh(material, mesh));
         }
 
         public IEnumerable<SubmeshIntersection> Intersect(Ray ray)

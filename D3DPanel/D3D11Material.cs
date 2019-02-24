@@ -14,60 +14,8 @@ namespace D3DPanel
         // texture0
         ImageBytes m_textureBytes;
         ShaderResourceView m_srv;
-        SamplerState m_ss;
-
-        RasterizerState m_rs;
-
-        // material color
-        public Color4 Color
+        ShaderResourceView GetOrCreateSRV(Device device)
         {
-            get;
-            private set;
-        }
-
-        public D3D11Material(D3D11Shader shader, ImageBytes texture, Color4 color)
-        {
-            m_shader = shader;
-            m_textureBytes = texture;
-            Color = color;
-        }
-
-        public void Dispose()
-        {
-            if (m_rs != null)
-            {
-                m_rs.Dispose();
-                m_rs = null;
-            }
-
-            if (m_ss != null)
-            {
-                m_ss.Dispose();
-                m_ss = null;
-            }
-
-            if (m_srv != null)
-            {
-                m_srv.Dispose();
-                m_srv = null;
-            }
-
-            if (m_shader != null)
-            {
-                m_shader.Dispose();
-                m_shader = null;
-            }
-        }
-
-        public void Draw(D3D11Renderer renderer, D3D11Mesh mesh)
-        {
-            var device = renderer.Device;
-            var context = renderer.Context;
-
-            // shader
-            m_shader.SetupContext(device, context);
-
-            // material
             if (m_srv == null)
             {
                 if (m_textureBytes.Bytes.Count > 0)
@@ -128,8 +76,12 @@ namespace D3DPanel
                     }
                 }
             }
-            context.PixelShader.SetShaderResource(0, m_srv);
+            return m_srv;
+        }
 
+        SamplerState m_ss;
+        SamplerState GetOrCreateSamplerState(Device device)
+        {
             if (m_ss == null)
             {
                 m_ss = new SamplerState(device, new SamplerStateDescription
@@ -139,8 +91,12 @@ namespace D3DPanel
                     AddressW = TextureAddressMode.Wrap,
                 });
             }
-            context.PixelShader.SetSampler(0, m_ss);
+            return m_ss;
+        }
 
+        RasterizerState m_rs;
+        RasterizerState GetRasterizerState(Device device)
+        {
             if (m_rs == null)
             {
                 m_rs = new RasterizerState(device, new RasterizerStateDescription
@@ -150,7 +106,95 @@ namespace D3DPanel
                     IsDepthClipEnabled = true,
                 });
             }
-            context.Rasterizer.State = m_rs;
+            return m_rs;
+        }
+
+        public bool EnableDepth
+        {
+            get;
+            private set;
+        }
+        DepthStencilState m_ds;
+        DepthStencilState GetOrCreateDepthStencilState(Device device)
+        {
+            if (m_ds == null)
+            {
+                m_ds = new DepthStencilState(device,
+                new DepthStencilStateDescription
+                {
+                    IsDepthEnabled = EnableDepth,
+                    DepthWriteMask = DepthWriteMask.All,
+                    DepthComparison = Comparison.Less,
+                });
+            }
+            return m_ds;
+        }
+
+        // material color
+        public Color4 Color
+        {
+            get;
+            private set;
+        }
+
+        public D3D11Material(D3D11Shader shader):this(shader, true, default(ImageBytes), Color4.White)
+        {
+        }
+
+        public D3D11Material(D3D11Shader shader, bool enableDepth, ImageBytes texture, Color4 color)
+        {
+            m_shader = shader;
+            EnableDepth = enableDepth;
+            m_textureBytes = texture;
+            Color = color;
+        }
+
+        public void Dispose()
+        {
+            if (m_ds != null)
+            {
+                m_ds.Dispose();
+                m_ds = null;
+            }
+
+            if (m_rs != null)
+            {
+                m_rs.Dispose();
+                m_rs = null;
+            }
+
+            if (m_ss != null)
+            {
+                m_ss.Dispose();
+                m_ss = null;
+            }
+
+            if (m_srv != null)
+            {
+                m_srv.Dispose();
+                m_srv = null;
+            }
+
+            if (m_shader != null)
+            {
+                m_shader.Dispose();
+                m_shader = null;
+            }
+        }
+
+        public void Draw(D3D11Renderer renderer, D3D11Mesh mesh)
+        {
+            var device = renderer.Device;
+            var context = renderer.Context;
+
+            // shader
+            m_shader.SetupContext(device, context);
+
+            // material
+            context.PixelShader.SetShaderResource(0, GetOrCreateSRV(device));
+            context.PixelShader.SetSampler(0, GetOrCreateSamplerState(device));
+            context.Rasterizer.State = GetRasterizerState(device);
+            context.OutputMerger.SetDepthStencilState(GetOrCreateDepthStencilState(device));
 
             mesh.Draw(device, context, m_shader.InputElements.Value);
         }
