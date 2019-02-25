@@ -102,7 +102,7 @@ namespace DXGLTF
             new FileDialogFilter("All files", new string[]{"*"}),
         };
 
-        private async void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
