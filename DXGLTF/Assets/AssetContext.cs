@@ -96,7 +96,7 @@ namespace DXGLTF.Assets
                     // build hierarchy
                     foreach (var j in node.children)
                     {
-                        drawable.Children.Add(newNodes[j]);
+                        drawable.AddChild(newNodes[j]);
                     }
                 }
 

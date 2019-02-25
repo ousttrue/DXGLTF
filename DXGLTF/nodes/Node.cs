@@ -13,7 +13,24 @@ namespace DXGLTF.Nodes
     {
         public bool IsValid => true;
 
-        public List<Node> Children = new List<Node>();
+        public Node Parent
+        {
+            get;
+            private set;
+        }
+        List<Node> _children = new List<Node>();
+        public IEnumerable<Node> Children
+        {
+            get
+            {
+                return _children;
+            }
+        }
+        public void AddChild(Node child)
+        {
+            _children.Add(child);
+            child.Parent = this;
+        }
 
         public Mesh Mesh
         {
@@ -29,11 +46,11 @@ namespace DXGLTF.Nodes
                 Mesh = null;
             }
 
-            foreach (var x in Children)
+            foreach (var x in _children)
             {
                 x.Dispose();
             }
-            Children.Clear();
+            _children.Clear();
         }
 
         Matrix _matrix = Matrix.Identity;

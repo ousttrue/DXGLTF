@@ -130,6 +130,13 @@ namespace D3DPanel
             return builder.ToMesh();
         }
 
+        public static D3D11Mesh CreateCube(float size=0.5f)
+        {
+            var builder = new MeshBuilder();
+            builder.AddCube(Vector3.Zero, size, size, size, Color.White);
+            return builder.ToMesh();
+        }
+
         public static D3D11Mesh CreateAxis(float w, float h)
         {
             var offset = 0.001f;

@@ -74,6 +74,15 @@ namespace DXGLTF
                 var deltaX = e.X - m_mouseX;
                 var deltaY = e.Y - m_mouseY;
 
+                if (m_leftDown)
+                {
+                    // drag
+                    if (_hierarchy.Manipulate(_camera, e.X, e.Y))
+                    {
+                        Invalidate();
+                    }
+                }
+
                 if (m_rightDown)
                 {
                     _camera.YawPitch(deltaX, deltaY);
@@ -102,9 +111,8 @@ namespace DXGLTF
                 case MouseButtons.Left:
                     if (!m_leftDown)
                     {
-                        // left down
-                        var ray = _camera.GetRay(e.X, e.Y);
-                        _hierarchy.Intersect(ray);
+                        _hierarchy.StartDrag(_camera, e.X, e.Y);
+                        Invalidate();
                     }
                     m_leftDown = true;
                     Capture = true;
@@ -127,6 +135,11 @@ namespace DXGLTF
             switch (e.Button)
             {
                 case MouseButtons.Left:
+                    if (m_leftDown)
+                    {
+                        _hierarchy.EndDrag();
+                        Invalidate();
+                    }
                     m_leftDown = false;
                     break;
 

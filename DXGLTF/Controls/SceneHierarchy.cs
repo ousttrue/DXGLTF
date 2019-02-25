@@ -50,6 +50,11 @@ namespace DXGLTF
         List<Node> _gizmos = new List<Node>();
         List<Node> _drawables = new List<Node>();
         Mesh _manipulator;
+
+        Mesh _cursor;
+        Vector3 _cursorPosition;
+        int _index = -1;
+
         void ClearDrawables()
         {
             foreach (var x in _drawables)
@@ -108,6 +113,13 @@ namespace DXGLTF
                     , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 2, true, new Color4(0, 0, 1.0f, 1)))
                     , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 2, false, new Color4(0, 0, 0.5f, 1)))
                     );
+            }
+
+            // cursor(drag position)
+            {
+                _cursor = new Mesh(new Submesh(
+                    new D3D11Material(gizmo),
+                    D3D11MeshFactory.CreateCube(0.01f)));
             }
         }
 
@@ -178,20 +190,6 @@ namespace DXGLTF
             _updated.OnNext(Unit.Default);
         }
 
-        public void Intersect(Ray ray)
-        {
-            if (Selected.Value == null)
-            {
-                return;
-            }
-            Logger.Debug(ray);
-
-            foreach(var t in _manipulator.Intersect(Selected.Value.WorldMatrix, ray))
-            {
-                Logger.Debug($"Intersect {t}");
-            }
-        }
-
         public void Draw(D3D11Renderer renderer, Camera camera)
         {
             foreach (var node in _gizmos)
@@ -210,13 +208,15 @@ namespace DXGLTF
             if (Selected.Value != null)
             {
                 DrawMesh(renderer, camera, _manipulator, Selected.Value.WorldMatrix);
+
+                DrawMesh(renderer, camera, _cursor, Matrix.Translation(_cursorPosition));
             }
         }
 
         static void DrawNode(D3D11Renderer renderer, Camera camera, Node node, Matrix accumulated)
         {
             node.WorldMatrix = node.LocalMatrix * accumulated;
-            
+
             DrawMesh(renderer, camera, node.Mesh, node.WorldMatrix);
 
             foreach (var child in node.Children)
@@ -236,6 +236,114 @@ namespace DXGLTF
             {
                 renderer.Draw(camera, x.Material, x.Mesh, m);
             }
+        }
+
+        public void StartDrag(Camera camera, float x, float y)
+        {
+            var ray = camera.GetRay(x, y);
+
+            if (Selected.Value == null)
+            {
+                _index = -1;
+                return;
+            }
+            Logger.Debug(ray);
+
+            var i = default(SubmeshIntersection?);
+            foreach (var t in _manipulator.Intersect(Selected.Value.WorldMatrix, ray))
+            {
+                if (!i.HasValue || t.Triangle.Distance < i.Value.Triangle.Distance)
+                {
+                    i = t;
+                }
+            }
+            if (!i.HasValue)
+            {
+                _index = -1;
+                return;
+            }
+
+            // Start Drag
+            _index = i.Value.SubmeshIndex;
+
+            Logger.Debug($"Intersect {_index}");
+        }
+
+        public void EndDrag()
+        {
+            var node = Selected.Value;
+            if (node == null)
+            {
+                // arienai
+                return;
+            }
+
+            var m = node.WorldMatrix;
+            m.Row4 = new Vector4(_cursorPosition, 1);
+
+            if (node.Parent != null)
+            {
+                var p = node.Parent.WorldMatrix;
+                p.Invert();
+                m = m * p;
+            }
+
+            node.LocalMatrix = m;
+        }
+
+        public bool Manipulate(Camera camera, float x, float y)
+        {
+            if (Selected.Value == null)
+            {
+                return false;
+            }
+
+            var center = camera.GetRay(0, 0).Direction;
+            var plane = new Plane((Vector3)Selected.Value.WorldMatrix.Row4,
+                center
+                );
+            var ray = camera.GetRay(x, y);
+            ray.Intersects(ref plane, out _cursorPosition);
+
+            switch (_index)
+            {
+                case 0:
+                case 1:
+                    {
+                        var w = Selected.Value.WorldMatrix;
+                        var o = (Vector3)w.Row4;
+                        var axis = (Vector3)w.Row1;
+                        _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
+                    }
+                    break;
+
+                case 2:
+                case 3:
+                    {
+                        var w = Selected.Value.WorldMatrix;
+                        var o = (Vector3)w.Row4;
+                        var axis = (Vector3)w.Row2;
+                        _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
+                    }
+                    break;
+
+                case 4:
+                case 5:
+                    {
+                        var w = Selected.Value.WorldMatrix;
+                        var o = (Vector3)w.Row4;
+                        var axis = (Vector3)w.Row3;
+                        _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
+                    }
+                    break;
+
+                default:
+                    {
+                    }
+                    break;
+            }
+
+            return true;
         }
     }
 }
