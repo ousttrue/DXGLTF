@@ -114,5 +114,36 @@ namespace DXGLTF.Assets
 
             return Mesh.Intersect(WorldMatrix, ray);
         }
+
+        /// <summary>
+        /// 描画しながらついでにWorldMatrixを更新する
+        /// </summary>
+        /// <param name="renderer"></param>
+        /// <param name="camera"></param>
+        /// <param name="accumulated"></param>
+        public void Draw(D3D11Renderer renderer, Camera camera, Matrix accumulated)
+        {
+            WorldMatrix = LocalMatrix * accumulated;
+
+            DrawMesh(renderer, camera, Mesh, WorldMatrix);
+
+            foreach (var child in Children)
+            {
+                child.Draw(renderer, camera, WorldMatrix);
+            }
+        }
+
+        public static void DrawMesh(D3D11Renderer renderer, Camera camera, Mesh mesh, Matrix m)
+        {
+            if (mesh == null)
+            {
+                return;
+            }
+
+            foreach (var x in mesh.Submeshes)
+            {
+                renderer.Draw(camera, x.Material, x.Mesh, m);
+            }
+        }
     }
 }

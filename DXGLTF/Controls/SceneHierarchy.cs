@@ -194,7 +194,7 @@ namespace DXGLTF
         {
             foreach (var node in _gizmos)
             {
-                DrawNode(renderer, camera, node, Matrix.Identity);
+                node.Draw(renderer, camera, Matrix.Identity);
             }
 
             // clear depth
@@ -202,39 +202,14 @@ namespace DXGLTF
 
             foreach (var node in _drawables)
             {
-                DrawNode(renderer, camera, node, Matrix.Identity);
+                node.Draw(renderer, camera, Matrix.Identity);
             }
 
             if (Selected.Value != null)
             {
-                DrawMesh(renderer, camera, _manipulator, Selected.Value.WorldMatrix);
+                Node.DrawMesh(renderer, camera, _manipulator, Selected.Value.WorldMatrix);
 
-                DrawMesh(renderer, camera, _cursor, Matrix.Translation(_cursorPosition));
-            }
-        }
-
-        static void DrawNode(D3D11Renderer renderer, Camera camera, Node node, Matrix accumulated)
-        {
-            node.WorldMatrix = node.LocalMatrix * accumulated;
-
-            DrawMesh(renderer, camera, node.Mesh, node.WorldMatrix);
-
-            foreach (var child in node.Children)
-            {
-                DrawNode(renderer, camera, child, node.WorldMatrix);
-            }
-        }
-
-        static void DrawMesh(D3D11Renderer renderer, Camera camera, Mesh mesh, Matrix m)
-        {
-            if (mesh == null)
-            {
-                return;
-            }
-
-            foreach (var x in mesh.Submeshes)
-            {
-                renderer.Draw(camera, x.Material, x.Mesh, m);
+                Node.DrawMesh(renderer, camera, _cursor, Matrix.Translation(_cursorPosition));
             }
         }
 
