@@ -19,8 +19,33 @@ namespace DXGLTF.Assets
         }
     }
 
+    public class Skin
+    {
+        public int RootIndex;
+        public int[] Joints;
+        public Matrix[] BindMatrices;
+        public static Skin FromGLTF(Source source, UniGLTF.glTFSkin skin)
+        {
+            return new Skin
+            {
+                RootIndex = skin.skeleton,
+                Joints = skin.joints,
+                BindMatrices = source.GlTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices)
+            };
+        }
+    }
+
     public class Mesh : IDisposable
     {
+        Skin _skin;
+        Node[] _bindNodes;
+
+        public void SetSkin(Skin skin, Node[] nodes)
+        {
+            _skin = skin;
+            _bindNodes = skin.Joints.Select(x => nodes[x]).ToArray();
+        }
+
         public List<Submesh> Submeshes = new List<Submesh>();
 
         public IEnumerable<SubmeshIntersection> Intersect(Matrix world, Ray ray)

@@ -29,8 +29,8 @@ namespace DXGLTF
 
         ShaderLoader _shaderLoader = new ShaderLoader();
 
-        Assets.AssetContext _asset;
-        Assets.AssetContext Asset
+        AssetContext _asset;
+        AssetContext Asset
         {
             get { return _asset; }
             set

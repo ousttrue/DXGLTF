@@ -9,7 +9,7 @@ namespace DXGLTF.Nodes
 {
     class ImageVisualizer : IVisualizer
     {
-        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Node> drawables)
+        public bool BuildNode(Source source, JsonPointer p, ShaderLoader shaderLoader, List<Assets.Node> drawables)
         {
             if (p[0].ToString() != "images")
             {
@@ -28,7 +28,7 @@ namespace DXGLTF.Nodes
         }
 
         static void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images,
-            ShaderLoader m_shaderLoader, List<Node> m_drawables)
+            ShaderLoader m_shaderLoader, List<Assets.Node> m_drawables)
         {
             var gltf = source.GlTF;
             foreach (var image in images)
@@ -51,7 +51,7 @@ namespace DXGLTF.Nodes
                     new Vector2(0, 1),
                 }));
 
-                m_drawables.Add(new Node(image.name));
+                m_drawables.Add(new Assets.Node(image.name));
 
                 break;
             }

@@ -1,13 +1,11 @@
 ﻿using D3DPanel;
-using DXGLTF.Assets;
 using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniJSON;
 
 
-namespace DXGLTF.Nodes
+namespace DXGLTF.Assets
 {
     public class Node : IDisposable
     {
@@ -69,13 +67,31 @@ namespace DXGLTF.Nodes
             set;
         }
 
+        public int Index
+        {
+            get;
+            private set;
+        }
+
         public string Name
         {
             get;
             private set;
         }
 
-        public Node(string name)
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(Name))
+            {
+                return base.ToString();
+            }
+            else
+            {
+                return $"{Name}";
+            }
+        }
+
+        public Node(string name, int index = -1)
         {
             Name = name;
         }

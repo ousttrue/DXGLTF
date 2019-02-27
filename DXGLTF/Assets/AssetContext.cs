@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using SharpDX;
 
+
 namespace DXGLTF.Assets
 {
     class AssetContext : IDisposable
@@ -22,6 +23,7 @@ namespace DXGLTF.Assets
         List<ImageBytes> _textureImages = new List<ImageBytes>();
         List<D3D11Material> _materials = new List<D3D11Material>();
         List<Mesh> _meshes = new List<Mesh>();
+        List<Skin> _skins = new List<Skin>();
 
         public void Dispose()
         {
@@ -50,7 +52,7 @@ namespace DXGLTF.Assets
                     ;
 
                 var texture = default(ImageBytes);
-                var color = SharpDX.Color4.White;
+                var color = Color4.White;
                 var pbr = material.pbrMetallicRoughness;
                 if (pbr != null)
                 {
@@ -75,6 +77,11 @@ namespace DXGLTF.Assets
                 asset._meshes.Add(Mesh.FromGLTF(source, mesh, asset._materials));
             }
 
+            foreach(var skin in gltf.skins)
+            {
+                asset._skins.Add(Skin.FromGLTF(source, skin));
+            }
+
             Logger.Info($"LoadAsset: {sw.Elapsed.TotalSeconds} sec");
 
             return asset;
@@ -84,7 +91,7 @@ namespace DXGLTF.Assets
         {
             var gltf = _source.GlTF;
 
-            var newNodes = gltf.nodes.Select((x, i)=>CreateDrawable(i, x)).ToArray();
+            var newNodes = gltf.nodes.Select((x, i) => CreateDrawable(i, x)).ToArray();
 
             for (int i = 0; i < gltf.nodes.Count; ++i)
             {
@@ -103,6 +110,11 @@ namespace DXGLTF.Assets
                 if (node.mesh >= 0)
                 {
                     drawable.Mesh = _meshes[node.mesh];
+
+                    if (node.skin >= 0)
+                    {
+                        drawable.Mesh.SetSkin(_skins[node.skin], newNodes);
+                    }
                 }
             }
 
