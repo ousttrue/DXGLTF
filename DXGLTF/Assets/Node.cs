@@ -96,7 +96,7 @@ namespace DXGLTF.Assets
             Name = name;
         }
 
-        public Node(D3D11Shader shader, D3D11Mesh mesh):this(new D3D11Material(shader), mesh)
+        public Node(D3D11Shader shader, D3D11Mesh mesh) : this(new D3D11Material(shader), mesh)
         {
         }
 
@@ -125,24 +125,14 @@ namespace DXGLTF.Assets
         {
             WorldMatrix = LocalMatrix * accumulated;
 
-            DrawMesh(renderer, camera, Mesh, WorldMatrix);
+            if (Mesh != null)
+            {
+                Mesh.Draw(renderer, camera, WorldMatrix);
+            }
 
             foreach (var child in Children)
             {
                 child.Draw(renderer, camera, WorldMatrix);
-            }
-        }
-
-        public static void DrawMesh(D3D11Renderer renderer, Camera camera, Mesh mesh, Matrix m)
-        {
-            if (mesh == null)
-            {
-                return;
-            }
-
-            foreach (var x in mesh.Submeshes)
-            {
-                renderer.Draw(camera, x.Material, x.Mesh, m);
             }
         }
     }

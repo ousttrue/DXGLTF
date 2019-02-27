@@ -150,5 +150,13 @@ namespace DXGLTF.Assets
 
             return drawable;
         }
+
+        public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
+        {
+            foreach (var x in Submeshes)
+            {
+                renderer.Draw(camera, x.Material, x.Mesh, m);
+            }
+        }
     }
 }

@@ -207,9 +207,9 @@ namespace DXGLTF
 
             if (Selected.Value != null)
             {
-                Node.DrawMesh(renderer, camera, _manipulator, Selected.Value.WorldMatrix);
+                _manipulator.Draw(renderer, camera, Selected.Value.WorldMatrix);
 
-                Node.DrawMesh(renderer, camera, _cursor, Matrix.Translation(_cursorPosition));
+                _cursor.Draw(renderer, camera, Matrix.Translation(_cursorPosition));
             }
         }
 
