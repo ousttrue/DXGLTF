@@ -170,9 +170,9 @@ namespace DXGLTF.Assets
 
         public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
         {
-            foreach(var submesh in Submeshes)
+            foreach (var submesh in Submeshes)
             {
-                renderer.Draw(camera, submesh.Material, submesh.Mesh, m);
+                submesh.Draw(renderer, camera, submesh.Material, submesh.Mesh, m);
             }
         }
     }

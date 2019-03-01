@@ -32,10 +32,26 @@ namespace D3DPanel
         {
             public Matrix MVP;
         }
+        public void UpdateWorldConstants(Matrix mvp)
+        {
+            m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context, 
+                new WorldConstants
+                {
+                    MVP = mvp
+                }));
+        }
 
         struct ObjectConstants
         { 
             public Color4 Color;
+        }
+        public void UpdateObjectConstants(Color4 color)
+        {
+            m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context, 
+                new ObjectConstants
+                {
+                    Color = color
+                }));
         }
 
         #region Resource
@@ -146,23 +162,6 @@ namespace D3DPanel
 
             m_context.OutputMerger.SetTargets(_dsv, _rtv);
             m_context.Rasterizer.SetViewport(Viewport);
-        }
-
-        public void Draw(Camera camera, D3D11Material material, D3D11Mesh drawable, Matrix modelMatrix)
-        {
-            var mvp = modelMatrix * camera.View * camera.Projection;
-            mvp.Transpose();
-            m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context, new WorldConstants
-            {
-                MVP = mvp
-            }));
-
-            m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context, new ObjectConstants
-            {
-                Color = material.Color
-            }));
-
-            material.Draw(this, drawable);
         }
 
         public void End()
