@@ -184,6 +184,13 @@ namespace DXGLTF.Assets
             {
                 // shared indices
                 var first = Submeshes[0];
+
+                if (_skin != null)
+                {
+                    // Skinning
+
+                }
+
                 if (renderer.SetVertices(first.Material.Shader, first.Mesh))
                 {
                     if (renderer.SetIndices(first.Mesh))
@@ -202,11 +209,17 @@ namespace DXGLTF.Assets
             {
                 foreach (var submesh in Submeshes)
                 {
-                    // material constants
-                    renderer.SetMaterial(submesh.Material);
-
-                    if(renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    if (_skin != null)
                     {
+                        // Skinning
+
+                    }
+
+                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    {
+                        // material constants
+                        renderer.SetMaterial(submesh.Material);
+
                         if (renderer.SetIndices(submesh.Mesh))
                         {
                             renderer.DrawIndexed(0, submesh.Mesh.IndexCount);
