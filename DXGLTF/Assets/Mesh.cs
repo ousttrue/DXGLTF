@@ -170,17 +170,42 @@ namespace DXGLTF.Assets
 
         public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
         {
+            if (Submeshes.Count == 0)
+            {
+                return;
+            }
+
             // world constants
             var mvp = m * camera.View * camera.Projection;
             mvp.Transpose();
             renderer.UpdateWorldConstants(mvp);
 
-            foreach (var submesh in Submeshes)
+            if (Submeshes[0].DrawVertexCount > 0)
             {
-                // material constants
-                renderer.SetMaterial(submesh.Material);
+                // shared indices
+                foreach (var submesh in Submeshes)
+                {
+                    // material constants
+                    renderer.SetMaterial(submesh.Material);
 
-                renderer.Draw(submesh.Material.Shader, submesh.Mesh);
+                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    {
+                        renderer.Draw(submesh.Mesh);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var submesh in Submeshes)
+                {
+                    // material constants
+                    renderer.SetMaterial(submesh.Material);
+
+                    if(renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    {
+                        renderer.Draw(submesh.Mesh);
+                    }
+                }
             }
         }
     }

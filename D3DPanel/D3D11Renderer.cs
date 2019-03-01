@@ -68,9 +68,36 @@ namespace D3DPanel
             Context.OutputMerger.SetDepthStencilState(material.GetOrCreateDepthStencilState(Device));
         }
 
-        public void Draw(D3D11Shader shader, D3D11Mesh mesh)
+        public bool SetVertices(D3D11Shader shader, D3D11Mesh mesh)
         {
-            mesh.Draw(this, shader.InputElements.Value);
+            var inputs = shader.InputElements.Value;
+            if (inputs == null)
+            {
+                return false;
+            }
+            if (!mesh.HasPositionAttribute)
+            {
+                return false;
+            }
+
+            Context.InputAssembler.PrimitiveTopology = mesh.Topology;
+            Context.InputAssembler.SetVertexBuffers(0,
+                new VertexBufferBinding(mesh.GetVertexBuffer(Device, inputs), mesh.Stride, 0));
+            return true;
+        }
+
+        public void Draw(D3D11Mesh mesh)
+        {
+            var indexBuffer = mesh.GetIndexBuffer(Device);
+            if (indexBuffer == null)
+            {
+                Context.Draw(mesh.VertexCount, 0);
+            }
+            else
+            {
+                Context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
+                Context.DrawIndexed(mesh.IndexCount, 0, 0);
+            }
         }
 
         #region Resource

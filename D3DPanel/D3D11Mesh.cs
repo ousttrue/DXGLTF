@@ -174,38 +174,6 @@ namespace D3DPanel
             }
         }
 
-        public void Draw(D3D11Renderer renderer, InputElement[] inputs)
-        {
-            if (inputs == null)
-            {
-                return;
-            }
-
-            if (!HasPositionAttribute)
-            {
-                return;
-            }
-
-            var device = renderer.Device;
-            var context = renderer.Context;
-
-            context.InputAssembler.PrimitiveTopology = Topology;
-
-            context.InputAssembler.SetVertexBuffers(0,
-                new VertexBufferBinding(GetVertexBuffer(device, inputs), Stride, 0));
-
-            var indexBuffer = GetIndexBuffer(device);
-            if (indexBuffer == null)
-            {
-                context.Draw(VertexCount, 0);
-            }
-            else
-            {
-                context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
-                context.DrawIndexed(IndexCount, 0, 0);
-            }
-        }
-
         public IEnumerable<TriangleIntersection> Intersect(Ray ray)
         {
             if (Topology != PrimitiveTopology.TriangleList)
