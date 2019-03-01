@@ -88,30 +88,40 @@ namespace DXGLTF.Assets
             Submeshes.AddRange(subMesh);
         }
 
-        public static Mesh FromGLTF(Source source, UniGLTF.glTFMesh m, List<D3D11Material> materials)
+        public static Mesh FromGLTF(Source source,
+            UniGLTF.glTFMesh m, List<D3D11Material> materials)
         {
             var mesh = new Mesh();
-
-            if (source.HasSameBuffer(m.primitives))
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                foreach (var prim in m.primitives)
-                {
-                    mesh.Submeshes.Add(new Submesh
-                    {
-                        Mesh = FromGLTF(source, prim),
-                        Material = materials[prim.material],
-                    });
-                }
-            }
-
+            mesh.Submeshes.AddRange(FromGLTF(source, m.primitives, materials));
             return mesh;
         }
 
-        static D3D11Mesh FromGLTF(Source source, UniGLTF.glTFPrimitives primitive)
+        public static IEnumerable<Submesh> FromGLTF(Source source,
+            List<UniGLTF.glTFPrimitives> primitives, List<D3D11Material> materials)
+        {
+            if (source.HasSameBuffer(primitives))
+            {
+                var mesh = FromGLTF(source, primitives[0]);
+                foreach (var prim in primitives)
+                {
+                    var indices = source.GLTF.accessors[prim.indices];
+                    var offset = indices.byteOffset / indices.ElementSize;
+                    yield return new Submesh(materials[prim.material],
+                        mesh, offset, indices.count);
+                }
+            }
+            else
+            {
+                foreach (var prim in primitives)
+                {
+                    yield return new Submesh(materials[prim.material],
+                        FromGLTF(source, prim));
+                }
+            }
+        }
+
+        static D3D11Mesh FromGLTF(Source source,
+            UniGLTF.glTFPrimitives primitive)
         {
             var gltf = source.GLTF;
             var accessor = gltf.accessors[primitive.indices];
@@ -160,9 +170,9 @@ namespace DXGLTF.Assets
 
         public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
         {
-            foreach (var x in Submeshes)
+            foreach(var submesh in Submeshes)
             {
-                renderer.Draw(camera, x.Material, x.Mesh, m);
+                renderer.Draw(camera, submesh.Material, submesh.Mesh, m);
             }
         }
     }

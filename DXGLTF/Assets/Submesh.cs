@@ -1,4 +1,5 @@
 ﻿using D3DPanel;
+using SharpDX;
 using System;
 
 
@@ -8,6 +9,8 @@ namespace DXGLTF.Assets
     {
         public D3D11Material Material;
         public D3D11Mesh Mesh;
+        public int DrawVertexOffset;
+        public int DrawVertexCount;
 
         public void Dispose()
         {
@@ -24,9 +27,17 @@ namespace DXGLTF.Assets
         }
 
         public Submesh(D3D11Material material, D3D11Mesh mesh)
+            : this(material, mesh, 0, 0)
+        {
+        }
+
+        public Submesh(D3D11Material material, D3D11Mesh mesh,
+            int offset, int count)
         {
             Material = material;
             Mesh = mesh;
+            DrawVertexOffset = offset;
+            DrawVertexCount = count;
         }
     }
 }
