@@ -34,7 +34,7 @@ namespace D3DPanel
         }
         public void UpdateWorldConstants(Matrix mvp)
         {
-            m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context, 
+            m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context,
                 new WorldConstants
                 {
                     MVP = mvp
@@ -42,12 +42,12 @@ namespace D3DPanel
         }
 
         struct ObjectConstants
-        { 
+        {
             public Color4 Color;
         }
         public void UpdateObjectConstants(Color4 color)
         {
-            m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context, 
+            m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context,
                 new ObjectConstants
                 {
                     Color = color
@@ -86,18 +86,26 @@ namespace D3DPanel
             return true;
         }
 
-        public void Draw(D3D11Mesh mesh)
+        public bool SetIndices(D3D11Mesh mesh)
         {
             var indexBuffer = mesh.GetIndexBuffer(Device);
             if (indexBuffer == null)
             {
-                Context.Draw(mesh.VertexCount, 0);
+                return false;
             }
-            else
-            {
-                Context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
-                Context.DrawIndexed(mesh.IndexCount, 0, 0);
-            }
+            Context.InputAssembler.SetIndexBuffer(indexBuffer,
+                SharpDX.DXGI.Format.R32_UInt, 0);
+            return true;
+        }
+
+        public void Draw(int offset, int count)
+        {
+            Context.Draw(count, offset);
+        }
+
+        public void DrawIndexed(int offset, int count)
+        {
+            Context.DrawIndexed(count, offset, 0);
         }
 
         #region Resource

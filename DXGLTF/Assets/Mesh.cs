@@ -183,14 +183,18 @@ namespace DXGLTF.Assets
             if (Submeshes[0].DrawVertexCount > 0)
             {
                 // shared indices
-                foreach (var submesh in Submeshes)
+                var first = Submeshes[0];
+                if (renderer.SetVertices(first.Material.Shader, first.Mesh))
                 {
-                    // material constants
-                    renderer.SetMaterial(submesh.Material);
-
-                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    if (renderer.SetIndices(first.Mesh))
                     {
-                        renderer.Draw(submesh.Mesh);
+                        foreach (var submesh in Submeshes)
+                        {
+                            // material constants
+                            renderer.SetMaterial(submesh.Material);
+
+                            renderer.DrawIndexed(submesh.DrawVertexOffset, submesh.DrawVertexCount);
+                        }
                     }
                 }
             }
@@ -203,7 +207,14 @@ namespace DXGLTF.Assets
 
                     if(renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
                     {
-                        renderer.Draw(submesh.Mesh);
+                        if (renderer.SetIndices(submesh.Mesh))
+                        {
+                            renderer.DrawIndexed(0, submesh.Mesh.IndexCount);
+                        }
+                        else
+                        {
+                            renderer.DrawIndexed(0, submesh.Mesh.VertexCount);
+                        }
                     }
                 }
             }
