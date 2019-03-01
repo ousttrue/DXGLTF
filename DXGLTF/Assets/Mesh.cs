@@ -178,8 +178,9 @@ namespace DXGLTF.Assets
             foreach (var submesh in Submeshes)
             {
                 // material constants
-                renderer.UpdateObjectConstants(submesh.Material.Color);
-                submesh.Material.Draw(renderer, submesh.Mesh);
+                renderer.SetMaterial(submesh.Material);
+
+                renderer.Draw(submesh.Material.Shader, submesh.Mesh);
             }
         }
     }

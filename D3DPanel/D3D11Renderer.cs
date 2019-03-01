@@ -54,6 +54,25 @@ namespace D3DPanel
                 }));
         }
 
+        public void SetMaterial(D3D11Material material)
+        {
+            UpdateObjectConstants(material.Color);
+
+            // shader
+            material.Shader.SetupContext(Device, Context);
+
+            // material
+            Context.PixelShader.SetShaderResource(0, material.GetOrCreateSRV(Device));
+            Context.PixelShader.SetSampler(0, material.GetOrCreateSamplerState(Device));
+            Context.Rasterizer.State = material.GetRasterizerState(Device);
+            Context.OutputMerger.SetDepthStencilState(material.GetOrCreateDepthStencilState(Device));
+        }
+
+        public void Draw(D3D11Shader shader, D3D11Mesh mesh)
+        {
+            mesh.Draw(this, shader.InputElements.Value);
+        }
+
         #region Resource
         SharpDX.Direct3D11.Device m_device;
         public SharpDX.Direct3D11.Device Device => m_device;

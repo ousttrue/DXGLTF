@@ -174,9 +174,8 @@ namespace D3DPanel
             }
         }
 
-        public void Draw(Device device, DeviceContext context, InputElement[] inputs)
+        public void Draw(D3D11Renderer renderer, InputElement[] inputs)
         {
-            //var inputs = m_shader.InputElements.Value;
             if (inputs == null)
             {
                 return;
@@ -187,8 +186,10 @@ namespace D3DPanel
                 return;
             }
 
-            context.InputAssembler.PrimitiveTopology = Topology;
+            var device = renderer.Device;
+            var context = renderer.Context;
 
+            context.InputAssembler.PrimitiveTopology = Topology;
 
             context.InputAssembler.SetVertexBuffers(0,
                 new VertexBufferBinding(GetVertexBuffer(device, inputs), Stride, 0));
@@ -203,7 +204,6 @@ namespace D3DPanel
                 context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R32_UInt, 0);
                 context.DrawIndexed(IndexCount, 0, 0);
             }
-
         }
 
         public IEnumerable<TriangleIntersection> Intersect(Ray ray)

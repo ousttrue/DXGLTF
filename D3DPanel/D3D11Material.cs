@@ -9,12 +9,16 @@ namespace D3DPanel
 {
     public class D3D11Material : IDisposable
     {
-        D3D11Shader m_shader;
+        public D3D11Shader Shader
+        {
+            get;
+            private set;
+        }
 
         // texture0
         ImageBytes m_textureBytes;
         ShaderResourceView m_srv;
-        ShaderResourceView GetOrCreateSRV(Device device)
+        public ShaderResourceView GetOrCreateSRV(Device device)
         {
             if (m_srv == null)
             {
@@ -80,7 +84,7 @@ namespace D3DPanel
         }
 
         SamplerState m_ss;
-        SamplerState GetOrCreateSamplerState(Device device)
+        public SamplerState GetOrCreateSamplerState(Device device)
         {
             if (m_ss == null)
             {
@@ -95,7 +99,7 @@ namespace D3DPanel
         }
 
         RasterizerState m_rs;
-        RasterizerState GetRasterizerState(Device device)
+        public RasterizerState GetRasterizerState(Device device)
         {
             if (m_rs == null)
             {
@@ -115,7 +119,7 @@ namespace D3DPanel
             private set;
         }
         DepthStencilState m_ds;
-        DepthStencilState GetOrCreateDepthStencilState(Device device)
+        public DepthStencilState GetOrCreateDepthStencilState(Device device)
         {
             if (m_ds == null)
             {
@@ -143,7 +147,7 @@ namespace D3DPanel
 
         public D3D11Material(D3D11Shader shader, bool enableDepth, ImageBytes texture, Color4 color)
         {
-            m_shader = shader;
+            Shader = shader;
             EnableDepth = enableDepth;
             m_textureBytes = texture;
             Color = color;
@@ -175,28 +179,11 @@ namespace D3DPanel
                 m_srv = null;
             }
 
-            if (m_shader != null)
+            if (Shader != null)
             {
-                m_shader.Dispose();
-                m_shader = null;
+                Shader.Dispose();
+                Shader = null;
             }
-        }
-
-        public void Draw(D3D11Renderer renderer, D3D11Mesh mesh)
-        {
-            var device = renderer.Device;
-            var context = renderer.Context;
-
-            // shader
-            m_shader.SetupContext(device, context);
-
-            // material
-            context.PixelShader.SetShaderResource(0, GetOrCreateSRV(device));
-            context.PixelShader.SetSampler(0, GetOrCreateSamplerState(device));
-            context.Rasterizer.State = GetRasterizerState(device);
-            context.OutputMerger.SetDepthStencilState(GetOrCreateDepthStencilState(device));
-
-            mesh.Draw(device, context, m_shader.InputElements.Value);
         }
     }
 }
