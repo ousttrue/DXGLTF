@@ -17,12 +17,12 @@ namespace DXGLTF.Nodes
             }
             if (p.Count == 1)
             {
-                ShowImage(source, source.GlTF.images, shaderLoader, drawables);
+                ShowImage(source, source.GLTF.images, shaderLoader, drawables);
             }
             else
             {
                 var index = p[1].ToInt32();
-                ShowImage(source, new[] { source.GlTF.images[index] }, shaderLoader, drawables);
+                ShowImage(source, new[] { source.GLTF.images[index] }, shaderLoader, drawables);
             }
             return false;
         }
@@ -30,7 +30,7 @@ namespace DXGLTF.Nodes
         static void ShowImage(Source source, IEnumerable<UniGLTF.glTFImage> images,
             ShaderLoader m_shaderLoader, List<Assets.Node> m_drawables)
         {
-            var gltf = source.GlTF;
+            var gltf = source.GLTF;
             foreach (var image in images)
             {
                 var bytes = source.GetImageBytes(image);

@@ -75,7 +75,7 @@ namespace DXGLTF
             TreeView.Nodes.Clear();
             m_source = source;
 
-            var gltf = source.GlTF;
+            var gltf = source.GLTF;
             if (gltf == null)
             {
                 return;

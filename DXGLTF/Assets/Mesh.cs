@@ -30,7 +30,7 @@ namespace DXGLTF.Assets
             {
                 RootIndex = skin.skeleton,
                 Joints = skin.joints,
-                BindMatrices = source.GlTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices)
+                BindMatrices = source.GLTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices)
             };
         }
     }
@@ -92,13 +92,20 @@ namespace DXGLTF.Assets
         {
             var mesh = new Mesh();
 
-            foreach (var prim in m.primitives)
+            if (source.HasSameBuffer(m.primitives))
             {
-                mesh.Submeshes.Add(new Submesh
+                throw new NotImplementedException();
+            }
+            else
+            {
+                foreach (var prim in m.primitives)
                 {
-                    Mesh = FromGLTF(source, prim),
-                    Material = materials[prim.material],
-                });
+                    mesh.Submeshes.Add(new Submesh
+                    {
+                        Mesh = FromGLTF(source, prim),
+                        Material = materials[prim.material],
+                    });
+                }
             }
 
             return mesh;
@@ -106,7 +113,7 @@ namespace DXGLTF.Assets
 
         static D3D11Mesh FromGLTF(Source source, UniGLTF.glTFPrimitives primitive)
         {
-            var gltf = source.GlTF;
+            var gltf = source.GLTF;
             var accessor = gltf.accessors[primitive.indices];
             int[] indices = null;
             switch (accessor.componentType)

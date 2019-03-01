@@ -16,7 +16,7 @@ namespace DXGLTF
         protected override void OnUpdated(Source source)
         {
             TreeView.Nodes.Clear();
-            var gltf = source.GlTF;
+            var gltf = source.GLTF;
             if (gltf == null)
             {
                 return;

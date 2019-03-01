@@ -35,7 +35,7 @@ namespace DXGLTF.Assets
 
             var asset = new AssetContext(source);
 
-            var gltf = source.GlTF;
+            var gltf = source.GLTF;
 
             foreach(var texture in gltf.textures)
             {
@@ -89,7 +89,7 @@ namespace DXGLTF.Assets
 
         public Node[] BuildHierarchy()
         {
-            var gltf = _source.GlTF;
+            var gltf = _source.GLTF;
 
             var newNodes = gltf.nodes.Select((x, i) => CreateDrawable(i, x)).ToArray();
 

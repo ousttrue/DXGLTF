@@ -130,7 +130,7 @@ namespace DXGLTF
 
         async void LoadAsset(Source source)
         {
-            if (source.GlTF == null)
+            if (source.GLTF == null)
             {
                 Asset = null;
                 return;

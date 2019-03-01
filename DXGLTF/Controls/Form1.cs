@@ -38,10 +38,10 @@ namespace DXGLTF
 
             m_scene.SourceObservableOnCurrent.Subscribe(x =>
             {
-                if (x.GlTF != null)
+                if (x.GLTF != null)
                 {
                     var path = Path.GetFileName(x.Path);
-                    this.Text = $"[{path}] {x.GlTF.TriangleCount} tris";
+                    this.Text = $"[{path}] {x.GLTF.TriangleCount} tris";
                 }
                 else
                 {

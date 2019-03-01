@@ -19,7 +19,7 @@ namespace DXGLTF
 
         void OnSource(Source source)
         {
-            if (source.GlTF == null) return;
+            if (source.GLTF == null) return;
 
             // indent
             richTextBox1.Text = source.JSON.ToString("  ");
