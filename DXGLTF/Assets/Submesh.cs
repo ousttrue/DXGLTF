@@ -39,16 +39,5 @@ namespace DXGLTF.Assets
             DrawVertexOffset = offset;
             DrawVertexCount = count;
         }
-
-        public void Draw(D3D11Renderer r, Camera camera, D3D11Material material, D3D11Mesh drawable, Matrix modelMatrix)
-        {
-            var mvp = modelMatrix * camera.View * camera.Projection;
-            mvp.Transpose();
-
-            r.UpdateWorldConstants(mvp);
-            r.UpdateObjectConstants(material.Color);
-
-            material.Draw(r, drawable);
-        }
     }
 }
