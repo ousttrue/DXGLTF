@@ -32,6 +32,9 @@ namespace DXGLTF
         D3DContent m_d3d;
 
         LoggerContent m_logger;
+
+        SelectedNodeContent m_selected;
+
         public Form1()
         {
             InitializeComponent();
@@ -51,6 +54,10 @@ namespace DXGLTF
 
             m_hierarchy = new SceneHierarchy(m_scene);
             AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
+
+            m_selected = new SelectedNodeContent(m_hierarchy);
+            AddContent("selected node", m_selected, DockState.DockRight);
+            m_selected.DockTo(m_hierarchy.Pane, DockStyle.Bottom, 1);
 
             m_d3d = new D3DContent(m_hierarchy);
             AddContent("selected", m_d3d, DockState.Document);

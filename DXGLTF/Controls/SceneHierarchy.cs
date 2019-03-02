@@ -22,9 +22,13 @@ namespace DXGLTF
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
         ReactiveProperty<Node> _selected = new ReactiveProperty<Node>();
-        public ReadOnlyReactiveProperty<Node> Selected
+        public Node Selected
         {
-            get { return _selected.ToReadOnlyReactiveProperty(); }
+            get { return _selected.Value; }
+        }
+        public IObservable<Node> SelectedObservable
+        {
+            get { return _selected.AsObservable(); }
         }
 
         ShaderLoader _shaderLoader = new ShaderLoader();
@@ -212,9 +216,9 @@ namespace DXGLTF
                 node.Draw(renderer, camera);
             }
 
-            if (Selected.Value != null)
+            if (Selected != null)
             {
-                _manipulator.Draw(renderer, camera, Selected.Value.WorldMatrix);
+                _manipulator.Draw(renderer, camera, Selected.WorldMatrix);
 
                 _cursor.Draw(renderer, camera, Matrix.Translation(_cursorPosition));
             }
@@ -224,7 +228,7 @@ namespace DXGLTF
         {
             var ray = camera.GetRay(x, y);
 
-            if (Selected.Value == null)
+            if (Selected == null)
             {
                 _index = -1;
                 return;
@@ -232,7 +236,7 @@ namespace DXGLTF
             Logger.Debug(ray);
 
             var i = default(SubmeshIntersection?);
-            foreach (var t in _manipulator.Intersect(Selected.Value.WorldMatrix, ray))
+            foreach (var t in _manipulator.Intersect(Selected.WorldMatrix, ray))
             {
                 if (!i.HasValue || t.Triangle.Distance < i.Value.Triangle.Distance)
                 {
@@ -253,7 +257,7 @@ namespace DXGLTF
 
         public void EndDrag()
         {
-            var node = Selected.Value;
+            var node = Selected;
             if (node == null)
             {
                 // arienai
@@ -275,13 +279,13 @@ namespace DXGLTF
 
         public bool Manipulate(Camera camera, float x, float y)
         {
-            if (Selected.Value == null)
+            if (Selected == null)
             {
                 return false;
             }
 
             var center = camera.GetRay(0, 0).Direction;
-            var plane = new Plane((Vector3)Selected.Value.WorldMatrix.Row4,
+            var plane = new Plane((Vector3)Selected.WorldMatrix.Row4,
                 center
                 );
             var ray = camera.GetRay(x, y);
@@ -292,7 +296,7 @@ namespace DXGLTF
                 case 0:
                 case 1:
                     {
-                        var w = Selected.Value.WorldMatrix;
+                        var w = Selected.WorldMatrix;
                         var o = (Vector3)w.Row4;
                         var axis = (Vector3)w.Row1;
                         _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
@@ -302,7 +306,7 @@ namespace DXGLTF
                 case 2:
                 case 3:
                     {
-                        var w = Selected.Value.WorldMatrix;
+                        var w = Selected.WorldMatrix;
                         var o = (Vector3)w.Row4;
                         var axis = (Vector3)w.Row2;
                         _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
@@ -312,7 +316,7 @@ namespace DXGLTF
                 case 4:
                 case 5:
                     {
-                        var w = Selected.Value.WorldMatrix;
+                        var w = Selected.WorldMatrix;
                         var o = (Vector3)w.Row4;
                         var axis = (Vector3)w.Row3;
                         _cursorPosition = o + axis * Vector3.Dot((_cursorPosition - o), axis);
