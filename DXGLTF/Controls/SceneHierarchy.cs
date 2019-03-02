@@ -1,6 +1,5 @@
 ﻿using D3DPanel;
 using DXGLTF.Assets;
-using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
 using Reactive.Bindings;
@@ -104,26 +103,25 @@ namespace DXGLTF
             _gizmos.Add(new Node(gizmo, D3D11MeshFactory.CreateGrid(1.0f, 10)));
 
             // manipulator
-            {
-                var manipulator = new D3D11Material("manipulator", _shaderLoader.CreateShader(ShaderType.Gizmo),
+            var nodepth = new D3D11Material("manipulator", _shaderLoader.CreateShader(ShaderType.Gizmo),
                     false, default(ImageBytes), Color.White);
-                var radius = 0.005f;
-                var length = 0.3f;
+            {
+                var radius = 0.008f;
+                var length = 0.2f;
                 _manipulator = new Mesh(
-                    new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 0, true, new Color4(1, 0, 0, 1)))
-                    , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 0, false, new Color4(0.5f, 0, 0, 1)))
-                    , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 1, true, new Color4(0, 1, 0, 1)))
-                    , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 1, false, new Color4(0, 0.5f, 0, 1)))
-                    , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 2, true, new Color4(0, 0, 1.0f, 1)))
-                    , new Submesh(manipulator, D3D11MeshFactory.CreateArrow(radius, length, 2, false, new Color4(0, 0, 0.5f, 1)))
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 0, true, new Color4(1, 0, 0, 1))),
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 0, false, new Color4(0.5f, 0, 0, 1))),
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 1, true, new Color4(0, 1, 0, 1))),
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 1, false, new Color4(0, 0.5f, 0, 1))),
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 2, true, new Color4(0, 0, 1.0f, 1))),
+                    new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 2, false, new Color4(0, 0, 0.5f, 1)))
                     );
             }
 
             // cursor(drag position)
             {
-                _cursor = new Mesh(new Submesh(
-                    new D3D11Material("cursor", gizmo),
-                    D3D11MeshFactory.CreateCube(0.01f)));
+                _cursor = new Mesh(
+                    new Submesh(nodepth, D3D11MeshFactory.CreateCube(0.01f)));
             }
         }
 
@@ -201,6 +199,7 @@ namespace DXGLTF
                 node.Draw(renderer, camera);
             }
 
+            #region Scene
             foreach (var node in _drawables)
             {
                 node.Update(Matrix.Identity);
@@ -215,12 +214,13 @@ namespace DXGLTF
             {
                 node.Draw(renderer, camera);
             }
+            #endregion
 
             if (Selected != null)
             {
-                _manipulator.Draw(renderer, camera, Selected.WorldMatrix);
-
-                _cursor.Draw(renderer, camera, Matrix.Translation(_cursorPosition));
+                var s = Matrix.Scaling(1.0f);
+                _manipulator.Draw(renderer, camera, s * Selected.WorldMatrix);
+                _cursor.Draw(renderer, camera, s * Matrix.Translation(_cursorPosition));
             }
         }
 
@@ -280,6 +280,10 @@ namespace DXGLTF
         public bool Manipulate(Camera camera, float x, float y)
         {
             if (Selected == null)
+            {
+                return false;
+            }
+            if (_index == -1)
             {
                 return false;
             }
