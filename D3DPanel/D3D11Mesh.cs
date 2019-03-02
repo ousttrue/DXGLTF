@@ -113,8 +113,9 @@ namespace D3DPanel
             private set;
         }
 
+        InterleavedBuffer _buffer;
         InputElement[] _inputs;
-        public SharpDX.Direct3D11.Buffer GetVertexBuffer(Device device,
+        public SharpDX.Direct3D11.Buffer GetVertexBuffer(Device device, DeviceContext context,
             InputElement[] inputs)
         {
             if (inputs != _inputs)
@@ -129,7 +130,7 @@ namespace D3DPanel
                 var pos = m_attributes[Semantics.POSITION];
 
                 // fill buffer
-                var buffer = new InterleavedBuffer(Stride, VertexCount);
+                _buffer = new InterleavedBuffer(Stride, VertexCount);
                 int offset = 0;
                 foreach (var input in inputs)
                 {
@@ -137,17 +138,29 @@ namespace D3DPanel
                     var semantics = (Semantics)Enum.Parse(typeof(Semantics), input.SemanticName, true);
                     if (m_attributes.TryGetValue(semantics, out attr))
                     {
-                        buffer.Set(attr.Value, attr.ElementSize, offset);
+                        _buffer.Set(attr.Value, attr.ElementSize, offset);
                     }
                     offset += GetSize(input);
                 }
 
-                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, buffer.Buffer,
-                    new BufferDescription
-                    {
-                        BindFlags = BindFlags.VertexBuffer
-                    });
+                var desc = new BufferDescription
+                {
+                    Usage = ResourceUsage.Dynamic,
+                    BindFlags = BindFlags.VertexBuffer,
+                    CpuAccessFlags = CpuAccessFlags.Write,
+                    SizeInBytes = _buffer.Buffer.Length,
+                };
+                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, _buffer.Buffer, desc);
                 m_vertexBuffer.DebugName = "VertexBuffer";
+            }
+
+            if (_skinnedPosition != null)
+            {
+                var box = context.MapSubresource(m_vertexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
+
+                Marshal.Copy(_buffer.Buffer, 0, box.DataPointer, _buffer.Buffer.Length);
+
+                context.UnmapSubresource(m_vertexBuffer, 0);
             }
 
             return m_vertexBuffer;
@@ -165,27 +178,6 @@ namespace D3DPanel
         public void SetWeights(float[] weights)
         {
             _weights = weights;
-        }
-        #endregion
-
-        public D3D11Mesh(PrimitiveTopology topology, int[] indices)
-        {
-            m_indices = indices;
-            Topology = topology;
-        }
-
-        public void Dispose()
-        {
-            if (m_indexBuffer != null)
-            {
-                m_indexBuffer.Dispose();
-                m_indexBuffer = null;
-            }
-            if (m_vertexBuffer != null)
-            {
-                m_vertexBuffer.Dispose();
-                m_vertexBuffer = null;
-            }
         }
 
         Vector3[] _skinnedPosition;
@@ -207,6 +199,27 @@ namespace D3DPanel
             for (int i = 0; i < _positions.Length; ++i)
             {
                 _skinnedPosition[i] = _positions[i];
+            }
+        }
+        #endregion
+
+        public D3D11Mesh(PrimitiveTopology topology, int[] indices)
+        {
+            m_indices = indices;
+            Topology = topology;
+        }
+
+        public void Dispose()
+        {
+            if (m_indexBuffer != null)
+            {
+                m_indexBuffer.Dispose();
+                m_indexBuffer = null;
+            }
+            if (m_vertexBuffer != null)
+            {
+                m_vertexBuffer.Dispose();
+                m_vertexBuffer = null;
             }
         }
 
