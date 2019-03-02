@@ -74,7 +74,22 @@ namespace D3DPanel
         public void SetAttribute(Semantics semantics, VertexAttribute attribute)
         {
             m_attributes[semantics] = attribute;
+
+            if (semantics == Semantics.POSITION)
+            {
+                VertexCount = attribute.Value.Count / attribute.ElementSize;
+
+                _positions = new Vector3[VertexCount];
+                var pinnedArray = GCHandle.Alloc(_positions, GCHandleType.Pinned);
+                {
+                    var ptr = pinnedArray.AddrOfPinnedObject();
+                    var positions = attribute.Value;
+                    Marshal.Copy(positions.Array, positions.Offset, ptr, positions.Count);
+                }
+                pinnedArray.Free();
+            }
         }
+        Vector3[] _positions;
 
         public bool HasPositionAttribute
         {
@@ -100,8 +115,7 @@ namespace D3DPanel
 
         InputElement[] _inputs;
         public SharpDX.Direct3D11.Buffer GetVertexBuffer(Device device,
-            InputElement[] inputs,
-            Matrix[] skinning)
+            InputElement[] inputs)
         {
             if (inputs != _inputs)
             {
@@ -109,11 +123,10 @@ namespace D3DPanel
                 _inputs = inputs;
             }
 
-            if (skinning != null || m_vertexBuffer == null)
+            if (m_vertexBuffer == null)
             {
                 Stride = inputs.Sum(y => GetSize(y));
                 var pos = m_attributes[Semantics.POSITION];
-                VertexCount = pos.Value.Count / pos.ElementSize;
 
                 // fill buffer
                 var buffer = new InterleavedBuffer(Stride, VertexCount);
@@ -124,14 +137,7 @@ namespace D3DPanel
                     var semantics = (Semantics)Enum.Parse(typeof(Semantics), input.SemanticName, true);
                     if (m_attributes.TryGetValue(semantics, out attr))
                     {
-                        if (semantics == Semantics.POSITION)
-                        {
-                            buffer.SetPosition(attr.Value, attr.ElementSize, offset, skinning);
-                        }
-                        else
-                        {
-                            buffer.Set(attr.Value, attr.ElementSize, offset);
-                        }
+                        buffer.Set(attr.Value, attr.ElementSize, offset);
                     }
                     offset += GetSize(input);
                 }
@@ -182,46 +188,25 @@ namespace D3DPanel
             }
         }
 
-        Vector3[] _positions;
-        Vector3[] Positions
-        {
-            get
-            {
-                if (_positions == null)
-                {
-                    _positions = new Vector3[VertexCount];
-                    var pinnedArray = GCHandle.Alloc(_positions, GCHandleType.Pinned);
-                    {
-                        var ptr = pinnedArray.AddrOfPinnedObject();
-                        var positions = m_attributes[Semantics.POSITION].Value;
-                        Marshal.Copy(positions.Array, positions.Offset, ptr, positions.Count);
-                    }
-                    pinnedArray.Free();
-                }
-                return _positions;
-            }
-        }
-
         Vector3[] _skinnedPosition;
-        public void Skinning(Matrix[] bind, Matrix[] world)
+        public void Skinning(Matrix[] matrices)
         {
-            if (!HasPositionAttribute)
+            if (matrices == null)
             {
                 return;
             }
-            if (VertexCount == 0)
+            if (!HasPositionAttribute)
             {
                 return;
             }
             if (_skinnedPosition == null)
             {
-                _skinnedPosition = new Vector3[Positions.Length];
+                _skinnedPosition = new Vector3[_positions.Length];
             }
 
-            var positions = Positions;
-            for (int i = 0; i < positions.Length; ++i)
+            for (int i = 0; i < _positions.Length; ++i)
             {
-                _skinnedPosition = positions;
+                _skinnedPosition[i] = _positions[i];
             }
         }
 
@@ -240,9 +225,9 @@ namespace D3DPanel
                     var i2 = i + 2;
                     var d = default(float);
                     if (ray.Intersects(
-                        ref Positions[i],
-                        ref Positions[i1],
-                        ref Positions[i2],
+                        ref _positions[i],
+                        ref _positions[i1],
+                        ref _positions[i2],
                         out d))
                     {
                         yield return new TriangleIntersection
@@ -264,9 +249,9 @@ namespace D3DPanel
                     var i2 = m_indices[i + 2];
                     var d = default(float);
                     if (ray.Intersects(
-                        ref Positions[i0],
-                        ref Positions[i1],
-                        ref Positions[i2],
+                        ref _positions[i0],
+                        ref _positions[i1],
+                        ref _positions[i2],
                         out d))
                     {
                         yield return new TriangleIntersection

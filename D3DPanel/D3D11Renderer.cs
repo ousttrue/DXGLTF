@@ -68,7 +68,7 @@ namespace D3DPanel
             Context.OutputMerger.SetDepthStencilState(material.GetOrCreateDepthStencilState(Device));
         }
 
-        public bool SetVertices(D3D11Shader shader, D3D11Mesh mesh, Matrix[] skinning)
+        public bool SetVertices(D3D11Shader shader, D3D11Mesh mesh)
         {
             var inputs = shader.InputElements.Value;
             if (inputs == null)
@@ -82,7 +82,7 @@ namespace D3DPanel
 
             Context.InputAssembler.PrimitiveTopology = mesh.Topology;
 
-            var vertices = mesh.GetVertexBuffer(Device, inputs, skinning);
+            var vertices = mesh.GetVertexBuffer(Device, inputs);
 
             Context.InputAssembler.SetVertexBuffers(0,
                 new VertexBufferBinding(vertices, mesh.Stride, 0));
