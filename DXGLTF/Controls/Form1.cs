@@ -25,7 +25,41 @@ namespace DXGLTF
             content.Text = name;
             content.TabText = name;
             content.Show(dockPanel1, state);
+            content.HideOnClose = true;
             m_contentMap.Add(name, content);
+
+            var cb = new ToolStripMenuItem();
+            cb.Checked = true;
+            cb.CheckOnClick = true;
+            cb.Text = name;
+            cb.Name = "chk_" + name;
+            cb.CheckedChanged += (o, e) =>
+            {
+                var check = ((ToolStripMenuItem)o).Checked;
+                if (check == content.Visible)
+                {
+                    return;
+                }
+
+                if (check)
+                {
+                    Console.WriteLine(string.Format("checked: {0}", name));
+                    content.Show();
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("unchecked: {0}", name));
+                    content.Hide();
+                }
+            };
+
+            viewToolStripMenuItem.DropDownItems.Add(cb);
+
+            content.VisibleChanged += (o, e) =>
+              {
+                  Console.WriteLine(string.Format("visible: {0}.{1}", name, content.Visible));
+                  cb.Checked = content.Visible;
+              };
         }
 
         SceneHierarchy m_hierarchy;
