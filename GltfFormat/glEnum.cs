@@ -5,7 +5,7 @@ namespace UniGLTF
 {
     public enum glComponentType : int
     {
-        BYTE = 5120, // signed ?
+        BYTE = 5120, // signed
         UNSIGNED_BYTE = 5121,
 
         SHORT = 5122,

@@ -82,12 +82,7 @@ namespace D3DPanel
 
             Context.InputAssembler.PrimitiveTopology = mesh.Topology;
 
-            if (skinning != null)
-            {
-                int a = 0;
-            }
-
-            var vertices = mesh.GetVertexBuffer(Device, inputs);
+            var vertices = mesh.GetVertexBuffer(Device, inputs, skinning);
 
             Context.InputAssembler.SetVertexBuffers(0,
                 new VertexBufferBinding(vertices, mesh.Stride, 0));

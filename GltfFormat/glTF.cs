@@ -190,14 +190,35 @@ namespace UniGLTF
 
         public float[] GetArrayFromAccessorAsFloat(IStorage io, int accessorIndex)
         {
+            return GetArrayFromAccessorAs<float>(io, accessorIndex);
+        }
+
+        static bool CheckType(Type t, glComponentType ct)
+        {
+            switch(ct)
+            {
+                case glComponentType.BYTE: return t == typeof(sbyte);
+                case glComponentType.SHORT: return t == typeof(short);
+                case glComponentType.UNSIGNED_BYTE: return t == typeof(byte);
+                case glComponentType.UNSIGNED_SHORT: return t == typeof(ushort);
+                case glComponentType.UNSIGNED_INT: return t == typeof(uint);
+                case glComponentType.FLOAT: return t == typeof(float);
+            }
+            throw new NotImplementedException();
+        }
+
+        public T[] GetArrayFromAccessorAs<T>(IStorage io, int accessorIndex)where T:struct
+        {
             var vertexAccessor = accessors[accessorIndex];
 
-            if (vertexAccessor.count <= 0) return new float[] { };
+            if (vertexAccessor.count <= 0) return new T[] { };
+
+            CheckType(typeof(T), vertexAccessor.componentType);
 
             var bufferCount = vertexAccessor.count * vertexAccessor.TypeCount;
             var result = (vertexAccessor.bufferView != -1)
-                    ? GetAttrib<float>(io, bufferCount, vertexAccessor.byteOffset, bufferViews[vertexAccessor.bufferView])
-                    : new float[bufferCount]
+                    ? GetAttrib<T>(io, bufferCount, vertexAccessor.byteOffset, bufferViews[vertexAccessor.bufferView])
+                    : new T[bufferCount]
                 ;
 
             var sparse = vertexAccessor.sparse;
@@ -205,7 +226,7 @@ namespace UniGLTF
             {
                 // override sparse values
                 var indices = _GetIndices(io, bufferViews[sparse.indices.bufferView], sparse.count, sparse.indices.byteOffset, sparse.indices.componentType);
-                var values = GetAttrib<float>(io, sparse.count * vertexAccessor.TypeCount, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
+                var values = GetAttrib<T>(io, sparse.count * vertexAccessor.TypeCount, sparse.values.byteOffset, bufferViews[sparse.values.bufferView]);
 
                 var it = indices.GetEnumerator();
                 for (int i = 0; i < sparse.count; ++i)

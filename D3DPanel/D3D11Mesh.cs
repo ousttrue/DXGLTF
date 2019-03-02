@@ -100,7 +100,8 @@ namespace D3DPanel
 
         InputElement[] _inputs;
         public SharpDX.Direct3D11.Buffer GetVertexBuffer(Device device,
-            InputElement[] inputs)
+            InputElement[] inputs,
+            Matrix[] skinning)
         {
             if (inputs != _inputs)
             {
@@ -108,13 +109,14 @@ namespace D3DPanel
                 _inputs = inputs;
             }
 
-            if (m_vertexBuffer == null)
+            if (skinning != null || m_vertexBuffer == null)
             {
                 Stride = inputs.Sum(y => GetSize(y));
                 var pos = m_attributes[Semantics.POSITION];
                 VertexCount = pos.Value.Count / pos.ElementSize;
-                var buffer = new InterleavedBuffer(Stride, VertexCount);
 
+                // fill buffer
+                var buffer = new InterleavedBuffer(Stride, VertexCount);
                 int offset = 0;
                 foreach (var input in inputs)
                 {
@@ -122,7 +124,14 @@ namespace D3DPanel
                     var semantics = (Semantics)Enum.Parse(typeof(Semantics), input.SemanticName, true);
                     if (m_attributes.TryGetValue(semantics, out attr))
                     {
-                        buffer.Set(attr.Value, attr.ElementSize, offset);
+                        if (semantics == Semantics.POSITION)
+                        {
+                            buffer.SetPosition(attr.Value, attr.ElementSize, offset, skinning);
+                        }
+                        else
+                        {
+                            buffer.Set(attr.Value, attr.ElementSize, offset);
+                        }
                     }
                     offset += GetSize(input);
                 }
@@ -136,6 +145,20 @@ namespace D3DPanel
             }
 
             return m_vertexBuffer;
+        }
+        #endregion
+
+        #region Skinniing
+        ushort[] _joints;
+        public void SetJoints(ushort[] joints)
+        {
+            _joints = joints;
+        }
+
+        float[] _weights;
+        public void SetWeights(float[] weights)
+        {
+            _weights = weights;
         }
         #endregion
 

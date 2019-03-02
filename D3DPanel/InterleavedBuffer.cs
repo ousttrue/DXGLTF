@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX;
+using System;
 using System.Runtime.InteropServices;
 
 namespace D3DPanel
@@ -35,6 +36,21 @@ namespace D3DPanel
             for (int pos = 0; pos < values.Count; pos += stride, offset += Stride)
             {
                 System.Buffer.BlockCopy(values.Array, values.Offset + pos, m_buffer, offset, stride);
+            }
+        }
+
+        public void SetPosition(ArraySegment<byte> values, int stride, int offset, Matrix[] matrices)
+        {
+            if (matrices == null)
+            {
+                Set(values, stride, offset);
+            }
+            else
+            {
+                for (int pos = 0; pos < values.Count; pos += stride, offset += Stride)
+                {
+                    System.Buffer.BlockCopy(values.Array, values.Offset + pos, m_buffer, offset, stride);
+                }
             }
         }
     }

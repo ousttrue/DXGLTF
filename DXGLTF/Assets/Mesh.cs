@@ -142,29 +142,32 @@ namespace DXGLTF.Assets
             UniGLTF.glTFPrimitives primitive)
         {
             var gltf = source.GLTF;
-            var accessor = gltf.accessors[primitive.indices];
-            int[] indices = null;
-            switch (accessor.componentType)
+            D3D11Mesh drawable = null;
             {
-                case UniGLTF.glComponentType.UNSIGNED_BYTE:
-                case UniGLTF.glComponentType.BYTE:
-                    indices = gltf.GetArrayFromAccessor<byte>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                    break;
+                var accessor = gltf.accessors[primitive.indices];
+                int[] indices = null;
+                switch (accessor.componentType)
+                {
+                    case UniGLTF.glComponentType.UNSIGNED_BYTE:
+                    case UniGLTF.glComponentType.BYTE:
+                        indices = gltf.GetArrayFromAccessor<byte>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
+                        break;
 
-                case UniGLTF.glComponentType.UNSIGNED_SHORT:
-                    indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
-                    break;
+                    case UniGLTF.glComponentType.UNSIGNED_SHORT:
+                        indices = gltf.GetArrayFromAccessor<ushort>(source.IO, primitive.indices).Select(x => (int)x).ToArray();
+                        break;
 
-                case UniGLTF.glComponentType.UNSIGNED_INT:
-                    indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
-                    break;
+                    case UniGLTF.glComponentType.UNSIGNED_INT:
+                        indices = gltf.GetArrayFromAccessor<int>(source.IO, primitive.indices);
+                        break;
 
-                default:
-                    throw new NotImplementedException();
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+                    indices);
             }
-
-            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
-                indices);
 
             var attribs = primitive.attributes;
 
@@ -181,6 +184,61 @@ namespace DXGLTF.Assets
             {
                 var uv = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.TEXCOORD_0);
                 drawable.SetAttribute(Semantics.TEXCOORD, new VertexAttribute(uv, 4 * 2));
+            }
+
+            if (primitive.attributes.JOINTS_0 != -1)
+            {
+                var accessor = gltf.accessors[primitive.attributes.JOINTS_0];
+                switch (accessor.componentType)
+                {
+                    case UniGLTF.glComponentType.BYTE:
+                        {
+                            var joints = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.JOINTS_0);
+                            drawable.SetJoints(joints.Select(x => (ushort)x).ToArray());
+                        }
+                        break;
+
+                    case UniGLTF.glComponentType.UNSIGNED_SHORT:
+                        {
+                            var joints = gltf.GetArrayFromAccessorAs<ushort>(source.IO, primitive.attributes.JOINTS_0);
+                            drawable.SetJoints(joints);
+                        }
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            if (primitive.attributes.WEIGHTS_0 != -1)
+            {
+                var accessor = gltf.accessors[primitive.attributes.WEIGHTS_0];
+                switch (accessor.componentType)
+                {
+                    case UniGLTF.glComponentType.BYTE:
+                        {
+                            var weights = gltf.GetBytesFromAccessor(source.IO, primitive.attributes.WEIGHTS_0);
+                            drawable.SetWeights(weights.Select(x => ((float)x) / byte.MaxValue).ToArray());
+                        }
+                        break;
+
+                    case UniGLTF.glComponentType.UNSIGNED_SHORT:
+                        {
+                            var weights = gltf.GetArrayFromAccessorAs<ushort>(source.IO, primitive.attributes.WEIGHTS_0);
+                            drawable.SetWeights(weights.Select(x => ((float)x) / ushort.MaxValue).ToArray());
+                        }
+                        break;
+
+                    case UniGLTF.glComponentType.FLOAT:
+                        {
+                            var weights = gltf.GetArrayFromAccessorAs<float>(source.IO, primitive.attributes.WEIGHTS_0);
+                            drawable.SetWeights(weights);
+                        }
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 
             return drawable;
