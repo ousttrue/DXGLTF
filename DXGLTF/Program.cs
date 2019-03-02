@@ -12,7 +12,7 @@ namespace DXGLTF
         [STAThread]
         static void Main()
         {
-            SharpDX.Configuration.EnableObjectTracking = true;
+            //SharpDX.Configuration.EnableObjectTracking = true;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

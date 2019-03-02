@@ -28,22 +28,22 @@ namespace UniGLTF
 
         public static List<GlbChunk> ParseGlbChanks(Byte[] bytes)
         {
-            if (bytes.Length == 0)
+            if (bytes==null || bytes.Length == 0)
             {
-                throw new Exception("empty bytes");
+                throw new ArgumentNullException("empty bytes");
             }
 
             int pos = 0;
             if (Encoding.ASCII.GetString(bytes, 0, 4) != GLB_MAGIC)
             {
-                throw new Exception("invalid magic");
+                throw new FormatException("invalid magic");
             }
             pos += 4;
 
             var version = BitConverter.ToUInt32(bytes, pos);
             if (version != GLB_VERSION)
             {
-                throw new Exception($"unknown version: {version}");
+                throw new FormatException($"unknown version: {version}");
             }
             pos += 4;
 

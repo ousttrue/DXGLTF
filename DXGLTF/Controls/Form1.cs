@@ -43,12 +43,12 @@ namespace DXGLTF
 
                 if (check)
                 {
-                    Console.WriteLine(string.Format("checked: {0}", name));
+                    //Console.WriteLine(string.Format("checked: {0}", name));
                     content.Show();
                 }
                 else
                 {
-                    Console.WriteLine(string.Format("unchecked: {0}", name));
+                    //Console.WriteLine(string.Format("unchecked: {0}", name));
                     content.Hide();
                 }
             };
@@ -57,7 +57,7 @@ namespace DXGLTF
 
             content.VisibleChanged += (o, e) =>
               {
-                  Console.WriteLine(string.Format("visible: {0}.{1}", name, content.Visible));
+                  //Console.WriteLine(string.Format("visible: {0}.{1}", name, content.Visible));
                   cb.Checked = content.Visible;
               };
         }
