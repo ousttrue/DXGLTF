@@ -105,7 +105,7 @@ namespace DXGLTF
         }
         static FileDialogFilter[] filters = new FileDialogFilter[]
         {
-            new FileDialogFilter("glTF files", new string[]{"gltf","glb", "vrm", "zip"}),
+            new FileDialogFilter("glTF files", new string[]{"gltf","glb", "vrm", "vci", "zip"}),
             new FileDialogFilter("All files", new string[]{"*"}),
         };
 
