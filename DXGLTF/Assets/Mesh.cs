@@ -22,15 +22,38 @@ namespace DXGLTF.Assets
     public class Skin
     {
         public int RootIndex;
-        public int[] Joints;
         public Matrix[] BindMatrices;
+        int[] _joints;
+
+        Matrix[] _nodeMatrices;
+        public Matrix[] NodeMatrices
+        {
+            get
+            {
+                return _nodeMatrices;
+            }
+        }
+
+        public void Update(Node[] nodes)
+        {
+            if (_nodeMatrices == null)
+            {
+                _nodeMatrices = new Matrix[_joints.Length];
+            }
+
+            for (int i = 0; i < _joints.Length; ++i)
+            {
+                _nodeMatrices[i] = nodes[_joints[i]].WorldMatrix;
+            }
+        }
+
         public static Skin FromGLTF(Source source, UniGLTF.glTFSkin skin)
         {
             return new Skin
             {
                 RootIndex = skin.skeleton,
-                Joints = skin.joints,
-                BindMatrices = source.GLTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices)
+                BindMatrices = source.GLTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices),
+                _joints = skin.joints,
             };
         }
     }
@@ -38,12 +61,10 @@ namespace DXGLTF.Assets
     public class Mesh : IDisposable
     {
         Skin _skin;
-        Node[] _bindNodes;
 
         public void SetSkin(Skin skin, Node[] nodes)
         {
             _skin = skin;
-            _bindNodes = skin.Joints.Select(x => nodes[x]).ToArray();
         }
 
         public List<Submesh> Submeshes = new List<Submesh>();
@@ -180,16 +201,10 @@ namespace DXGLTF.Assets
             mvp.Transpose();
             renderer.UpdateWorldConstants(mvp);
 
-            if (Submeshes[0].DrawVertexCount > 0)
+            if (Submeshes[0].DrawIndexCount > 0)
             {
                 // shared indices
                 var first = Submeshes[0];
-
-                if (_skin != null)
-                {
-                    // Skinning
-
-                }
 
                 if (renderer.SetVertices(first.Material.Shader, first.Mesh))
                 {
@@ -200,7 +215,7 @@ namespace DXGLTF.Assets
                             // material constants
                             renderer.SetMaterial(submesh.Material);
 
-                            renderer.DrawIndexed(submesh.DrawVertexOffset, submesh.DrawVertexCount);
+                            renderer.DrawIndexed(submesh.DrawIndexOffset, submesh.DrawIndexCount);
                         }
                     }
                 }
@@ -209,12 +224,6 @@ namespace DXGLTF.Assets
             {
                 foreach (var submesh in Submeshes)
                 {
-                    if (_skin != null)
-                    {
-                        // Skinning
-
-                    }
-
                     if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
                     {
                         // material constants
@@ -226,8 +235,12 @@ namespace DXGLTF.Assets
                         }
                         else
                         {
-                            renderer.DrawIndexed(0, submesh.Mesh.VertexCount);
+                            renderer.Draw(0, submesh.Mesh.VertexCount);
                         }
+                    }
+                    else
+                    {
+                        int a = 0;
                     }
                 }
             }

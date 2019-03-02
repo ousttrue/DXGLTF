@@ -55,6 +55,12 @@ namespace D3DPanel
         VertexShader m_vs;
         PixelShader m_ps;
 
+        public string Name;
+        public D3D11Shader(string name)
+        {
+            Name = name;
+        }
+
         ReactiveProperty<InputElement[]> m_inputElements = new ReactiveProperty<InputElement[]>();
         public ReactiveProperty<InputElement[]> InputElements
         {

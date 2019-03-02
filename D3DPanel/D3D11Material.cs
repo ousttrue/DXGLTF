@@ -141,12 +141,24 @@ namespace D3DPanel
             private set;
         }
 
-        public D3D11Material(D3D11Shader shader):this(shader, true, default(ImageBytes), Color4.White)
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public D3D11Material(string name, D3D11Shader shader):this(name, shader, true, default(ImageBytes), Color4.White)
         {
         }
 
-        public D3D11Material(D3D11Shader shader, bool enableDepth, ImageBytes texture, Color4 color)
+        public D3D11Material(string name,  D3D11Shader shader, bool enableDepth, ImageBytes texture, Color4 color)
         {
+            Name = name;
             Shader = shader;
             EnableDepth = enableDepth;
             m_textureBytes = texture;

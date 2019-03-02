@@ -66,7 +66,7 @@ namespace DXGLTF
         public D3D11Shader CreateShader(ShaderType type)
         {
             var source = GetShaderSource(type);
-            var shader = new D3D11Shader();
+            var shader = new D3D11Shader(type.ToString());
 
             source
                 .Subscribe(x =>

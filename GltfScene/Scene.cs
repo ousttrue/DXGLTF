@@ -69,17 +69,20 @@ namespace GltfScene
             {
                 return false;
             }
+
+            int i = 1;
             var first = it.Current;
 
             while (it.MoveNext())
             {
+                ++i;
                 if (!HasSameBuffer(first, it.Current))
                 {
                     return false;
                 }
             }
 
-            return true;
+            return i>1;
         }
     }
 

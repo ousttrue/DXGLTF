@@ -101,7 +101,7 @@ namespace DXGLTF
 
             // manipulator
             {
-                var manipulator = new D3D11Material(_shaderLoader.CreateShader(ShaderType.Gizmo),
+                var manipulator = new D3D11Material("manipulator", _shaderLoader.CreateShader(ShaderType.Gizmo),
                     false, default(ImageBytes), Color.White);
                 var radius = 0.005f;
                 var length = 0.3f;
@@ -118,7 +118,7 @@ namespace DXGLTF
             // cursor(drag position)
             {
                 _cursor = new Mesh(new Submesh(
-                    new D3D11Material(gizmo),
+                    new D3D11Material("cursor", gizmo),
                     D3D11MeshFactory.CreateCube(0.01f)));
             }
         }
@@ -194,15 +194,22 @@ namespace DXGLTF
         {
             foreach (var node in _gizmos)
             {
-                node.Draw(renderer, camera, Matrix.Identity);
+                node.Draw(renderer, camera);
             }
-
-            // clear depth
-            //_renderer.ClearDepth();
 
             foreach (var node in _drawables)
             {
-                node.Draw(renderer, camera, Matrix.Identity);
+                node.Update(Matrix.Identity);
+            }
+
+            if (_asset != null)
+            {
+                _asset.UpdateSkins();
+            }
+
+            foreach (var node in _drawables)
+            {
+                node.Draw(renderer, camera);
             }
 
             if (Selected.Value != null)

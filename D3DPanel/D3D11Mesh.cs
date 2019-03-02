@@ -174,6 +174,23 @@ namespace D3DPanel
             }
         }
 
+        Vector3[] _skinnedPosition;
+        public void Skinning(Matrix[] bind, Matrix[] world)
+        {
+            if (!HasPositionAttribute)
+            {
+                return;
+            }
+            if (VertexCount == 0)
+            {
+                return;
+            }
+            if (_skinnedPosition == null)
+            {
+                _skinnedPosition = new Vector3[Positions.Length];
+            }
+        }
+
         public IEnumerable<TriangleIntersection> Intersect(Ray ray)
         {
             if (Topology != PrimitiveTopology.TriangleList)

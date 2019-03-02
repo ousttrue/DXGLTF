@@ -10,11 +10,6 @@ namespace D3DPanel
         D3D11Renderer m_renderer = new D3D11Renderer();
 
         List<D3D11Mesh> m_drawables = new List<D3D11Mesh>();
-        public void AddDrawable(string vs, string ps)
-        {
-            var shader = new D3D11Shader();
-            shader.SetShader(vs, ps);
-        }
 
         Camera m_camera = new Camera
         {

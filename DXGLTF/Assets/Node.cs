@@ -51,20 +51,28 @@ namespace DXGLTF.Assets
             _children.Clear();
         }
 
-        Matrix _matrix = Matrix.Identity;
+        Matrix _localMatrix = Matrix.Identity;
         public Matrix LocalMatrix
         {
-            get { return _matrix; }
+            get { return _localMatrix; }
             set
             {
-                _matrix = value;
+                _localMatrix = value;
             }
         }
 
+        Matrix _worldMatrix = Matrix.Identity;
         public Matrix WorldMatrix
         {
-            get;
-            set;
+            get { return _worldMatrix; }
+            set
+            {
+                if (_worldMatrix == value)
+                {
+                    return;
+                }
+                _worldMatrix = value;
+            }
         }
 
         public int Index
@@ -96,7 +104,7 @@ namespace DXGLTF.Assets
             Name = name;
         }
 
-        public Node(D3D11Shader shader, D3D11Mesh mesh) : this(new D3D11Material(shader), mesh)
+        public Node(D3D11Shader shader, D3D11Mesh mesh) : this(new D3D11Material(shader.Name, shader), mesh)
         {
         }
 
@@ -115,16 +123,23 @@ namespace DXGLTF.Assets
             return Mesh.Intersect(WorldMatrix, ray);
         }
 
+        public void Update(Matrix accumulated)
+        {
+            WorldMatrix = LocalMatrix * accumulated;
+            foreach (var child in Children)
+            {
+                child.Update(WorldMatrix);
+            }
+        }
+
         /// <summary>
         /// 描画しながらついでにWorldMatrixを更新する
         /// </summary>
         /// <param name="renderer"></param>
         /// <param name="camera"></param>
         /// <param name="accumulated"></param>
-        public void Draw(D3D11Renderer renderer, Camera camera, Matrix accumulated)
+        public void Draw(D3D11Renderer renderer, Camera camera)
         {
-            WorldMatrix = LocalMatrix * accumulated;
-
             if (Mesh != null)
             {
                 Mesh.Draw(renderer, camera, WorldMatrix);
@@ -132,7 +147,7 @@ namespace DXGLTF.Assets
 
             foreach (var child in Children)
             {
-                child.Draw(renderer, camera, WorldMatrix);
+                child.Draw(renderer, camera);
             }
         }
     }

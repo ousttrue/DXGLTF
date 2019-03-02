@@ -9,8 +9,8 @@ namespace DXGLTF.Assets
     {
         public D3D11Material Material;
         public D3D11Mesh Mesh;
-        public int DrawVertexOffset;
-        public int DrawVertexCount;
+        public int DrawIndexOffset;
+        public int DrawIndexCount;
 
         public void Dispose()
         {
@@ -36,8 +36,8 @@ namespace DXGLTF.Assets
         {
             Material = material;
             Mesh = mesh;
-            DrawVertexOffset = offset;
-            DrawVertexCount = count;
+            DrawIndexOffset = offset;
+            DrawIndexCount = count;
         }
     }
 }

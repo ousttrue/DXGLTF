@@ -23,7 +23,17 @@ namespace DXGLTF.Assets
         List<ImageBytes> _textureImages = new List<ImageBytes>();
         List<D3D11Material> _materials = new List<D3D11Material>();
         List<Mesh> _meshes = new List<Mesh>();
+
+        Node[] _nodes;
+
         List<Skin> _skins = new List<Skin>();
+        public void UpdateSkins()
+        {
+            foreach(var skin in _skins)
+            {
+                skin.Update(_nodes);
+            }
+        }
 
         public void Dispose()
         {
@@ -69,7 +79,7 @@ namespace DXGLTF.Assets
                         color.Alpha = pbr.baseColorFactor[3];
                     }
                 }
-                asset._materials.Add(new D3D11Material(shader, true, texture, color));
+                asset._materials.Add(new D3D11Material(material.name, shader, true, texture, color));
             }
 
             foreach(var mesh in gltf.meshes)
@@ -91,19 +101,19 @@ namespace DXGLTF.Assets
         {
             var gltf = _source.GLTF;
 
-            var newNodes = gltf.nodes.Select((x, i) => CreateDrawable(i, x)).ToArray();
+            _nodes = gltf.nodes.Select((x, i) => CreateDrawable(i, x)).ToArray();
 
             for (int i = 0; i < gltf.nodes.Count; ++i)
             {
                 var node = gltf.nodes[i];
-                var drawable = newNodes[i];
+                var drawable = _nodes[i];
 
                 if (node.children != null)
                 {
                     // build hierarchy
                     foreach (var j in node.children)
                     {
-                        drawable.AddChild(newNodes[j]);
+                        drawable.AddChild(_nodes[j]);
                     }
                 }
 
@@ -113,13 +123,13 @@ namespace DXGLTF.Assets
 
                     if (node.skin >= 0)
                     {
-                        drawable.Mesh.SetSkin(_skins[node.skin], newNodes);
+                        drawable.Mesh.SetSkin(_skins[node.skin], _nodes);
                     }
                 }
             }
 
             // return only no parent
-            return newNodes;
+            return _nodes;
         }
 
         public static Node CreateDrawable(int i, UniGLTF.glTFNode node)
