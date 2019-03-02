@@ -90,7 +90,7 @@
       <Project>{e7b4846e-a89e-449e-9278-cd0e409ccdf7}</Project>
       <Name>GltfFormat</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UniJSON\UniVRM\UniJSON35\UniJSON\UniJSON.csproj">
+    <ProjectReference Include="..\UniJSON\UniJSON.csproj">
       <Project>{7df65fb7-fc53-4ef8-ac2f-1c825d67c767}</Project>
       <Name>UniJSON</Name>
     </ProjectReference>

@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GltfScene", "GltfScene\Gltf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GltfFormat", "GltfFormat\GltfFormat.csproj", "{E7B4846E-A89E-449E-9278-CD0E409CCDF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniJSON", "UniJSON\UniVRM\UniJSON35\UniJSON\UniJSON.csproj", "{7DF65FB7-FC53-4EF8-AC2F-1C825D67C767}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniJSON", "UniJSON\UniJSON.csproj", "{7DF65FB7-FC53-4EF8-AC2F-1C825D67C767}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -201,7 +201,7 @@
       <Project>{9afa370c-76d6-4dd0-9926-8039cb8b0366}</Project>
       <Name>GltfScene</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UniJSON\UniVRM\UniJSON35\UniJSON\UniJSON.csproj">
+    <ProjectReference Include="..\UniJSON\UniJSON.csproj">
       <Project>{7df65fb7-fc53-4ef8-ac2f-1c825d67c767}</Project>
       <Name>UniJSON</Name>
     </ProjectReference>
