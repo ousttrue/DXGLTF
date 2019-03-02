@@ -39,6 +39,21 @@ namespace D3DPanel
             }
         }
 
+        public void Set<T>(T[] values, int offset)where T: struct
+        {
+            var size = Marshal.SizeOf(typeof(T));
+            using (var pin = UniGLTF.Pin.Create(values))
+            {
+                var src = 0;
+                for(int i=0; i<values.Length; ++i)
+                {
+                    Marshal.Copy(IntPtr.Add(pin.Ptr, src), m_buffer, offset, size);
+                    src += size;
+                    offset += Stride;
+                }
+            }
+        }
+
         public void SetPosition(ArraySegment<byte> values, int stride, int offset, Matrix[] matrices)
         {
             if (matrices == null)

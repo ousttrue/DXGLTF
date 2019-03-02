@@ -158,6 +158,24 @@ namespace D3DPanel
             {
                 var box = context.MapSubresource(m_vertexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
 
+                int offset = 0;
+                foreach (var input in inputs)
+                {
+                    // search position sematntics
+                    VertexAttribute attr;
+                    var semantics = (Semantics)Enum.Parse(typeof(Semantics), input.SemanticName, true);
+                    if (semantics == Semantics.POSITION)
+                    {
+                        if (m_attributes.TryGetValue(semantics, out attr))
+                        {
+                            _buffer.Set(_skinnedPosition, offset);
+                        }
+                        break;
+                    }
+                    offset += GetSize(input);
+                }
+
+
                 Marshal.Copy(_buffer.Buffer, 0, box.DataPointer, _buffer.Buffer.Length);
 
                 context.UnmapSubresource(m_vertexBuffer, 0);
