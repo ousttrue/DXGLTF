@@ -156,6 +156,9 @@ namespace D3DPanel
 
             if (_skinnedPosition != null)
             {
+                //
+                // skinning
+                //
                 var box = context.MapSubresource(m_vertexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
 
                 int offset = 0;
@@ -174,7 +177,6 @@ namespace D3DPanel
                     }
                     offset += GetSize(input);
                 }
-
 
                 Marshal.Copy(_buffer.Buffer, 0, box.DataPointer, _buffer.Buffer.Length);
 
@@ -216,7 +218,8 @@ namespace D3DPanel
 
             for (int i = 0; i < _positions.Length; ++i)
             {
-                _skinnedPosition[i] = _positions[i];
+                var transformed = Vector3.Transform(_positions[i], matrices[_joints[i * 4]]);
+                _skinnedPosition[i] = (Vector3)transformed;
             }
         }
         #endregion
