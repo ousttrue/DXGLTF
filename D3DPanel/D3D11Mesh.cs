@@ -126,10 +126,15 @@ namespace D3DPanel
                     }
                     offset += GetSize(input);
                 }
-                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device,
-                    BindFlags.VertexBuffer, buffer.Buffer);
+
+                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, buffer.Buffer,
+                    new BufferDescription
+                    {
+                        BindFlags = BindFlags.VertexBuffer
+                    });
                 m_vertexBuffer.DebugName = "VertexBuffer";
             }
+
             return m_vertexBuffer;
         }
         #endregion
@@ -188,6 +193,12 @@ namespace D3DPanel
             if (_skinnedPosition == null)
             {
                 _skinnedPosition = new Vector3[Positions.Length];
+            }
+
+            var positions = Positions;
+            for (int i = 0; i < positions.Length; ++i)
+            {
+                _skinnedPosition = positions;
             }
         }
 

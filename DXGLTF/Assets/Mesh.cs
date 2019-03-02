@@ -22,29 +22,26 @@ namespace DXGLTF.Assets
     public class Skin
     {
         public int RootIndex;
-        public Matrix[] BindMatrices;
+        Matrix[] _bindMatrices;
         int[] _joints;
-
-        Matrix[] _nodeMatrices;
-        public Matrix[] NodeMatrices
-        {
-            get
-            {
-                return _nodeMatrices;
-            }
-        }
 
         public void Update(Node[] nodes)
         {
-            if (_nodeMatrices == null)
+            if (_matrices == null)
             {
-                _nodeMatrices = new Matrix[_joints.Length];
+                _matrices = new Matrix[_joints.Length];
             }
 
             for (int i = 0; i < _joints.Length; ++i)
             {
-                _nodeMatrices[i] = nodes[_joints[i]].WorldMatrix;
+                _matrices[i] = _bindMatrices[i] * nodes[_joints[i]].WorldMatrix;
             }
+        }
+
+        Matrix[] _matrices;
+        public Matrix[] Matrices
+        {
+            get { return _matrices; }
         }
 
         public static Skin FromGLTF(Source source, UniGLTF.glTFSkin skin)
@@ -52,7 +49,7 @@ namespace DXGLTF.Assets
             return new Skin
             {
                 RootIndex = skin.skeleton,
-                BindMatrices = source.GLTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices),
+                _bindMatrices = source.GLTF.GetArrayFromAccessor<Matrix>(source.IO, skin.inverseBindMatrices),
                 _joints = skin.joints,
             };
         }
@@ -206,7 +203,8 @@ namespace DXGLTF.Assets
                 // shared indices
                 var first = Submeshes[0];
 
-                if (renderer.SetVertices(first.Material.Shader, first.Mesh))
+                if (renderer.SetVertices(first.Material.Shader, first.Mesh, 
+                    _skin?.Matrices))
                 {
                     if (renderer.SetIndices(first.Mesh))
                     {
@@ -224,7 +222,7 @@ namespace DXGLTF.Assets
             {
                 foreach (var submesh in Submeshes)
                 {
-                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh, _skin?.Matrices))
                     {
                         // material constants
                         renderer.SetMaterial(submesh.Material);
@@ -237,10 +235,6 @@ namespace DXGLTF.Assets
                         {
                             renderer.Draw(0, submesh.Mesh.VertexCount);
                         }
-                    }
-                    else
-                    {
-                        int a = 0;
                     }
                 }
             }
