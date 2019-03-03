@@ -123,7 +123,26 @@ namespace DXGLTF
                 _cursor = new Mesh(
                     new Submesh(nodepth, D3D11MeshFactory.CreateCube(0.01f)));
             }
+
+            // Matrixが変化したら再描画
+            _selected.Subscribe(x =>
+            {
+                if (_subscription != null)
+                {
+                    _subscription.Dispose();
+                    _subscription = null;
+                }
+
+                if (x != null)
+                {
+                    _subscription = x.LocalMatrixObservable.Subscribe(y =>
+                    {
+                        _updated.OnNext(Unit.Default);
+                    });
+                }
+            });
         }
+        IDisposable _subscription;
 
         protected override void OnUpdated(Source source)
         {

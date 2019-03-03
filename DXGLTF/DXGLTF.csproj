@@ -134,6 +134,12 @@
     <Compile Include="Controls\SelectedNodeContent.Designer.cs">
       <DependentUpon>SelectedNodeContent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Vector3Control.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Vector3Control.Designer.cs">
+      <DependentUpon>Vector3Control.cs</DependentUpon>
+    </Compile>
     <Compile Include="Nodes\ImageVisualizer.cs" />
     <Compile Include="Nodes\IVisualizer.cs" />
     <Compile Include="Assets\Node.cs" />
@@ -169,6 +175,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SelectedNodeContent.resx">
       <DependentUpon>SelectedNodeContent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Vector3Control.resx">
+      <DependentUpon>Vector3Control.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
