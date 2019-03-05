@@ -244,6 +244,11 @@ namespace DXGLTF.Assets
             return drawable;
         }
 
+        struct WorldConstants
+        {
+            public Matrix MVP;
+        }
+
         public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
         {
             if (Submeshes.Count == 0)
@@ -254,7 +259,10 @@ namespace DXGLTF.Assets
             // world constants
             var mvp = m * camera.View * camera.Projection;
             mvp.Transpose();
-            renderer.UpdateWorldConstants(mvp);
+            renderer.UpdateWorldConstants(new WorldConstants
+            {
+                MVP = mvp
+            });
 
             if (Submeshes[0].DrawIndexCount > 0)
             {

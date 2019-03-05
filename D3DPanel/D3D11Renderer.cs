@@ -28,35 +28,25 @@ namespace D3DPanel
             }
         }
 
-        struct WorldConstants
-        {
-            public Matrix MVP;
-        }
-        public void UpdateWorldConstants(Matrix mvp)
+        public void UpdateWorldConstants<T>(T value) where T : struct
         {
             m_context.VertexShader.SetConstantBuffer(0, m_worldConstants.Update(m_device, m_context,
-                new WorldConstants
-                {
-                    MVP = mvp
-                }));
+                value));
         }
 
         struct ObjectConstants
         {
             public Color4 Color;
         }
-        public void UpdateObjectConstants(Color4 color)
+        public void SetMaterial(D3D11Material material)
         {
             m_context.PixelShader.SetConstantBuffer(0, m_objectConstants.Update(m_device, m_context,
                 new ObjectConstants
                 {
-                    Color = color
-                }));
-        }
-
-        public void SetMaterial(D3D11Material material)
-        {
-            UpdateObjectConstants(material.Color);
+                    Color = material.Color
+                }
+                ));
+            //UpdateObjectConstants(material.Color);
 
             // shader
             material.Shader.SetupContext(Device, Context);
@@ -119,7 +109,7 @@ namespace D3DPanel
         DeviceContext m_context;
         public DeviceContext Context => m_context;
 
-        class Constants<T> : System.IDisposable where T : struct
+        class Constants : System.IDisposable
         {
             Buffer m_constantBuffer;
 
@@ -132,8 +122,8 @@ namespace D3DPanel
                 }
             }
 
-            public Buffer Update(SharpDX.Direct3D11.Device m_device, DeviceContext context,
-                T value)
+            public Buffer Update<T>(SharpDX.Direct3D11.Device m_device, DeviceContext context,
+                T value) where T : struct
             {
                 if (m_constantBuffer == null)
                 {
@@ -144,8 +134,8 @@ namespace D3DPanel
                 return m_constantBuffer;
             }
         }
-        Constants<WorldConstants> m_worldConstants = new Constants<WorldConstants>();
-        Constants<ObjectConstants> m_objectConstants = new Constants<ObjectConstants>();
+        Constants m_worldConstants = new Constants();
+        Constants m_objectConstants = new Constants();
 
         public void Dispose()
         {
