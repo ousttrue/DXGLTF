@@ -38,8 +38,12 @@ namespace DXGLTF.Assets
             set;
         }
 
+        D3D11Constants<Matrix> _constants = new D3D11Constants<Matrix>();
+
         public void Dispose()
         {
+            _constants.Dispose();
+
             if (Mesh != null)
             {
                 Mesh.Dispose();
@@ -141,16 +145,21 @@ namespace DXGLTF.Assets
         /// <param name="renderer"></param>
         /// <param name="camera"></param>
         /// <param name="accumulated"></param>
-        public void Draw(D3D11Renderer renderer, Camera camera)
+        public void Draw(D3D11Device device, Camera camera)
         {
+            // world constants
+            var mvp = WorldMatrix * camera.View * camera.Projection;
+            mvp.Transpose();
+            _constants.SetVSConstants(device, 0, mvp);
+
             if (Mesh != null)
             {
-                Mesh.Draw(renderer, camera, WorldMatrix);
+                Mesh.Draw(device, camera, WorldMatrix);
             }
 
             foreach (var child in Children)
             {
-                child.Draw(renderer, camera);
+                child.Draw(device, camera);
             }
         }
     }

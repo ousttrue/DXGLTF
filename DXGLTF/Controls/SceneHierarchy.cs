@@ -211,11 +211,11 @@ namespace DXGLTF
             _updated.OnNext(Unit.Default);
         }
 
-        public void Draw(D3D11Renderer renderer, Camera camera)
+        public void Draw(D3D11Device device, Camera camera)
         {
             foreach (var node in _gizmos)
             {
-                node.Draw(renderer, camera);
+                node.Draw(device, camera);
             }
 
             #region Scene
@@ -231,15 +231,15 @@ namespace DXGLTF
 
             foreach (var node in _drawables)
             {
-                node.Draw(renderer, camera);
+                node.Draw(device, camera);
             }
             #endregion
 
             if (Selected != null)
             {
                 var s = Matrix.Scaling(1.0f);
-                _manipulator.Draw(renderer, camera, s * Selected.WorldMatrix);
-                _cursor.Draw(renderer, camera, s * Matrix.Translation(_cursorPosition));
+                _manipulator.Draw(device, camera, s * Selected.WorldMatrix);
+                _cursor.Draw(device, camera, s * Matrix.Translation(_cursorPosition));
             }
         }
 

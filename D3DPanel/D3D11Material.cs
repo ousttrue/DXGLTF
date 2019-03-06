@@ -15,6 +15,8 @@ namespace D3DPanel
             private set;
         }
 
+        D3D11Constants<Color4> _constants = new D3D11Constants<Color4>();
+
         // texture0
         ImageBytes m_textureBytes;
         ShaderResourceView m_srv;
@@ -134,6 +136,41 @@ namespace D3DPanel
             return m_ds;
         }
 
+        public void Dispose()
+        {
+            _constants.Dispose();
+
+            if (m_ds != null)
+            {
+                m_ds.Dispose();
+                m_ds = null;
+            }
+
+            if (m_rs != null)
+            {
+                m_rs.Dispose();
+                m_rs = null;
+            }
+
+            if (m_ss != null)
+            {
+                m_ss.Dispose();
+                m_ss = null;
+            }
+
+            if (m_srv != null)
+            {
+                m_srv.Dispose();
+                m_srv = null;
+            }
+
+            if (Shader != null)
+            {
+                Shader.Dispose();
+                Shader = null;
+            }
+        }
+
         // material color
         public Color4 Color
         {
@@ -165,37 +202,18 @@ namespace D3DPanel
             Color = color;
         }
 
-        public void Dispose()
+        public void Setup(D3D11Device device)
         {
-            if (m_ds != null)
-            {
-                m_ds.Dispose();
-                m_ds = null;
-            }
+            _constants.SetPSConstants(device, 0, Color);
 
-            if (m_rs != null)
-            {
-                m_rs.Dispose();
-                m_rs = null;
-            }
+            // shader
+            Shader.Setup(device);
 
-            if (m_ss != null)
-            {
-                m_ss.Dispose();
-                m_ss = null;
-            }
-
-            if (m_srv != null)
-            {
-                m_srv.Dispose();
-                m_srv = null;
-            }
-
-            if (Shader != null)
-            {
-                Shader.Dispose();
-                Shader = null;
-            }
+            // material
+            device.Context.PixelShader.SetShaderResource(0, GetOrCreateSRV(device.Device));
+            device.Context.PixelShader.SetSampler(0, GetOrCreateSamplerState(device.Device));
+            device.Context.Rasterizer.State = GetRasterizerState(device.Device);
+            device.Context.OutputMerger.SetDepthStencilState(GetOrCreateDepthStencilState(device.Device));
         }
     }
 }

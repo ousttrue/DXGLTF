@@ -1,5 +1,4 @@
 ﻿using D3DPanel;
-using SharpDX;
 using System;
 
 
@@ -38,6 +37,29 @@ namespace DXGLTF.Assets
             Mesh = mesh;
             DrawIndexOffset = offset;
             DrawIndexCount = count;
+        }
+
+        public void DrawSubmesh(D3D11Device device)
+        {
+            // material constants
+            Material.Setup(device);
+
+            Mesh.DrawIndexed(device, DrawIndexOffset, DrawIndexCount);
+        }
+
+        public void Draw(D3D11Device device)
+        {
+            // material constants
+            Material.Setup(device);
+
+            if (Mesh.SetIndices(device))
+            {
+                Mesh.DrawIndexed(device, 0, Mesh.IndexCount);
+            }
+            else
+            {
+                Mesh.Draw(device, 0, Mesh.VertexCount);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System;
 
 namespace D3DPanel
 {
-    class DXGISwapChain : IDisposable
+    public class DXGISwapChain : IDisposable
     {
         SwapChain m_swapChain;
         public DXGISwapChain(SwapChain swapChain)

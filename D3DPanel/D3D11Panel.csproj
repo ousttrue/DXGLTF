@@ -99,9 +99,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="D3D11Constants.cs" />
+    <Compile Include="D3D11Device.cs" />
     <Compile Include="D3D11Mesh.cs" />
     <Compile Include="D3D11MeshFactory.cs" />
     <Compile Include="D3D11Material.cs" />
+    <Compile Include="D3D11RenderTarget.cs" />
     <Compile Include="D3D11Shader.cs" />
     <Compile Include="D3D11Panel.cs">
       <SubType>UserControl</SubType>
@@ -109,7 +112,6 @@
     <Compile Include="D3D11Panel.Designer.cs">
       <DependentUpon>D3D11Panel.cs</DependentUpon>
     </Compile>
-    <Compile Include="D3D11Renderer.cs" />
     <Compile Include="DXGISwapChain.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="InterleavedBuffer.cs" />

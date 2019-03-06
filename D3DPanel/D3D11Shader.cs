@@ -35,7 +35,7 @@ namespace D3DPanel
             {
                 Format = ImageFormat.Jpeg;
             }
-            else if(sig == 0x474E5089)
+            else if (sig == 0x474E5089)
             {
                 Format = ImageFormat.Png;
             }
@@ -168,7 +168,7 @@ namespace D3DPanel
             m_updated.OnNext(Unit.Default);
         }
 
-        public void SetupContext(SharpDX.Direct3D11.Device device, DeviceContext context)
+        public void Setup(D3D11Device device)
         {
             if (m_vsCompiled == null)
             {
@@ -176,29 +176,29 @@ namespace D3DPanel
             }
 
             // Prepare All the stages
-            context.InputAssembler.InputLayout = m_layout;
+            device.Context.InputAssembler.InputLayout = m_layout;
 
             if (m_vs == null)
             {
-                m_vs = new VertexShader(device, m_vsCompiled);
+                m_vs = new VertexShader(device.Device, m_vsCompiled);
             }
-            context.VertexShader.Set(m_vs);
+            device.Context.VertexShader.Set(m_vs);
 
             if (m_ps == null)
             {
-                m_ps = new PixelShader(device, m_psCompiled);
+                m_ps = new PixelShader(device.Device, m_psCompiled);
             }
-            context.PixelShader.Set(m_ps);
+            device.Context.PixelShader.Set(m_ps);
 
             if (m_layout == null)
             {
                 // Layout from VertexShader input signature
                 m_layout = new InputLayout(
-                    device,
+                    device.Device,
                     ShaderSignature.GetInputSignature(m_vsCompiled),
                     InputElements.Value);
             }
-            context.InputAssembler.InputLayout = m_layout;
+            device.Context.InputAssembler.InputLayout = m_layout;
         }
     }
 }

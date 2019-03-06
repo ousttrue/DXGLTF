@@ -249,20 +249,12 @@ namespace DXGLTF.Assets
             public Matrix MVP;
         }
 
-        public void Draw(D3D11Renderer renderer, Camera camera, Matrix m)
+        public void Draw(D3D11Device device, Camera camera, Matrix m)
         {
             if (Submeshes.Count == 0)
             {
                 return;
             }
-
-            // world constants
-            var mvp = m * camera.View * camera.Projection;
-            mvp.Transpose();
-            renderer.UpdateWorldConstants(new WorldConstants
-            {
-                MVP = mvp
-            });
 
             if (Submeshes[0].DrawIndexCount > 0)
             {
@@ -273,16 +265,13 @@ namespace DXGLTF.Assets
                 {
                     first.Mesh.Skinning(_skin.Matrices);
                 }
-                if (renderer.SetVertices(first.Material.Shader, first.Mesh))
+                if (first.Mesh.SetVertices(device, first.Material.Shader))
                 {
-                    if (renderer.SetIndices(first.Mesh))
+                    if (first.Mesh.SetIndices(device))
                     {
                         foreach (var submesh in Submeshes)
                         {
-                            // material constants
-                            renderer.SetMaterial(submesh.Material);
-
-                            renderer.DrawIndexed(submesh.DrawIndexOffset, submesh.DrawIndexCount);
+                            submesh.DrawSubmesh(device);
                         }
                     }
                 }
@@ -295,19 +284,9 @@ namespace DXGLTF.Assets
                     {
                         submesh.Mesh.Skinning(_skin.Matrices);
                     }
-                    if (renderer.SetVertices(submesh.Material.Shader, submesh.Mesh))
+                    if (submesh.Mesh.SetVertices(device, submesh.Material.Shader))
                     {
-                        // material constants
-                        renderer.SetMaterial(submesh.Material);
-
-                        if (renderer.SetIndices(submesh.Mesh))
-                        {
-                            renderer.DrawIndexed(0, submesh.Mesh.IndexCount);
-                        }
-                        else
-                        {
-                            renderer.Draw(0, submesh.Mesh.VertexCount);
-                        }
+                        submesh.Draw(device);
                     }
                 }
             }

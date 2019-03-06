@@ -14,7 +14,8 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        D3D11Renderer _renderer = new D3D11Renderer();
+        D3D11Device _device = new D3D11Device();
+
         Camera _camera = new Camera
         {
             View = Matrix.Identity,
@@ -39,7 +40,7 @@ namespace DXGLTF
 
         public void Shutdown()
         {
-            _renderer.Dispose();
+            _device.Dispose();
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
@@ -50,17 +51,33 @@ namespace DXGLTF
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
             _camera.Update();
-            _renderer.Begin(Handle, new Color4(0.5f, 0.5f, 0.5f, 0));
 
-            _hierarchy.Draw(_renderer, _camera);
+            _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
-            _renderer.End();
+            var rt = _device.GetRenderTarget();
+            {
+                rt.Setup(_device,
+                    new Viewport(0, 0, Width, Height, 0.0f, 1.0f),
+                    new Color4(0.5f, 0.5f, 0.5f, 0)
+                    );
+
+                _hierarchy.Draw(_device, _camera);
+
+                _device.Present();
+            }
         }
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            _renderer.Resize(ClientSize.Width, ClientSize.Height);
+            //_renderer.Resize();
+
             _camera.Resize(ClientSize.Width, ClientSize.Height);
+
+            if (_device.SwapChain != null)
+            {
+                _device.SwapChain.Resize(ClientSize.Width, ClientSize.Height);
+            }
+
             Invalidate();
         }
 

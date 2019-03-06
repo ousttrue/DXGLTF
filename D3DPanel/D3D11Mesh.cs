@@ -50,7 +50,7 @@ namespace D3DPanel
             get { return m_indices != null ? m_indices.Length : 0; }
         }
         SharpDX.Direct3D11.Buffer m_indexBuffer;
-        public SharpDX.Direct3D11.Buffer GetIndexBuffer(Device device)
+        SharpDX.Direct3D11.Buffer GetIndexBuffer(Device device)
         {
             if (m_indices == null)
             {
@@ -66,6 +66,17 @@ namespace D3DPanel
                 }
                 return m_indexBuffer;
             }
+        }
+        public bool SetIndices(D3D11Device device)
+        {
+            var indexBuffer = GetIndexBuffer(device.Device);
+            if (indexBuffer == null)
+            {
+                return false;
+            }
+            device.Context.InputAssembler.SetIndexBuffer(indexBuffer,
+                SharpDX.DXGI.Format.R32_UInt, 0);
+            return true;
         }
         #endregion
 
@@ -115,7 +126,7 @@ namespace D3DPanel
 
         InterleavedBuffer _buffer;
         InputElement[] _inputs;
-        public SharpDX.Direct3D11.Buffer GetVertexBuffer(Device device, DeviceContext context,
+        SharpDX.Direct3D11.Buffer GetVertexBuffer(D3D11Device device,
             InputElement[] inputs)
         {
             if (inputs != _inputs)
@@ -150,7 +161,7 @@ namespace D3DPanel
                     CpuAccessFlags = CpuAccessFlags.Write,
                     SizeInBytes = _buffer.Buffer.Length,
                 };
-                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device, _buffer.Buffer, desc);
+                m_vertexBuffer = SharpDX.Direct3D11.Buffer.Create(device.Device, _buffer.Buffer, desc);
                 m_vertexBuffer.DebugName = "VertexBuffer";
             }
 
@@ -159,7 +170,7 @@ namespace D3DPanel
                 //
                 // skinning
                 //
-                var box = context.MapSubresource(m_vertexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
+                var box = device.Context.MapSubresource(m_vertexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
 
                 int offset = 0;
                 foreach (var input in inputs)
@@ -180,12 +191,46 @@ namespace D3DPanel
 
                 Marshal.Copy(_buffer.Buffer, 0, box.DataPointer, _buffer.Buffer.Length);
 
-                context.UnmapSubresource(m_vertexBuffer, 0);
+                device.Context.UnmapSubresource(m_vertexBuffer, 0);
             }
 
             return m_vertexBuffer;
         }
+        public bool SetVertices(D3D11Device device, D3D11Shader shader)
+        {
+            var inputs = shader.InputElements.Value;
+            if (inputs == null)
+            {
+                return false;
+            }
+            if (!HasPositionAttribute)
+            {
+                return false;
+            }
+
+            device.Context.InputAssembler.PrimitiveTopology = Topology;
+
+            var vertices = GetVertexBuffer(device, inputs);
+
+            device.Context.InputAssembler.SetVertexBuffers(0,
+                new VertexBufferBinding(vertices, Stride, 0));
+            return true;
+        }
         #endregion
+
+        public void Dispose()
+        {
+            if (m_indexBuffer != null)
+            {
+                m_indexBuffer.Dispose();
+                m_indexBuffer = null;
+            }
+            if (m_vertexBuffer != null)
+            {
+                m_vertexBuffer.Dispose();
+                m_vertexBuffer = null;
+            }
+        }
 
         #region Skinniing
         ushort[] _joints;
@@ -230,18 +275,14 @@ namespace D3DPanel
             Topology = topology;
         }
 
-        public void Dispose()
+        public void DrawIndexed(D3D11Device device, int offset, int count)
         {
-            if (m_indexBuffer != null)
-            {
-                m_indexBuffer.Dispose();
-                m_indexBuffer = null;
-            }
-            if (m_vertexBuffer != null)
-            {
-                m_vertexBuffer.Dispose();
-                m_vertexBuffer = null;
-            }
+            device.Context.DrawIndexed(count, offset, 0);
+        }
+
+        public void Draw(D3D11Device device, int offset, int count)
+        {
+            device.Context.Draw(count, offset);
         }
 
         public IEnumerable<TriangleIntersection> Intersect(Ray ray)
