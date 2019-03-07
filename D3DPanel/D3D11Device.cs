@@ -90,12 +90,6 @@ namespace D3DPanel
             SwapChain = new DXGISwapChain(swapChain);
         }
 
-        public D3D11RenderTarget GetRenderTarget()
-        {
-            var (rtv, dsv) = SwapChain.GetRenderTarget(Device);
-            return new D3D11RenderTarget(rtv, dsv);               
-        }
-
         public void Present()
         {
             Context.OutputMerger.SetTargets(

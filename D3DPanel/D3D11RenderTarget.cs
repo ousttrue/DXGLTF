@@ -19,7 +19,7 @@ namespace D3DPanel
 
             if (_dsv != null)
             {
-                //_dsv.Dispose();
+                _dsv.Dispose();
                 _dsv = null;
             }
         }

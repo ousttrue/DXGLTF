@@ -15,6 +15,7 @@ namespace DXGLTF
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
         D3D11Device _device = new D3D11Device();
+        D3D11RenderTarget _backbuffer;
 
         Camera _camera = new Camera
         {
@@ -40,6 +41,12 @@ namespace DXGLTF
 
         public void Shutdown()
         {
+            if (_backbuffer != null)
+            {
+                _backbuffer.Dispose();
+                _backbuffer = null;
+            }
+
             _device.Dispose();
         }
 
@@ -54,24 +61,30 @@ namespace DXGLTF
 
             _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
-            var rt = _device.GetRenderTarget();
+            if (_backbuffer == null)
             {
-                rt.Setup(_device,
-                    new Viewport(0, 0, Width, Height, 0.0f, 1.0f),
-                    new Color4(0.5f, 0.5f, 0.5f, 0)
-                    );
-
-                _hierarchy.Draw(_device, _camera);
-
-                _device.Present();
+                _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
             }
+
+            _backbuffer.Setup(_device,
+                new Viewport(0, 0, Width, Height, 0.0f, 1.0f),
+                new Color4(0.5f, 0.5f, 0.5f, 0)
+                );
+
+            _hierarchy.Draw(_device, _camera);
+
+            _device.Present();
         }
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            //_renderer.Resize();
-
             _camera.Resize(ClientSize.Width, ClientSize.Height);
+
+            if (_backbuffer != null)
+            {
+                _backbuffer.Dispose();
+                _backbuffer = null;
+            }
 
             if (_device.SwapChain != null)
             {
