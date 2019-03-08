@@ -95,6 +95,12 @@ namespace DXGLTF
 
             _camera.Resize(w, h);
 
+            if (_sceneRT != null)
+            {
+                _sceneRT.Dispose();
+                _sceneRT = null;
+            }
+
             if (_backbuffer != null)
             {
                 _backbuffer.Dispose();
