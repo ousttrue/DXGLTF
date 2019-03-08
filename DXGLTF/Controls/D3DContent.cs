@@ -16,7 +16,7 @@ namespace DXGLTF
 
         D3D11Device _device = new D3D11Device();
         D3D11RenderTarget _backbuffer;
-        D3D11RenderTarget _sceneRT = new D3D11RenderTarget();
+        D3D11RenderTarget _sceneRT;
 
         Camera _camera = new Camera
         {
@@ -42,6 +42,12 @@ namespace DXGLTF
 
         public void Shutdown()
         {
+            if (_sceneRT != null)
+            {
+                _sceneRT.Dispose();
+                _sceneRT = null;
+            }
+
             if (_backbuffer != null)
             {
                 _backbuffer.Dispose();
@@ -62,12 +68,18 @@ namespace DXGLTF
 
             _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
+            if (_sceneRT == null)
+            {
+                _sceneRT = new D3D11RenderTarget();
+                _sceneRT.Create(_device, ClientSize.Width, ClientSize.Height / 2);
+            }
+
             if (_backbuffer == null)
             {
                 _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
             }
             _backbuffer.Setup(_device,
-                new Viewport(0, 0, Width, Height, 0.0f, 1.0f),
+                new Viewport(0, 0, _camera.ScreenWidth, _camera.ScreenHeight, 0.0f, 1.0f),
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
 
@@ -78,7 +90,10 @@ namespace DXGLTF
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            _camera.Resize(ClientSize.Width, ClientSize.Height);
+            var w = ClientSize.Width;
+            var h = ClientSize.Height / 2;
+
+            _camera.Resize(w, h);
 
             if (_backbuffer != null)
             {

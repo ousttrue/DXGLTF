@@ -7,12 +7,22 @@ namespace D3DPanel
     {
         const float ToRadians = (float)(System.Math.PI / 180);
 
-        int m_screenWidth;
-        int m_screenHeight;
+        public int ScreenWidth
+        {
+            get;
+            private set;
+        }
+
+        public int ScreenHeight
+        {
+            get;
+            private set;
+        }
+
         public void Resize(int w, int h)
         {
-            m_screenWidth = w;
-            m_screenHeight = h;
+            ScreenWidth = w;
+            ScreenHeight = h;
             AspectRatio = (float)w / h;
         }
 
@@ -31,8 +41,8 @@ namespace D3DPanel
         public float ShiftY;
         public void Shift(int dx, int dy)
         {
-            ShiftX += ((float)dx / m_screenWidth) * Distance * SHIFT;
-            ShiftY += ((float)dy / m_screenWidth) * Distance * SHIFT;
+            ShiftX += ((float)dx / ScreenWidth) * Distance * SHIFT;
+            ShiftY += ((float)dy / ScreenWidth) * Distance * SHIFT;
         }
         public float Distance = 5;
         public void Dolly(int delta)
@@ -66,8 +76,8 @@ namespace D3DPanel
         public Ray GetRay(float x, float y)
         {
             // convert screen pixel to view space
-            var vx = (2.0f * x / m_screenWidth - 1.0f) / Projection.M11;
-            var vy = (-2.0f * y / m_screenHeight + 1.0f) / Projection.M22;
+            var vx = (2.0f * x / ScreenWidth - 1.0f) / Projection.M11;
+            var vy = (-2.0f * y / ScreenHeight + 1.0f) / Projection.M22;
 
             var ray = new Ray(new Vector3(), new Vector3(vx, vy, -1.0f));
             var toWorld = View;

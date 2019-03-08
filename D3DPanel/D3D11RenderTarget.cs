@@ -68,9 +68,34 @@ namespace D3DPanel
             }
         }
 
+        public void Create(D3D11Device device, int w, int h)
+        {
+            if (device.Device == null)
+            {
+                return;
+            }
+
+            using (var texture = new Texture2D(device.Device, new Texture2DDescription
+            {
+                Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = w,
+                Height = h,
+                SampleDescription = new SharpDX.DXGI.SampleDescription
+                {
+                    Count = 1,
+                    Quality = 0
+                },
+                BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource
+            }))
+            {
+                CreateFromTexture(texture, 1, 0);
+            }
+        }
+
         public void Setup(D3D11Device device, Viewport viewport, Color4 clear)
         {
-            //var clear = new SharpDX.Mathematics.Interop.RawColor4(0, 0, 128, 0);
             device.Context.ClearRenderTargetView(_rtv, clear);
             device.Context.ClearDepthStencilView(_dsv,
                 DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil,
