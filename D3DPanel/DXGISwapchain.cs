@@ -44,38 +44,11 @@ namespace D3DPanel
             using (var backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0))
             {
                 backBuffer.DebugName = "backBuffer";
-                var rtv = new RenderTargetView(device.Device, backBuffer);
-
-                {
-                    var desc = backBuffer.Description;
-                    using (var depthBuffer = new Texture2D(device.Device, new Texture2DDescription
-                    {
-                        Format = Format.D24_UNorm_S8_UInt,
-                        ArraySize = 1,
-                        MipLevels = 1,
-                        Width = desc.Width,
-                        Height = desc.Height,
-                        SampleDescription = m_swapChain.Description.SampleDescription,
-                        BindFlags = BindFlags.DepthStencil
-                    }))
-                    {
-                        var depthDesc = new DepthStencilViewDescription
-                        {
-                        };
-                        if (m_swapChain.Description.SampleDescription.Count > 1 ||
-                            m_swapChain.Description.SampleDescription.Quality > 0)
-                        {
-                            depthDesc.Dimension = DepthStencilViewDimension.Texture2DMultisampled;
-                        }
-                        else
-                        {
-                            depthDesc.Dimension = DepthStencilViewDimension.Texture2D;
-                        }
-                        var dsv = new DepthStencilView(device.Device, depthBuffer, depthDesc);
-
-                        return new D3D11RenderTarget(rtv, dsv);
-                    }
-                }
+                var rt = new D3D11RenderTarget();
+                rt.CreateFromTexture(backBuffer, 
+                    m_swapChain.Description.SampleDescription.Count,
+                    m_swapChain.Description.SampleDescription.Quality);
+                return rt;
             }
         }
     }

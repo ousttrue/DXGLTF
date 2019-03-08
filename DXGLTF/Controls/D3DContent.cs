@@ -16,6 +16,7 @@ namespace DXGLTF
 
         D3D11Device _device = new D3D11Device();
         D3D11RenderTarget _backbuffer;
+        D3D11RenderTarget _sceneRT = new D3D11RenderTarget();
 
         Camera _camera = new Camera
         {
@@ -65,7 +66,6 @@ namespace DXGLTF
             {
                 _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
             }
-
             _backbuffer.Setup(_device,
                 new Viewport(0, 0, Width, Height, 0.0f, 1.0f),
                 new Color4(0.5f, 0.5f, 0.5f, 0)

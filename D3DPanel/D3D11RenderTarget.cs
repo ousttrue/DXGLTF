@@ -24,10 +24,48 @@ namespace D3DPanel
             }
         }
 
-        public D3D11RenderTarget(RenderTargetView rtv, DepthStencilView dsv)
+        public D3D11RenderTarget()
+        { }
+
+        //m_swapChain.Description.SampleDescription,
+        public void CreateFromTexture(Texture2D texture, int count, int quality)
         {
-            _rtv = rtv;
-            _dsv = dsv;
+            Dispose();
+
+            var device = texture.Device;
+            _rtv = new RenderTargetView(texture.Device, texture);
+            {
+                var desc = texture.Description;
+                using (var depthBuffer = new Texture2D(device, new Texture2DDescription
+                {
+                    Format = SharpDX.DXGI.Format.D24_UNorm_S8_UInt,
+                    ArraySize = 1,
+                    MipLevels = 1,
+                    Width = desc.Width,
+                    Height = desc.Height,
+                    SampleDescription = new SharpDX.DXGI.SampleDescription
+                    {
+                        Count = count,
+                        Quality = quality
+                    },
+                    BindFlags = BindFlags.DepthStencil
+                }))
+                {
+                    var depthDesc = new DepthStencilViewDescription
+                    {
+                    };
+                    if (count > 1 ||
+                        quality > 0)
+                    {
+                        depthDesc.Dimension = DepthStencilViewDimension.Texture2DMultisampled;
+                    }
+                    else
+                    {
+                        depthDesc.Dimension = DepthStencilViewDimension.Texture2D;
+                    }
+                    _dsv = new DepthStencilView(device, depthBuffer, depthDesc);
+                }
+            }
         }
 
         public void Setup(D3D11Device device, Viewport viewport, Color4 clear)
