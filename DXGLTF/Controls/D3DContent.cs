@@ -53,7 +53,7 @@ namespace DXGLTF
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
 
-            _drawable.Draw(_device);
+            _drawable.Draw(_device, 0, 0);
 
             _device.Present();
         }

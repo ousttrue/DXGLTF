@@ -158,18 +158,23 @@ namespace DXGLTF.Assets
             View = Matrix.Identity,
         };
 
-        Viewport _viewport;
+        LocalRect _rect = new LocalRect();
         public void SetLocalRect(int x, int y, int w, int h)
         {
             _camera.Resize(w, h);
-            _viewport = new Viewport(x, y, w, h);
+            _rect.SetLocalRect(x, y, w, h);
         }
 
-        public void Draw(D3D11Device device)
+        public bool IsOnRect(int x, int y)
+        {
+            return _rect.IsOnRect(x, y);
+        }
+
+        public void Draw(D3D11Device device, int left, int top)
         {
             _camera.Update();
 
-            device.SetViewport(_viewport);
+            device.SetViewport(new Viewport(left, top, _rect.Width, _rect.Height));
 
             var camera = _camera.View * _camera.Projection;
 
@@ -204,11 +209,13 @@ namespace DXGLTF.Assets
         }
 
         #region Mouse
+        public bool MouseIsCaptured => m_leftDown || m_middleDown || m_rightDown;
         int m_mouseX;
         int m_mouseY;
         bool m_leftDown;
         bool m_middleDown;
         bool m_rightDown;
+        bool m_capture;
         public bool MouseMove(int x, int y)
         {
             var invalidate = false;

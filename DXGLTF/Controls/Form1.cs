@@ -76,7 +76,8 @@ namespace DXGLTF
             InitializeComponent();
 
             var scene = new Scene();
-            _disposable.Add(scene);
+            var splitter = new VerticalSplitter(null, scene);
+            _disposable.Add(splitter);
 
             // setup docks
             var hierarchy = new SceneHierarchyContent(node =>
@@ -89,7 +90,7 @@ namespace DXGLTF
             AddContent("selected node", selected, DockState.DockRight);
             selected.DockTo(hierarchy.Pane, DockStyle.Bottom, 1);
 
-            var d3d = new D3DContent(scene);
+            var d3d = new D3DContent(splitter);
             _disposable.Add(d3d);
             AddContent("selected", d3d, DockState.Document);
 
