@@ -238,8 +238,8 @@ namespace DXGLTF
             if (Selected != null)
             {
                 var s = Matrix.Scaling(1.0f);
-                _manipulator.Draw(device, camera, s * Selected.WorldMatrix);
-                _cursor.Draw(device, camera, s * Matrix.Translation(_cursorPosition));
+                _manipulator.Draw(device/*, camera, s * Selected.WorldMatrix*/);
+                _cursor.Draw(device/*, camera, s * Matrix.Translation(_cursorPosition)*/);
             }
         }
 

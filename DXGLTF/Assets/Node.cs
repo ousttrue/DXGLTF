@@ -154,7 +154,7 @@ namespace DXGLTF.Assets
 
             if (Mesh != null)
             {
-                Mesh.Draw(device, camera, WorldMatrix);
+                Mesh.Draw(device);
             }
 
             foreach (var child in Children)

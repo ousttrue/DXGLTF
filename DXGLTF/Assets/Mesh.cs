@@ -249,7 +249,7 @@ namespace DXGLTF.Assets
             public Matrix MVP;
         }
 
-        public void Draw(D3D11Device device, Camera camera, Matrix m)
+        public void Draw(D3D11Device device)
         {
             if (Submeshes.Count == 0)
             {
