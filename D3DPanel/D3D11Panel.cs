@@ -11,11 +11,6 @@ namespace D3DPanel
 
         List<D3D11Mesh> m_drawables = new List<D3D11Mesh>();
 
-        Camera m_camera = new Camera
-        {
-
-        };
-
         public void ClearDrawables()
         {
             foreach (var d in m_drawables)

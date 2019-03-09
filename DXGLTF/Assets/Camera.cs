@@ -1,7 +1,7 @@
 ﻿using SharpDX;
 
 
-namespace D3DPanel
+namespace DXGLTF.Assets
 {
     public class Camera
     {

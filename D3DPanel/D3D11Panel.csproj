@@ -98,7 +98,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Camera.cs" />
     <Compile Include="D3D11Constants.cs" />
     <Compile Include="D3D11Device.cs" />
     <Compile Include="D3D11Mesh.cs" />
