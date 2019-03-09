@@ -26,6 +26,22 @@ namespace DXGLTF.Assets
             return _rect.IsOnRect(x, y);
         }
 
+        public int Width
+        {
+            get
+            {
+                return _rect.Width;
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                return _rect.Height;
+            }
+        }
+
         Scene _scene;
 
         public void Dispose()
@@ -69,10 +85,13 @@ namespace DXGLTF.Assets
             }
         }
 
-        public void Draw(D3D11Device device, int left, int top)
+        public void Update(D3D11Device device)
         {
             _camera.Update();
+        }
 
+        public void Draw(D3D11Device device, int left, int top)
+        {
             device.SetViewport(new Viewport(left, top, _rect.Width, _rect.Height));
 
             var camera = _camera.View * _camera.Projection;

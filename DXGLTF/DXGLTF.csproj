@@ -229,6 +229,9 @@
     <Content Include="shaders\gizmo.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="shaders\screen.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="shaders\shader.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

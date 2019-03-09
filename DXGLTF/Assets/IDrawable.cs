@@ -8,6 +8,9 @@ namespace DXGLTF.Assets
     {
         void SetLocalRect(int x, int y, int w, int h);
         bool IsOnRect(int x, int y);
+        int Width { get; }
+        int Height { get; }
+
         bool MouseLeftDown(int x, int y);
         bool MouseMiddleDown(int x, int y);
         bool MouseRightDown(int x, int y);
@@ -16,6 +19,8 @@ namespace DXGLTF.Assets
         bool MouseRightUp(int x, int y);
         bool MouseMove(int x, int y);
         bool MouseWheel(int d);
+
+        void Update(D3D11Device device);
         void Draw(D3D11Device device, int left, int top);
     }
 

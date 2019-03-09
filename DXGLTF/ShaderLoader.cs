@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,6 +16,7 @@ namespace DXGLTF
         Gizmo,
         Unlit,
         Standard,
+        Screen,
     }
 
     class SourceWatcher
@@ -26,7 +26,7 @@ namespace DXGLTF
         {
             m_watcher = new FileSystemWatcher();
             m_watcher.Path = dir;
-            m_watcher.NotifyFilter = System.IO.NotifyFilters.LastWrite;
+            m_watcher.NotifyFilter = NotifyFilters.LastWrite;
             m_watcher.Filter = file;
             m_watcher.Changed += Watcher_Changed;
             m_watcher.EnableRaisingEvents = true;
@@ -59,6 +59,7 @@ namespace DXGLTF
             m_map.Add(ShaderType.Unlit, new SourceWatcher(shaderDir, "unlit.hlsl"));
             m_map.Add(ShaderType.Standard, new SourceWatcher(shaderDir, "unlit.hlsl"));
             m_map.Add(ShaderType.Gizmo, new SourceWatcher(shaderDir, "gizmo.hlsl"));
+            m_map.Add(ShaderType.Screen, new SourceWatcher(shaderDir, "screen.hlsl"));
         }
 
         public IObservable<string> GetShaderSource(ShaderType type)

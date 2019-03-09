@@ -45,6 +45,8 @@ namespace DXGLTF
         {
             _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
+            _drawable.Update(_device);
+
             if (_backbuffer == null)
             {
                 _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
@@ -52,7 +54,6 @@ namespace DXGLTF
             _backbuffer.Setup(_device,
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
-
             _drawable.Draw(_device, 0, 0);
 
             _device.Present();
