@@ -94,7 +94,7 @@ namespace D3DPanel
             }
         }
 
-        public void Setup(D3D11Device device, Viewport viewport, Color4 clear)
+        public void Setup(D3D11Device device, Color4 clear)
         {
             device.Context.ClearRenderTargetView(_rtv, clear);
             device.Context.ClearDepthStencilView(_dsv,
@@ -102,8 +102,6 @@ namespace D3DPanel
                 1.0f, 0);
 
             device.Context.OutputMerger.SetTargets(_dsv, _rtv);
-
-            device.Context.Rasterizer.SetViewport(viewport);
         }
     }
 }

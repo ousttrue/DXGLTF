@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UniJSON;
@@ -109,6 +111,13 @@ namespace DXGLTF
 
             m_d3d = new D3DContent(_scene);
             AddContent("selected", m_d3d, DockState.Document);
+            _scene.Updated
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ =>
+                {
+                    m_d3d.Invalidate();
+                })
+                ;
 
             AddContent("json", new JsonContent(_loader), DockState.DockLeft);
 

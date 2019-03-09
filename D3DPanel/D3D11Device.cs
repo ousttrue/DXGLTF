@@ -97,5 +97,10 @@ namespace D3DPanel
                 (SharpDX.Direct3D11.RenderTargetView)null);
             SwapChain.Present();
         }
+
+        public void SetViewport(SharpDX.Viewport viewport)
+        {
+            Context.Rasterizer.SetViewport(viewport);
+        }
     }
 }

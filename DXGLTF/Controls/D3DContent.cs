@@ -17,33 +17,18 @@ namespace DXGLTF
 
         D3D11Device _device = new D3D11Device();
         D3D11RenderTarget _backbuffer;
-        D3D11RenderTarget _sceneRT;
 
-        Scene _scene;
+        IDrawable _drawable;
 
-        public D3DContent(Scene scene)
+        public D3DContent(IDrawable drawable)
         {
             InitializeComponent();
 
-            _scene = scene;
-
-            _scene.Updated
-                .ObserveOn(SynchronizationContext.Current)
-                .Subscribe(_ =>
-                {
-                    Invalidate();
-                })
-                ;
+            _drawable = drawable;
         }
 
         public void Shutdown()
         {
-            if (_sceneRT != null)
-            {
-                _sceneRT.Dispose();
-                _sceneRT = null;
-            }
-
             if (_backbuffer != null)
             {
                 _backbuffer.Dispose();
@@ -62,35 +47,22 @@ namespace DXGLTF
         {
             _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
-            if (_sceneRT == null)
-            {
-                _sceneRT = new D3D11RenderTarget();
-                _sceneRT.Create(_device, ClientSize.Width, ClientSize.Height / 2);
-            }
-
             if (_backbuffer == null)
             {
                 _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
             }
             _backbuffer.Setup(_device,
-                new Viewport(0, 0, ClientSize.Width, ClientSize.Height, 0.0f, 1.0f),
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
 
-            _scene.Draw(_device);
+            _drawable.Draw(_device);
 
             _device.Present();
         }
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            _scene.SetScreenSize(ClientSize.Width, ClientSize.Height);
-
-            if (_sceneRT != null)
-            {
-                _sceneRT.Dispose();
-                _sceneRT = null;
-            }
+            _drawable.SetLocalRect(0, 0, ClientSize.Width, ClientSize.Height);
 
             if (_backbuffer != null)
             {
@@ -109,7 +81,7 @@ namespace DXGLTF
         #region MouseEvents
         private void D3DContent_MouseMove(object sender, MouseEventArgs e)
         {
-            if(_scene.MouseMove(e.X, e.Y))
+            if(_drawable.MouseMove(e.X, e.Y))
             {
                 Invalidate();
             }
@@ -126,7 +98,7 @@ namespace DXGLTF
             {
                 case MouseButtons.Left:
                     m_leftDown = true;
-                    if(_scene.MouseLeftDown(e.X, e.Y))
+                    if(_drawable.MouseLeftDown(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -135,7 +107,7 @@ namespace DXGLTF
 
                 case MouseButtons.Middle:
                     m_middleDown = true;
-                    if(_scene.MouseMiddleDown(e.X, e.Y))
+                    if(_drawable.MouseMiddleDown(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -144,7 +116,7 @@ namespace DXGLTF
 
                 case MouseButtons.Right:
                     m_rightDown = true;
-                    if(_scene.MouseRightDown(e.X, e.Y))
+                    if(_drawable.MouseRightDown(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -159,7 +131,7 @@ namespace DXGLTF
             {
                 case MouseButtons.Left:
                     m_leftDown = false;
-                    if(_scene.MouseLeftUp(e.X, e.Y))
+                    if(_drawable.MouseLeftUp(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -167,7 +139,7 @@ namespace DXGLTF
 
                 case MouseButtons.Middle:
                     m_middleDown = false;
-                    if(_scene.MouseMiddleUp(e.X, e.Y))
+                    if(_drawable.MouseMiddleUp(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -175,7 +147,7 @@ namespace DXGLTF
 
                 case MouseButtons.Right:
                     m_rightDown = false;
-                    if(_scene.MouseRightUp(e.X, e.Y))
+                    if(_drawable.MouseRightUp(e.X, e.Y))
                     {
                         Invalidate();
                     }
@@ -192,7 +164,7 @@ namespace DXGLTF
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            if (_scene.MouseWheel(e.Delta))
+            if (_drawable.MouseWheel(e.Delta))
             {
                 Invalidate();
             }

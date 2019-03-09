@@ -12,25 +12,70 @@ using System.Reactive.Subjects;
 
 namespace DXGLTF.Assets
 {
-    public interface IDrawable: IDisposable
+    public class VerticalSplitter: IDrawable
     {
-        void SetScreenSize(int w, int h);
-        void Draw(D3D11Device device);
+        public VerticalSplitter()
+        {
+
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Draw(D3D11Device device)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseLeftDown(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseLeftUp(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseMiddleDown(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseMiddleUp(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseMove(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseRightDown(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseRightUp(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MouseWheel(int d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLocalRect(int x, int y, int w, int h)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    public interface IMouseObserver
-    {
-        bool MouseLeftDown(int x, int y);
-        bool MouseMiddleDown(int x, int y);
-        bool MouseRightDown(int x, int y);
-        bool MouseLeftUp(int x, int y);
-        bool MouseMiddleUp(int x, int y);
-        bool MouseRightUp(int x, int y);
-        bool MouseMove(int x, int y);
-        bool MouseWheel(int d);
-    }
-
-    public class Scene : IDrawable, IMouseObserver
+    public class Scene : IDrawable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -176,14 +221,18 @@ namespace DXGLTF.Assets
             View = Matrix.Identity,
         };
 
-        public void SetScreenSize(int w, int h)
+        Viewport _viewport;
+        public void SetLocalRect(int x, int y, int w, int h)
         {
             _camera.Resize(w, h);
+            _viewport = new Viewport(x, y, w, h);
         }
 
         public void Draw(D3D11Device device)
         {
             _camera.Update();
+
+            device.SetViewport(_viewport);
 
             var camera = _camera.View * _camera.Projection;
 
