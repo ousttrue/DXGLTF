@@ -94,6 +94,8 @@
   <ItemGroup>
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Mesh.cs" />
+    <Compile Include="Assets\SceneHierarchy.cs" />
+    <Compile Include="Assets\SceneLoader.cs" />
     <Compile Include="Assets\Submesh.cs" />
     <Compile Include="Controls\D3DContent.cs">
       <SubType>Form</SubType>
@@ -212,10 +214,6 @@
     <ProjectReference Include="..\GltfFormat\GltfFormat.csproj">
       <Project>{e7b4846e-a89e-449e-9278-cd0e409ccdf7}</Project>
       <Name>GltfFormat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GltfScene\GltfScene.csproj">
-      <Project>{9afa370c-76d6-4dd0-9926-8039cb8b0366}</Project>
-      <Name>GltfScene</Name>
     </ProjectReference>
     <ProjectReference Include="..\UniJSON\UniJSON.csproj">
       <Project>{7df65fb7-fc53-4ef8-ac2f-1c825d67c767}</Project>

@@ -86,7 +86,7 @@ namespace GltfScene
         }
     }
 
-    public class Scene
+    public class SceneLoader
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 

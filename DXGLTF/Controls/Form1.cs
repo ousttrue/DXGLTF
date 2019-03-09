@@ -17,7 +17,7 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        Scene m_scene = new Scene();
+        SceneLoader _loader = new SceneLoader();
 
         Dictionary<string, DockContent> m_contentMap = new Dictionary<string, DockContent>();
         void AddContent(string name, DockContent content, DockState state)
@@ -63,6 +63,7 @@ namespace DXGLTF
         }
 
         SceneHierarchyContent m_hierarchy;
+        Assets.SceneHierarchy _scene = new Assets.SceneHierarchy();
         D3DContent m_d3d;
 
         LoggerContent m_logger;
@@ -73,7 +74,7 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            m_scene.SourceObservableOnCurrent.Subscribe(x =>
+            _loader.SourceObservableOnCurrent.Subscribe(x =>
             {
                 if (x.GLTF != null)
                 {
@@ -86,19 +87,19 @@ namespace DXGLTF
                 }
             });
 
-            m_hierarchy = new SceneHierarchyContent(m_scene);
+            m_hierarchy = new SceneHierarchyContent(_loader);
             AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
 
-            m_selected = new SelectedNodeContent(m_hierarchy);
+            m_selected = new SelectedNodeContent(_scene);
             AddContent("selected node", m_selected, DockState.DockRight);
             m_selected.DockTo(m_hierarchy.Pane, DockStyle.Bottom, 1);
 
-            m_d3d = new D3DContent(m_hierarchy);
+            m_d3d = new D3DContent(_scene);
             AddContent("selected", m_d3d, DockState.Document);
 
-            AddContent("json", new JsonContent(m_scene), DockState.DockLeft);
+            AddContent("json", new JsonContent(_loader), DockState.DockLeft);
 
-            var jsonNode = new JsonNodeContent(m_scene);
+            var jsonNode = new JsonNodeContent(_loader);
             AddContent("jsonnode", jsonNode, DockState.DockLeft);
             jsonNode.Selected.Subscribe(x =>
             {
@@ -117,7 +118,7 @@ namespace DXGLTF
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            m_hierarchy.Shutdown();
+            _scene.Dispose();
             m_d3d.Shutdown();
         }
 
@@ -155,7 +156,7 @@ namespace DXGLTF
                 {
                     return;
                 }
-                m_scene.Load(openFileDialog.FileName);
+                _loader.Load(openFileDialog.FileName);
             }
         }
         #endregion

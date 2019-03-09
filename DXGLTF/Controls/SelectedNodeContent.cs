@@ -10,7 +10,7 @@ namespace DXGLTF
 {
     public partial class SelectedNodeContent : DockContent
     {
-        public SelectedNodeContent(SceneHierarchyContent hierarchy)
+        public SelectedNodeContent(SceneHierarchy hierarchy)
         {
             InitializeComponent();
 

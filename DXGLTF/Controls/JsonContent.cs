@@ -9,7 +9,7 @@ namespace DXGLTF
 {
     public partial class JsonContent : DockContent
     {
-        public JsonContent(Scene scene)
+        public JsonContent(SceneLoader scene)
         {
             InitializeComponent();
 

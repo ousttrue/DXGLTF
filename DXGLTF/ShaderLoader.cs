@@ -50,7 +50,10 @@ namespace DXGLTF
     class ShaderLoader
     {
         Dictionary<ShaderType, SourceWatcher> m_map = new Dictionary<ShaderType, SourceWatcher>();
-        public ShaderLoader()
+
+        public static ShaderLoader Instance = new ShaderLoader();
+
+        ShaderLoader()
         {
             var shaderDir = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "shaders");
             m_map.Add(ShaderType.Unlit, new SourceWatcher(shaderDir, "unlit.hlsl"));

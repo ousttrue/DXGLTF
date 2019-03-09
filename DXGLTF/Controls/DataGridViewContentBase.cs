@@ -13,7 +13,7 @@ namespace DXGLTF
 {
     public abstract partial class DataGridViewContentBase : DockContent
     {
-        public DataGridViewContentBase(Scene scene)
+        public DataGridViewContentBase(SceneLoader scene)
         {
             InitializeComponent();
             dataGridView1.DataSource = DataSource;
@@ -37,7 +37,7 @@ namespace DXGLTF
 
     class BufferViewContent : DataGridViewContentBase
     {
-        public BufferViewContent(Scene scene) : base(scene) { }
+        public BufferViewContent(SceneLoader scene) : base(scene) { }
 
         class Item
         {
@@ -78,7 +78,7 @@ namespace DXGLTF
 
     class AccessorContent : DataGridViewContentBase
     {
-        public AccessorContent(Scene scene) : base(scene) { }
+        public AccessorContent(SceneLoader scene) : base(scene) { }
 
         class Item
         {
@@ -119,7 +119,7 @@ namespace DXGLTF
 
     class PrimitiveContent : DataGridViewContentBase
     {
-        public PrimitiveContent(Scene scene) : base(scene) { }
+        public PrimitiveContent(SceneLoader scene) : base(scene) { }
 
         class Item
         {
@@ -192,7 +192,7 @@ namespace DXGLTF
 
     class MaterialContent : DataGridViewContentBase
     {
-        public MaterialContent(Scene scene) : base(scene) { }
+        public MaterialContent(SceneLoader scene) : base(scene) { }
 
         class Item
         {

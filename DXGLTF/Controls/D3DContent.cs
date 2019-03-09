@@ -1,4 +1,5 @@
 ﻿using D3DPanel;
+using DXGLTF.Assets;
 using NLog;
 using SharpDX;
 using System;
@@ -18,20 +19,15 @@ namespace DXGLTF
         D3D11RenderTarget _backbuffer;
         D3D11RenderTarget _sceneRT;
 
-        Camera _camera = new Camera
-        {
-            View = Matrix.Identity,
-        };
+        SceneHierarchy _scene;
 
-        SceneHierarchyContent _hierarchy;
-
-        public D3DContent(SceneHierarchyContent hierarchy)
+        public D3DContent(SceneHierarchy scene)
         {
             InitializeComponent();
 
-            _hierarchy = hierarchy;
+            _scene = scene;
 
-            _hierarchy.Updated
+            _scene.Updated
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ =>
                 {
@@ -64,8 +60,6 @@ namespace DXGLTF
 
         private void D3DContent_Paint(object sender, PaintEventArgs e)
         {
-            _camera.Update();
-
             _device.SetHWND(Handle, ClientSize.Width, ClientSize.Height);
 
             if (_sceneRT == null)
@@ -79,11 +73,11 @@ namespace DXGLTF
                 _backbuffer = _device.SwapChain.CreateRenderTarget(_device);
             }
             _backbuffer.Setup(_device,
-                new Viewport(0, 0, _camera.ScreenWidth, _camera.ScreenHeight, 0.0f, 1.0f),
+                new Viewport(0, 0, ClientSize.Width, ClientSize.Height, 0.0f, 1.0f),
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
 
-            _hierarchy.Draw(_device, _camera.View * _camera.Projection);
+            _scene.Draw(_device);
 
             _device.Present();
         }
@@ -93,7 +87,7 @@ namespace DXGLTF
             var w = ClientSize.Width;
             var h = ClientSize.Height / 2;
 
-            _camera.Resize(w, h);
+            _scene.SetScreenSize(w, h);
 
             if (_sceneRT != null)
             {
@@ -116,38 +110,12 @@ namespace DXGLTF
         }
 
         #region MouseEvents
-        int m_mouseX;
-        int m_mouseY;
         private void D3DContent_MouseMove(object sender, MouseEventArgs e)
         {
-            if (m_mouseX != 0 && m_mouseY != 0)
+            if(_scene.MouseMove(e.X, e.Y))
             {
-                var deltaX = e.X - m_mouseX;
-                var deltaY = e.Y - m_mouseY;
-
-                if (m_leftDown)
-                {
-                    // drag
-                    if (_hierarchy.Manipulate(_camera, e.X, e.Y))
-                    {
-                        Invalidate();
-                    }
-                }
-
-                if (m_rightDown)
-                {
-                    _camera.YawPitch(deltaX, deltaY);
-                    Invalidate();
-                }
-
-                if (m_middleDown)
-                {
-                    _camera.Shift(deltaX, deltaY);
-                    Invalidate();
-                }
+                Invalidate();
             }
-            m_mouseX = e.X;
-            m_mouseY = e.Y;
         }
 
         bool m_leftDown;
@@ -160,22 +128,29 @@ namespace DXGLTF
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    if (!m_leftDown)
+                    m_leftDown = true;
+                    if(_scene.MouseLeftDown(e.X, e.Y))
                     {
-                        _hierarchy.StartDrag(_camera, e.X, e.Y);
                         Invalidate();
                     }
-                    m_leftDown = true;
                     Capture = true;
                     break;
 
                 case MouseButtons.Middle:
                     m_middleDown = true;
+                    if(_scene.MouseMiddleDown(e.X, e.Y))
+                    {
+                        Invalidate();
+                    }
                     Capture = true;
                     break;
 
                 case MouseButtons.Right:
                     m_rightDown = true;
+                    if(_scene.MouseRightDown(e.X, e.Y))
+                    {
+                        Invalidate();
+                    }
                     Capture = true;
                     break;
             }
@@ -186,20 +161,27 @@ namespace DXGLTF
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    if (m_leftDown)
+                    m_leftDown = false;
+                    if(_scene.MouseLeftUp(e.X, e.Y))
                     {
-                        _hierarchy.EndDrag();
                         Invalidate();
                     }
-                    m_leftDown = false;
                     break;
 
                 case MouseButtons.Middle:
                     m_middleDown = false;
+                    if(_scene.MouseMiddleUp(e.X, e.Y))
+                    {
+                        Invalidate();
+                    }
                     break;
 
                 case MouseButtons.Right:
                     m_rightDown = false;
+                    if(_scene.MouseRightUp(e.X, e.Y))
+                    {
+                        Invalidate();
+                    }
                     break;
             }
 
@@ -213,8 +195,10 @@ namespace DXGLTF
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            _camera.Dolly(e.Delta);
-            Invalidate();
+            if (_scene.MouseWheel(e.Delta))
+            {
+                Invalidate();
+            }
         }
         #endregion
     }

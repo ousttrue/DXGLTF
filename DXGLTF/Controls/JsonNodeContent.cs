@@ -1,6 +1,7 @@
 ﻿using GltfScene;
 using NLog;
 using Reactive.Bindings;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using UniJSON;
@@ -18,8 +19,9 @@ namespace DXGLTF
             get { return m_selected.ToReadOnlyReactiveProperty(); }
         }
 
-        public JsonNodeContent(Scene scene) : base(scene)
+        public JsonNodeContent(SceneLoader scene)
         {
+            scene.SourceObservableOnCurrent.Subscribe(x => SetSource(x));
         }
 
         Dictionary<TreeNode, ListTreeNode<JsonValue>> m_nodeMap = new Dictionary<TreeNode, ListTreeNode<JsonValue>>();
@@ -68,7 +70,7 @@ namespace DXGLTF
             get { return m_source; }
         }
 
-        protected override void OnUpdated(Source source)
+        public void SetSource(Source source)
         {
             // clear
             m_nodeMap.Clear();

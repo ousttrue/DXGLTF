@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using SharpDX;
+using System.Threading.Tasks;
 
 
 namespace DXGLTF.Assets
 {
-    class AssetContext : IDisposable
+    public class AssetContext : IDisposable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -24,6 +25,18 @@ namespace DXGLTF.Assets
         List<Mesh> _meshes = new List<Mesh>();
 
         Node[] _nodes;
+        public Node[] Nodes
+        {
+            get { return _nodes; }
+        }
+
+        public IEnumerable<Node> Roots
+        {
+            get
+            {
+                return Nodes.Where(x => !Nodes.Any(y => y.Children.Contains(x)));
+            }
+        }
 
         List<Skin> _skins = new List<Skin>();
         public void UpdateSkins()
@@ -38,7 +51,7 @@ namespace DXGLTF.Assets
         {
         }
 
-        public static AssetContext Load(Source source, ShaderLoader shaderLoader)
+        public static AssetContext Load(Source source)
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
@@ -56,8 +69,8 @@ namespace DXGLTF.Assets
             foreach (var material in gltf.materials)
             {
                 var shader = material.IsUnlit
-                    ? shaderLoader.CreateShader(ShaderType.Unlit)
-                    : shaderLoader.CreateShader(ShaderType.Standard)
+                    ? ShaderLoader.Instance.CreateShader(ShaderType.Unlit)
+                    : ShaderLoader.Instance.CreateShader(ShaderType.Standard)
                     ;
 
                 var texture = default(ImageBytes);
@@ -93,10 +106,12 @@ namespace DXGLTF.Assets
 
             Logger.Info($"LoadAsset: {sw.Elapsed.TotalSeconds} sec");
 
+            asset.BuildHierarchy();
+
             return asset;
         }
 
-        public Node[] BuildHierarchy()
+        void BuildHierarchy()
         {
             var gltf = _source.GLTF;
 
@@ -126,9 +141,6 @@ namespace DXGLTF.Assets
                     }
                 }
             }
-
-            // return only no parent
-            return _nodes;
         }
 
         public static Node CreateDrawable(int i, UniGLTF.glTFNode node)
@@ -175,6 +187,8 @@ namespace DXGLTF.Assets
 
             return drawable;
         }
+
+
 
     }
 }

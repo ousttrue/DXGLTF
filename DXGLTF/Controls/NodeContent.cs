@@ -1,4 +1,5 @@
 ﻿using GltfScene;
+using System;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -7,13 +8,14 @@ namespace DXGLTF
 {
     class NodeContent : TreeViewContentBase
     {
-        public NodeContent(Scene scene) : base(scene)
+        public NodeContent(SceneLoader scene)
         {
+            scene.SourceObservableOnCurrent.Subscribe(OnUpdated);
         }
 
         TreeNode[] m_nodes;
 
-        protected override void OnUpdated(Source source)
+        void OnUpdated(Source source)
         {
             TreeView.Nodes.Clear();
             var gltf = source.GLTF;
