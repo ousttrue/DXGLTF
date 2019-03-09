@@ -1,5 +1,4 @@
 ﻿using D3DPanel;
-using DXGLTF.Nodes;
 using GltfScene;
 using NLog;
 using System;

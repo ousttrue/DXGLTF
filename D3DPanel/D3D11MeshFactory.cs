@@ -263,5 +263,24 @@ namespace D3DPanel
             }
             return builder.ToMesh();
         }
+
+        public static D3D11Mesh CreateQuadrangle()
+        {
+            var drawable = new D3D11Mesh(SharpDX.Direct3D.PrimitiveTopology.TriangleList,
+                new int[] { 0, 1, 2, 2, 3, 0 });
+            drawable.SetAttribute(Semantics.POSITION, VertexAttribute.Create(new Vector3[]{
+                    new Vector3(-1, 1, 0),
+                    new Vector3(1, 1, 0),
+                    new Vector3(1, -1, 0),
+                    new Vector3(-1, -1, 0),
+                }));
+            drawable.SetAttribute(Semantics.TEXCOORD, VertexAttribute.Create(new Vector2[]{
+                    new Vector2(0, 0),
+                    new Vector2(1, 0),
+                    new Vector2(1, 1),
+                    new Vector2(0, 1),
+                }));
+            return drawable;
+        }
     }
 }

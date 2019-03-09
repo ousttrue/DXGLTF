@@ -140,8 +140,6 @@
     <Compile Include="Controls\Vector3Control.Designer.cs">
       <DependentUpon>Vector3Control.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nodes\ImageVisualizer.cs" />
-    <Compile Include="Nodes\IVisualizer.cs" />
     <Compile Include="Assets\Node.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
