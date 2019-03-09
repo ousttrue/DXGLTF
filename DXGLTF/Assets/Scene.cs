@@ -4,6 +4,7 @@ using Reactive.Bindings;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -63,7 +64,8 @@ namespace DXGLTF.Assets
                 _asset = value;
                 if (_asset != null)
                 {
-                    _drawables.AddRange(_asset.Roots);
+                    var roots = _asset.Roots.ToArray();
+                    _drawables.AddRange(roots);
                 }
 
                 _updated.OnNext(Unit.Default);

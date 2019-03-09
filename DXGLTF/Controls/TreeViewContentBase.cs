@@ -8,6 +8,11 @@ namespace DXGLTF
     {
         protected TreeView TreeView { get { return treeView1; } }
 
+        protected TreeViewContentBase()
+        {
+            InitializeComponent();
+        }
+
         /// <summary>
         /// ツリーノードが選択された
         /// </summary>

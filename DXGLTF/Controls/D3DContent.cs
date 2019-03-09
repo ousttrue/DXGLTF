@@ -84,10 +84,7 @@ namespace DXGLTF
 
         private void D3DContent_SizeChanged(object sender, EventArgs e)
         {
-            var w = ClientSize.Width;
-            var h = ClientSize.Height / 2;
-
-            _scene.SetScreenSize(w, h);
+            _scene.SetScreenSize(ClientSize.Width, ClientSize.Height);
 
             if (_sceneRT != null)
             {

@@ -13,29 +13,11 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        Scene _hierarchy = new Scene();
+        Scene _scene;
 
-        public SceneHierarchyContent(AssetLoader loader)
+        public SceneHierarchyContent(Scene scene)
         {
-            loader.SourceObservableOnCurrent.Subscribe(x => 
-            {
-                LoadAsset(x);
-            });
-        }
-
-        async void LoadAsset(AssetSource source)
-        {
-            if (source.GLTF == null)
-            {
-                return;
-            }
-            var asset = await Task.Run(() => AssetContext.Load(source));
-
-            // update treeview
-            SetTreeNode(asset);
-
-            // update scene
-            _hierarchy.Asset = asset;
+            _scene = scene;
         }
 
         Dictionary<TreeNode, Node> _map = new Dictionary<TreeNode, Node>();
@@ -51,7 +33,7 @@ namespace DXGLTF
             }
         }
 
-        void SetTreeNode(AssetContext asset)
+        public void SetTreeNode(AssetContext asset)
         {
             TreeView.Nodes.Clear();
             _map.Clear();
@@ -74,7 +56,7 @@ namespace DXGLTF
                 Logger.Warn($"{viewNode} not found");
             }
 
-            _hierarchy.Selected = node;
+            _scene.Selected = node;
         }
     }
 }

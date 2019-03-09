@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UniJSON;
 using WeifenLuo.WinFormsUI.Docking;
@@ -63,12 +64,32 @@ namespace DXGLTF
         }
 
         SceneHierarchyContent m_hierarchy;
-        Assets.Scene _scene = new Assets.Scene();
+
         D3DContent m_d3d;
 
         LoggerContent m_logger;
 
         SelectedNodeContent m_selected;
+
+        Scene _scene = new Scene();
+        async void LoadAsset(AssetSource source)
+        {
+            if (source.GLTF == null)
+            {
+                this.Text = "";
+                return;
+            }
+
+            var path = Path.GetFileName(source.Path);
+            this.Text = $"[{path}] {source.GLTF.TriangleCount} tris";
+            var asset = await Task.Run(() => AssetContext.Load(source));
+
+            // update treeview
+            m_hierarchy.SetTreeNode(asset);
+
+            // update scene
+            _scene.Asset = asset;
+        }
 
         public Form1()
         {
@@ -76,18 +97,10 @@ namespace DXGLTF
 
             _loader.SourceObservableOnCurrent.Subscribe(x =>
             {
-                if (x.GLTF != null)
-                {
-                    var path = Path.GetFileName(x.Path);
-                    this.Text = $"[{path}] {x.GLTF.TriangleCount} tris";
-                }
-                else
-                {
-                    this.Text = "";
-                }
+                LoadAsset(x);
             });
 
-            m_hierarchy = new SceneHierarchyContent(_loader);
+            m_hierarchy = new SceneHierarchyContent(_scene);
             AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
 
             m_selected = new SelectedNodeContent(_scene);
