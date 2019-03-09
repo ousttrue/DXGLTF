@@ -20,16 +20,15 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        AssetLoader _loader = new AssetLoader();
-
-        Dictionary<string, DockContent> m_contentMap = new Dictionary<string, DockContent>();
+        #region Dock
+        Dictionary<string, DockContent> _contentMap = new Dictionary<string, DockContent>();
         void AddContent(string name, DockContent content, DockState state)
         {
             content.Text = name;
             content.TabText = name;
             content.Show(dockPanel1, state);
             content.HideOnClose = true;
-            m_contentMap.Add(name, content);
+            _contentMap.Add(name, content);
 
             var cb = new ToolStripMenuItem();
             cb.Checked = true;
@@ -64,15 +63,13 @@ namespace DXGLTF
                   cb.Checked = content.Visible;
               };
         }
+        SceneHierarchyContent _hierarchy;
+        D3DContent _d3d;
+        LoggerContent _logger;
+        #endregion
 
-        SceneHierarchyContent m_hierarchy;
-
-        D3DContent m_d3d;
-
-        LoggerContent m_logger;
-
-        SelectedNodeContent m_selected;
-
+        #region Scene
+        AssetLoader _loader = new AssetLoader();
         Scene _scene = new Scene();
         async void LoadAsset(AssetSource source)
         {
@@ -87,41 +84,32 @@ namespace DXGLTF
             var asset = await Task.Run(() => AssetContext.Load(source));
 
             // update treeview
-            m_hierarchy.SetTreeNode(asset);
+            _hierarchy.SetTreeNode(asset);
 
             // update scene
             _scene.Asset = asset;
         }
+        #endregion
 
         public Form1()
         {
             InitializeComponent();
 
-            _loader.SourceObservableOnCurrent.Subscribe(x =>
-            {
-                LoadAsset(x);
-            });
+            // setup docks
+            _hierarchy = new SceneHierarchyContent(_scene);
+            AddContent("scene hierarchy", _hierarchy, DockState.DockRight);
 
-            m_hierarchy = new SceneHierarchyContent(_scene);
-            AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
+            var selected = new SelectedNodeContent(_scene);
+            AddContent("selected node", selected, DockState.DockRight);
+            selected.DockTo(_hierarchy.Pane, DockStyle.Bottom, 1);
 
-            m_selected = new SelectedNodeContent(_scene);
-            AddContent("selected node", m_selected, DockState.DockRight);
-            m_selected.DockTo(m_hierarchy.Pane, DockStyle.Bottom, 1);
+            _d3d = new D3DContent(_scene);
+            AddContent("selected", _d3d, DockState.Document);
 
-            m_d3d = new D3DContent(_scene);
-            AddContent("selected", m_d3d, DockState.Document);
-            _scene.Updated
-                .ObserveOn(SynchronizationContext.Current)
-                .Subscribe(_ =>
-                {
-                    m_d3d.Invalidate();
-                })
-                ;
+            var json = new JsonContent();
+            AddContent("json", json, DockState.DockLeft);
 
-            AddContent("json", new JsonContent(_loader), DockState.DockLeft);
-
-            var jsonNode = new JsonNodeContent(_loader);
+            var jsonNode = new JsonNodeContent();
             AddContent("jsonnode", jsonNode, DockState.DockLeft);
             jsonNode.Selected.Subscribe(x =>
             {
@@ -134,14 +122,29 @@ namespace DXGLTF
                 {
                     toolStripStatusLabel1.Text ="";
                 }
-                //m_d3d.SetSelection(jsonNode.Source, x);
             });
+
+            // setup scene
+            _loader.SourceObservableOnCurrent.Subscribe(x =>
+            {
+                json.SetAssetSource(x);
+                jsonNode.SetAssetSource(x);
+
+                LoadAsset(x);
+            });
+            _scene.Updated
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ =>
+                {
+                    _d3d.Invalidate();
+                })
+                ;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             _scene.Dispose();
-            m_d3d.Shutdown();
+            _d3d.Shutdown();
         }
 
         #region FileDialog
@@ -214,8 +217,8 @@ namespace DXGLTF
             //RichTextBoxTarget.GetTargetByControl(richTextBox1).LinkClicked += LoggerContent_LinkClicked;
             */
 
-            m_logger = new LoggerContent(richTextBox1);
-            AddContent("logger", m_logger, DockState.DockBottom);
+            _logger = new LoggerContent(richTextBox1);
+            AddContent("logger", _logger, DockState.DockBottom);
         }
         #endregion
     }

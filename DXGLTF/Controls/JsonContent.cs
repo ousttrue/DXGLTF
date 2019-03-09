@@ -1,6 +1,4 @@
 ﻿using DXGLTF.Assets;
-using System;
-using System.Reactive.Linq;
 using WeifenLuo.WinFormsUI.Docking;
 
 
@@ -8,15 +6,12 @@ namespace DXGLTF
 {
     public partial class JsonContent : DockContent
     {
-        public JsonContent(AssetLoader scene)
+        public JsonContent()
         {
             InitializeComponent();
-
-            scene.SourceObservableOnCurrent
-                  .Subscribe(OnSource);
         }
 
-        void OnSource(AssetSource source)
+        public void SetAssetSource(AssetSource source)
         {
             if (source.GLTF == null) return;
 

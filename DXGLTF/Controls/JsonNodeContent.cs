@@ -1,7 +1,6 @@
 ﻿using DXGLTF.Assets;
 using NLog;
 using Reactive.Bindings;
-using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using UniJSON;
@@ -13,15 +12,11 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        ReactiveProperty<ListTreeNode<JsonValue>> m_selected = new ReactiveProperty<ListTreeNode<JsonValue>>();
+        ReactiveProperty<ListTreeNode<JsonValue>> _selected =
+            new ReactiveProperty<ListTreeNode<JsonValue>>();
         public ReadOnlyReactiveProperty<ListTreeNode<JsonValue>> Selected
         {
-            get { return m_selected.ToReadOnlyReactiveProperty(); }
-        }
-
-        public JsonNodeContent(AssetLoader scene)
-        {
-            scene.SourceObservableOnCurrent.Subscribe(x => SetSource(x));
+            get { return _selected.ToReadOnlyReactiveProperty(); }
         }
 
         Dictionary<TreeNode, ListTreeNode<JsonValue>> m_nodeMap = new Dictionary<TreeNode, ListTreeNode<JsonValue>>();
@@ -64,18 +59,18 @@ namespace DXGLTF
             }
         }
 
-        AssetSource m_source;
+        AssetSource _source;
         public AssetSource Source
         {
-            get { return m_source; }
+            get { return _source; }
         }
 
-        public void SetSource(AssetSource source)
+        public void SetAssetSource(AssetSource source)
         {
             // clear
             m_nodeMap.Clear();
             TreeView.Nodes.Clear();
-            m_source = source;
+            _source = source;
 
             var gltf = source.GLTF;
             if (gltf == null)
@@ -103,7 +98,7 @@ namespace DXGLTF
             {
                 Logger.Warn($"{node} not found");
             }
-            m_selected.Value = json;
+            _selected.Value = json;
         }
     }
 }
