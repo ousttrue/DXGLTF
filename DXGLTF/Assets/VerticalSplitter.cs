@@ -1,5 +1,5 @@
 ﻿using D3DPanel;
-
+using System;
 
 namespace DXGLTF.Assets
 {
@@ -7,14 +7,12 @@ namespace DXGLTF.Assets
     {
         IDrawable _top;
         IDrawable _bottom;
-        IDrawable _target;
 
+        IDrawable _target;
         public VerticalSplitter(IDrawable top, IDrawable bottom)
         {
             _top = top;
             _bottom = bottom;
-
-            _target = top;
         }
 
         public void Dispose()
@@ -69,21 +67,44 @@ namespace DXGLTF.Assets
         }
 
         #region Mouse
-        public bool MouseLeftDown(int x, int y)
+        void UpdateCaptureFocus(int x, int y)
         {
-            _rect.MouseLeftDown(x, y);
-            if (_target == null)
+            if (_top == null && _bottom == null)
             {
-                if (_top != null && _top.IsOnRect(x, y))
+                return;
+            }
+            else if (_bottom == null)
+            {
+                Console.WriteLine(string.Format("UpdateFocus: Top"));
+                _target = _top;
+            }
+            else if (_top == null)
+            {
+                Console.WriteLine(string.Format("UpdateFocus: Bottom"));
+                _target = _bottom;
+            }
+            else
+            {
+                if (_top.IsOnRect(x, y))
                 {
+                    Console.WriteLine(string.Format("UpdateFocus: Top"));
                     _target = _top;
                 }
-                else if(_bottom!=null && _bottom.IsOnRect(x, y))
+                else if (_bottom.IsOnRect(x, y))
                 {
+                    Console.WriteLine(string.Format("UpdateFocus: Bottom"));
                     _target = _bottom;
                 }
-                return false;
             }
+        }
+
+        public bool MouseLeftDown(int x, int y)
+        {
+            if (!_rect.DownAny)
+            {
+                UpdateCaptureFocus(x, y);
+            }
+            _rect.MouseLeftDown(x, y);
 
             if (_target == null)
             {
@@ -111,19 +132,11 @@ namespace DXGLTF.Assets
 
         public bool MouseMiddleDown(int x, int y)
         {
-            _rect.MouseMiddleDown(x, y);
-            if (_target == null)
+            if (!_rect.DownAny)
             {
-                if (_top != null && _top.IsOnRect(x, y))
-                {
-                    _target = _top;
-                }
-                else if (_bottom != null && _bottom.IsOnRect(x, y))
-                {
-                    _target = _bottom;
-                }
-                return false;
+                UpdateCaptureFocus(x, y);
             }
+            _rect.MouseMiddleDown(x, y);
 
             if (_target == null)
             {
@@ -163,19 +176,11 @@ namespace DXGLTF.Assets
 
         public bool MouseRightDown(int x, int y)
         {
-            _rect.MouseRightDown(x, y);
-            if (_target == null)
+            if (!_rect.DownAny)
             {
-                if (_top != null && _top.IsOnRect(x, y))
-                {
-                    _target = _top;
-                }
-                else if (_bottom != null && _bottom.IsOnRect(x, y))
-                {
-                    _target = _bottom;
-                }
-                return false;
+                UpdateCaptureFocus(x, y);
             }
+            _rect.MouseRightDown(x, y);
 
             if (_target == null)
             {

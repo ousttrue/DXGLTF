@@ -29,6 +29,11 @@ namespace DXGLTF.Assets
         bool _leftDown;
         bool _middleDown;
         bool _rightDown;
+        public bool DownAny
+        {
+            get { return _leftDown || _middleDown || _rightDown; }
+        }
+
         public void MouseLeftDown(int x, int y)
         {
             _mx = x;

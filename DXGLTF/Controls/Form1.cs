@@ -75,18 +75,19 @@ namespace DXGLTF
         {
             InitializeComponent();
 
-            var scene = new Scene();
-            var splitter = new VerticalSplitter(null, scene);
+            var scene0 = new Scene();
+            var scene1 = new Scene();
+            var splitter = new VerticalSplitter(scene0, scene1);
             _disposable.Add(splitter);
 
             // setup docks
             var hierarchy = new SceneHierarchyContent(node =>
             {
-                scene.Selected = node;
+                scene0.Selected = node;
             });
             AddContent("scene hierarchy", hierarchy, DockState.DockRight);
 
-            var selected = new SelectedNodeContent(scene.SelectedObservable);
+            var selected = new SelectedNodeContent(scene0.SelectedObservable);
             AddContent("selected node", selected, DockState.DockRight);
             selected.DockTo(hierarchy.Pane, DockStyle.Bottom, 1);
 
@@ -133,10 +134,18 @@ namespace DXGLTF
                 hierarchy.SetTreeNode(asset);
 
                 // update scene
-                scene.Asset = asset;
+                scene0.Asset = asset;
+                scene1.Asset = asset;
 
             });
-            scene.Updated
+            scene0.Updated
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ =>
+                {
+                    d3d.Invalidate();
+                })
+                ;
+            scene1.Updated
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ =>
                 {
