@@ -1,5 +1,5 @@
 ﻿using D3DPanel;
-using System;
+
 
 namespace DXGLTF.Assets
 {
@@ -75,24 +75,24 @@ namespace DXGLTF.Assets
             }
             else if (_bottom == null)
             {
-                Console.WriteLine(string.Format("UpdateFocus: Top"));
+                //Console.WriteLine(string.Format("UpdateFocus: Top"));
                 _target = _top;
             }
             else if (_top == null)
             {
-                Console.WriteLine(string.Format("UpdateFocus: Bottom"));
+                //Console.WriteLine(string.Format("UpdateFocus: Bottom"));
                 _target = _bottom;
             }
             else
             {
                 if (_top.IsOnRect(x, y))
                 {
-                    Console.WriteLine(string.Format("UpdateFocus: Top"));
+                    //Console.WriteLine(string.Format("UpdateFocus: Top"));
                     _target = _top;
                 }
                 else if (_bottom.IsOnRect(x, y))
                 {
-                    Console.WriteLine(string.Format("UpdateFocus: Bottom"));
+                    //Console.WriteLine(string.Format("UpdateFocus: Bottom"));
                     _target = _bottom;
                 }
             }
