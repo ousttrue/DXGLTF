@@ -1,9 +1,8 @@
-﻿using GltfScene;
+﻿using DXGLTF.Assets;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Text;
 using System.Windows.Forms;
 using UniGLTF;
 using WeifenLuo.WinFormsUI.Docking;
@@ -13,7 +12,7 @@ namespace DXGLTF
 {
     public abstract partial class DataGridViewContentBase : DockContent
     {
-        public DataGridViewContentBase(SceneLoader scene)
+        public DataGridViewContentBase(AssetLoader scene)
         {
             InitializeComponent();
             dataGridView1.DataSource = DataSource;
@@ -32,12 +31,12 @@ namespace DXGLTF
         }
 
         protected abstract object DataSource { get; }
-        protected abstract void OnUpdated(Source source);
+        protected abstract void OnUpdated(AssetSource source);
     }
 
     class BufferViewContent : DataGridViewContentBase
     {
-        public BufferViewContent(SceneLoader scene) : base(scene) { }
+        public BufferViewContent(AssetLoader scene) : base(scene) { }
 
         class Item
         {
@@ -59,7 +58,7 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(Source source)
+        protected override void OnUpdated(AssetSource source)
         {
             m_items.Clear();
             var gltf = source.GLTF;
@@ -78,7 +77,7 @@ namespace DXGLTF
 
     class AccessorContent : DataGridViewContentBase
     {
-        public AccessorContent(SceneLoader scene) : base(scene) { }
+        public AccessorContent(AssetLoader scene) : base(scene) { }
 
         class Item
         {
@@ -100,7 +99,7 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(Source source)
+        protected override void OnUpdated(AssetSource source)
         {
             m_items.Clear();
             var gltf = source.GLTF;
@@ -119,7 +118,7 @@ namespace DXGLTF
 
     class PrimitiveContent : DataGridViewContentBase
     {
-        public PrimitiveContent(SceneLoader scene) : base(scene) { }
+        public PrimitiveContent(AssetLoader scene) : base(scene) { }
 
         class Item
         {
@@ -170,7 +169,7 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(Source source)
+        protected override void OnUpdated(AssetSource source)
         {
             m_items.Clear();
             var gltf = source.GLTF;
@@ -192,7 +191,7 @@ namespace DXGLTF
 
     class MaterialContent : DataGridViewContentBase
     {
-        public MaterialContent(SceneLoader scene) : base(scene) { }
+        public MaterialContent(AssetLoader scene) : base(scene) { }
 
         class Item
         {
@@ -205,7 +204,7 @@ namespace DXGLTF
         BindingList<Item> m_items = new BindingList<Item>();
         protected override object DataSource => m_items;
 
-        protected override void OnUpdated(Source source)
+        protected override void OnUpdated(AssetSource source)
         {
             m_items.Clear();
             var gltf = source.GLTF;

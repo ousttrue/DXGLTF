@@ -95,7 +95,8 @@
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Mesh.cs" />
     <Compile Include="Assets\SceneHierarchy.cs" />
-    <Compile Include="Assets\SceneLoader.cs" />
+    <Compile Include="Assets\AssetLoader.cs" />
+    <Compile Include="Assets\AssetSource.cs" />
     <Compile Include="Assets\Submesh.cs" />
     <Compile Include="Controls\D3DContent.cs">
       <SubType>Form</SubType>

@@ -1,5 +1,4 @@
 ﻿using D3DPanel;
-using GltfScene;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -44,7 +43,7 @@ namespace DXGLTF.Assets
             get { return _matrices; }
         }
 
-        public static Skin FromGLTF(Source source, UniGLTF.glTFSkin skin)
+        public static Skin FromGLTF(AssetSource source, UniGLTF.glTFSkin skin)
         {
             return new Skin
             {
@@ -106,7 +105,7 @@ namespace DXGLTF.Assets
             Submeshes.AddRange(subMesh);
         }
 
-        public static Mesh FromGLTF(Source source,
+        public static Mesh FromGLTF(AssetSource source,
             UniGLTF.glTFMesh m, List<D3D11Material> materials)
         {
             var mesh = new Mesh();
@@ -114,7 +113,7 @@ namespace DXGLTF.Assets
             return mesh;
         }
 
-        public static IEnumerable<Submesh> FromGLTF(Source source,
+        public static IEnumerable<Submesh> FromGLTF(AssetSource source,
             List<UniGLTF.glTFPrimitives> primitives, List<D3D11Material> materials)
         {
             if (source.HasSameBuffer(primitives))
@@ -138,7 +137,7 @@ namespace DXGLTF.Assets
             }
         }
 
-        static D3D11Mesh FromGLTF(Source source,
+        static D3D11Mesh FromGLTF(AssetSource source,
             UniGLTF.glTFPrimitives primitive)
         {
             var gltf = source.GLTF;

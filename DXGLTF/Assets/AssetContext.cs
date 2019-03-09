@@ -1,11 +1,9 @@
 ﻿using D3DPanel;
-using GltfScene;
 using NLog;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using SharpDX;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace DXGLTF.Assets
@@ -14,8 +12,8 @@ namespace DXGLTF.Assets
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        Source _source;
-        AssetContext(Source source)
+        AssetSource _source;
+        AssetContext(AssetSource source)
         {
             _source = source;
         }
@@ -51,7 +49,7 @@ namespace DXGLTF.Assets
         {
         }
 
-        public static AssetContext Load(Source source)
+        public static AssetContext Load(AssetSource source)
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
 

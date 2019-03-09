@@ -1,7 +1,6 @@
 ﻿using NLog;
 using Reactive.Bindings;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
@@ -11,88 +10,15 @@ using UniGLTF.Zip;
 using UniJSON;
 
 
-namespace GltfScene
+namespace DXGLTF.Assets
 {
-    public struct Source
-    {
-        public string Path;
-        public IStorage IO;
-        public glTF GLTF;
-        public ListTreeNode<JsonValue> JSON;
-
-        public ArraySegment<byte> GetImageBytes(glTFImage image)
-        {
-            if (string.IsNullOrEmpty(image.uri))
-            {
-                return GLTF.GetViewBytes(IO, image.bufferView);
-            }
-            else
-            {
-                return IO.Get(image.uri);
-            }
-        }
-
-        bool HasSameBuffer(glTFPrimitives lhs, glTFPrimitives rhs)
-        {
-            {
-                var l = GLTF.accessors[lhs.indices];
-                var r = GLTF.accessors[rhs.indices];
-                if (l.componentType != r.componentType)
-                {
-                    return false;
-                }
-                if (l.type != r.type)
-                {
-                    return false;
-                }
-                if (l.bufferView != r.bufferView)
-                {
-                    return false;
-                }
-            }
-
-            if (lhs.attributes.POSITION != rhs.attributes.POSITION) return false;
-            if (lhs.attributes.NORMAL != rhs.attributes.NORMAL) return false;
-            if (lhs.attributes.TEXCOORD_0 != rhs.attributes.TEXCOORD_0) return false;
-            if (lhs.attributes.TANGENT != rhs.attributes.TANGENT) return false;
-            if (lhs.attributes.COLOR_0 != rhs.attributes.COLOR_0) return false;
-            if (lhs.attributes.JOINTS_0 != rhs.attributes.JOINTS_0) return false;
-            if (lhs.attributes.WEIGHTS_0 != rhs.attributes.WEIGHTS_0) return false;
-
-            return true;
-        }
-
-        public bool HasSameBuffer(IEnumerable<glTFPrimitives> primitives)
-        {
-            var it = primitives.GetEnumerator();
-            if (!it.MoveNext())
-            {
-                return false;
-            }
-
-            int i = 1;
-            var first = it.Current;
-
-            while (it.MoveNext())
-            {
-                ++i;
-                if (!HasSameBuffer(first, it.Current))
-                {
-                    return false;
-                }
-            }
-
-            return i>1;
-        }
-    }
-
-    public class SceneLoader
+    public class AssetLoader
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        ReactiveProperty<Source> m_source = new ReactiveProperty<Source>();
-        public ReadOnlyReactiveProperty<Source> Source { get { return m_source.ToReadOnlyReactiveProperty(); } }
-        public IObservable<Source> SourceObservableOnCurrent
+        ReactiveProperty<AssetSource> m_source = new ReactiveProperty<AssetSource>();
+        public ReadOnlyReactiveProperty<AssetSource> Source { get { return m_source.ToReadOnlyReactiveProperty(); } }
+        public IObservable<AssetSource> SourceObservableOnCurrent
         {
             get
             {
@@ -108,7 +34,7 @@ namespace GltfScene
             Logger.Info($"Load: { Path.GetFileName(path)}");
 
             // clear
-            m_source.Value = default(Source);
+            m_source.Value = default(AssetSource);
 
             // async load
             try
@@ -136,7 +62,7 @@ namespace GltfScene
             }
         }
 
-        public static Source _Load(string path)
+        public static AssetSource _Load(string path)
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
@@ -171,7 +97,7 @@ namespace GltfScene
                 }
             }
 
-            var source = new Source
+            var source = new AssetSource
             {
                 Path = path
             };

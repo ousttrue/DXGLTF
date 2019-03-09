@@ -1,4 +1,4 @@
-﻿using GltfScene;
+﻿using DXGLTF.Assets;
 using NLog;
 using NLog.Windows.Forms;
 using System;
@@ -17,7 +17,7 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        SceneLoader _loader = new SceneLoader();
+        AssetLoader _loader = new AssetLoader();
 
         Dictionary<string, DockContent> m_contentMap = new Dictionary<string, DockContent>();
         void AddContent(string name, DockContent content, DockState state)

@@ -1,5 +1,4 @@
 ﻿using DXGLTF.Assets;
-using GltfScene;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace DXGLTF
 
         SceneHierarchy _hierarchy = new SceneHierarchy();
 
-        public SceneHierarchyContent(SceneLoader loader)
+        public SceneHierarchyContent(AssetLoader loader)
         {
             loader.SourceObservableOnCurrent.Subscribe(x => 
             {
@@ -24,7 +23,7 @@ namespace DXGLTF
             });
         }
 
-        async void LoadAsset(Source source)
+        async void LoadAsset(AssetSource source)
         {
             if (source.GLTF == null)
             {

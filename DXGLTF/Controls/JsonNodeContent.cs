@@ -1,4 +1,4 @@
-﻿using GltfScene;
+﻿using DXGLTF.Assets;
 using NLog;
 using Reactive.Bindings;
 using System;
@@ -19,7 +19,7 @@ namespace DXGLTF
             get { return m_selected.ToReadOnlyReactiveProperty(); }
         }
 
-        public JsonNodeContent(SceneLoader scene)
+        public JsonNodeContent(AssetLoader scene)
         {
             scene.SourceObservableOnCurrent.Subscribe(x => SetSource(x));
         }
@@ -64,13 +64,13 @@ namespace DXGLTF
             }
         }
 
-        Source m_source;
-        public Source Source
+        AssetSource m_source;
+        public AssetSource Source
         {
             get { return m_source; }
         }
 
-        public void SetSource(Source source)
+        public void SetSource(AssetSource source)
         {
             // clear
             m_nodeMap.Clear();
