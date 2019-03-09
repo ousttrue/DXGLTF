@@ -211,7 +211,7 @@ namespace DXGLTF
             _updated.OnNext(Unit.Default);
         }
 
-        public void Draw(D3D11Device device, Camera camera)
+        public void Draw(D3D11Device device, Matrix camera)
         {
             foreach (var node in _gizmos)
             {

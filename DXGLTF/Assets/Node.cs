@@ -145,10 +145,10 @@ namespace DXGLTF.Assets
         /// <param name="renderer"></param>
         /// <param name="camera"></param>
         /// <param name="accumulated"></param>
-        public void Draw(D3D11Device device, Camera camera)
+        public void Draw(D3D11Device device, Matrix camera)
         {
             // world constants
-            var mvp = WorldMatrix * camera.View * camera.Projection;
+            var mvp = WorldMatrix * camera;
             mvp.Transpose();
             _constants.SetVSConstants(device, 0, mvp);
 

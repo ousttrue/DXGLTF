@@ -83,7 +83,7 @@ namespace DXGLTF
                 new Color4(0.5f, 0.5f, 0.5f, 0)
                 );
 
-            _hierarchy.Draw(_device, _camera);
+            _hierarchy.Draw(_device, _camera.View * _camera.Projection);
 
             _device.Present();
         }
