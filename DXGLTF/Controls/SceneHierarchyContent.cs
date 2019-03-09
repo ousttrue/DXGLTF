@@ -13,11 +13,11 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        Scene _scene;
+        Action<Node> _onSelected;
 
-        public SceneHierarchyContent(Scene scene)
+        public SceneHierarchyContent(Action<Node> onSelected)
         {
-            _scene = scene;
+            _onSelected = onSelected;
         }
 
         Dictionary<TreeNode, Node> _map = new Dictionary<TreeNode, Node>();
@@ -56,7 +56,7 @@ namespace DXGLTF
                 Logger.Warn($"{viewNode} not found");
             }
 
-            _scene.Selected = node;
+            _onSelected(node);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace DXGLTF
 {
     public partial class SelectedNodeContent : DockContent
     {
-        public SelectedNodeContent(Scene hierarchy)
+        public SelectedNodeContent(IObservable<Node> selectedObservable)
         {
             InitializeComponent();
 
-            hierarchy.SelectedObservable
+            selectedObservable
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(SetNode)
                 ;

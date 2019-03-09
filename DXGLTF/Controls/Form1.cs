@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,48 +64,34 @@ namespace DXGLTF
                   cb.Checked = content.Visible;
               };
         }
-        SceneHierarchyContent _hierarchy;
-        D3DContent _d3d;
         LoggerContent _logger;
         #endregion
 
-        #region Scene
         AssetLoader _loader = new AssetLoader();
-        Scene _scene = new Scene();
-        async void LoadAsset(AssetSource source)
-        {
-            if (source.GLTF == null)
-            {
-                this.Text = "";
-                return;
-            }
 
-            var path = Path.GetFileName(source.Path);
-            this.Text = $"[{path}] {source.GLTF.TriangleCount} tris";
-            var asset = await Task.Run(() => AssetContext.Load(source));
-
-            // update treeview
-            _hierarchy.SetTreeNode(asset);
-
-            // update scene
-            _scene.Asset = asset;
-        }
-        #endregion
+        CompositeDisposable _disposable = new CompositeDisposable();
 
         public Form1()
         {
             InitializeComponent();
 
+            var scene = new Scene();
+            _disposable.Add(scene);
+
             // setup docks
-            _hierarchy = new SceneHierarchyContent(_scene);
-            AddContent("scene hierarchy", _hierarchy, DockState.DockRight);
+            var hierarchy = new SceneHierarchyContent(node =>
+            {
+                scene.Selected = node;
+            });
+            AddContent("scene hierarchy", hierarchy, DockState.DockRight);
 
-            var selected = new SelectedNodeContent(_scene);
+            var selected = new SelectedNodeContent(scene.SelectedObservable);
             AddContent("selected node", selected, DockState.DockRight);
-            selected.DockTo(_hierarchy.Pane, DockStyle.Bottom, 1);
+            selected.DockTo(hierarchy.Pane, DockStyle.Bottom, 1);
 
-            _d3d = new D3DContent(_scene);
-            AddContent("selected", _d3d, DockState.Document);
+            var d3d = new D3DContent(scene);
+            _disposable.Add(d3d);
+            AddContent("selected", d3d, DockState.Document);
 
             var json = new JsonContent();
             AddContent("json", json, DockState.DockLeft);
@@ -125,26 +112,42 @@ namespace DXGLTF
             });
 
             // setup scene
-            _loader.SourceObservableOnCurrent.Subscribe(x =>
+            _loader.SourceObservableOnCurrent.Subscribe(async source =>
             {
-                json.SetAssetSource(x);
-                jsonNode.SetAssetSource(x);
+                json.SetAssetSource(source);
+                jsonNode.SetAssetSource(source);
 
-                LoadAsset(x);
+                //LoadAsset(x);
+                if (source.GLTF == null)
+                {
+                    this.Text = "";
+                    return;
+                }
+
+                var path = Path.GetFileName(source.Path);
+                this.Text = $"[{path}] {source.GLTF.TriangleCount} tris";
+                var asset = await Task.Run(() => AssetContext.Load(source));
+
+                // update treeview
+                hierarchy.SetTreeNode(asset);
+
+                // update scene
+                scene.Asset = asset;
+
             });
-            _scene.Updated
+            scene.Updated
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ =>
                 {
-                    _d3d.Invalidate();
+                    d3d.Invalidate();
                 })
                 ;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            _scene.Dispose();
-            _d3d.Shutdown();
+            _disposable.Dispose();
+            _disposable=null;
         }
 
         #region FileDialog
