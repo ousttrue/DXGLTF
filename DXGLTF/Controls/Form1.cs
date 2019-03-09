@@ -63,7 +63,7 @@ namespace DXGLTF
         }
 
         SceneHierarchyContent m_hierarchy;
-        Assets.SceneHierarchy _scene = new Assets.SceneHierarchy();
+        Assets.Scene _scene = new Assets.Scene();
         D3DContent m_d3d;
 
         LoggerContent m_logger;

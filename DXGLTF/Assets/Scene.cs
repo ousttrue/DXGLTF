@@ -29,7 +29,7 @@ namespace DXGLTF.Assets
         bool MouseWheel(int d);
     }
 
-    public class SceneHierarchy : IDrawable, IMouseObserver
+    public class Scene : IDrawable, IMouseObserver
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -111,7 +111,7 @@ namespace DXGLTF.Assets
         }
 
         IDisposable _subscription;
-        public SceneHierarchy()
+        public Scene()
         {
             _selected.Subscribe(_ =>
             {

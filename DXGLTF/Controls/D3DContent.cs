@@ -19,9 +19,9 @@ namespace DXGLTF
         D3D11RenderTarget _backbuffer;
         D3D11RenderTarget _sceneRT;
 
-        SceneHierarchy _scene;
+        Scene _scene;
 
-        public D3DContent(SceneHierarchy scene)
+        public D3DContent(Scene scene)
         {
             InitializeComponent();
 

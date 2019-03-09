@@ -13,7 +13,7 @@ namespace DXGLTF
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
-        SceneHierarchy _hierarchy = new SceneHierarchy();
+        Scene _hierarchy = new Scene();
 
         public SceneHierarchyContent(AssetLoader loader)
         {
