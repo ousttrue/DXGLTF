@@ -7,7 +7,13 @@ namespace D3DPanel
 {
     public class D3D11RenderTarget : IDisposable
     {
+        Texture2D _texture;
+        public Texture2D Texture
+        {
+            get { return _texture; }
+        }
         RenderTargetView _rtv;
+
         DepthStencilView _dsv;
         public void Dispose()
         {
@@ -15,6 +21,12 @@ namespace D3DPanel
             {
                 _rtv.Dispose();
                 _rtv = null;
+            }
+
+            if (_texture != null)
+            {
+                _texture.Dispose();
+                _texture = null;
             }
 
             if (_dsv != null)
@@ -27,10 +39,17 @@ namespace D3DPanel
         public D3D11RenderTarget()
         { }
 
-        //m_swapChain.Description.SampleDescription,
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="texture">take ownership</param>
+        /// <param name="count">m_swapChain.Description.SampleDescription</param>
+        /// <param name="quality">m_swapChain.Description.SampleDescription</param>
         public void CreateFromTexture(Texture2D texture, int count, int quality)
         {
             Dispose();
+
+            _texture = texture;
 
             var device = texture.Device;
             _rtv = new RenderTargetView(texture.Device, texture);
@@ -75,7 +94,7 @@ namespace D3DPanel
                 return;
             }
 
-            using (var texture = new Texture2D(device.Device, new Texture2DDescription
+            var texture = new Texture2D(device.Device, new Texture2DDescription
             {
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
                 ArraySize = 1,
@@ -88,10 +107,8 @@ namespace D3DPanel
                     Quality = 0
                 },
                 BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource
-            }))
-            {
-                CreateFromTexture(texture, 1, 0);
-            }
+            });
+            CreateFromTexture(texture, 1, 0);
         }
 
         public void Setup(D3D11Device device, Color4 clear)

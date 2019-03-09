@@ -97,6 +97,7 @@
     <Compile Include="Assets\CameraSceneView.cs" />
     <Compile Include="Assets\IDrawable.cs" />
     <Compile Include="Assets\Mesh.cs" />
+    <Compile Include="Assets\RenderTargetRect.cs" />
     <Compile Include="Assets\Scene.cs" />
     <Compile Include="Assets\AssetLoader.cs" />
     <Compile Include="Assets\AssetSource.cs" />

@@ -41,15 +41,13 @@ namespace D3DPanel
         public D3D11RenderTarget CreateRenderTarget(D3D11Device device)
         {
             // New RenderTargetView from the backbuffer
-            using (var backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0))
-            {
-                backBuffer.DebugName = "backBuffer";
-                var rt = new D3D11RenderTarget();
-                rt.CreateFromTexture(backBuffer, 
-                    m_swapChain.Description.SampleDescription.Count,
-                    m_swapChain.Description.SampleDescription.Quality);
-                return rt;
-            }
+            var backBuffer = Texture2D.FromSwapChain<Texture2D>(m_swapChain, 0);
+            backBuffer.DebugName = "backBuffer";
+            var rt = new D3D11RenderTarget();
+            rt.CreateFromTexture(backBuffer, 
+                m_swapChain.Description.SampleDescription.Count,
+                m_swapChain.Description.SampleDescription.Quality);
+            return rt;
         }
     }
 }

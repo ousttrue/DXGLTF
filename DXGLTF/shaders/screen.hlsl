@@ -29,6 +29,5 @@ PS_IN VS( VS_IN input )
 
 float4 PS( PS_IN input ) : SV_Target
 {
-	return float4(input.uv, 1, 1);
-	//return ShaderTexture.Sample(Sampler, input.uv);
+	return ShaderTexture.Sample(Sampler, input.uv);
 }

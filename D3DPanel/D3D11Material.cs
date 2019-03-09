@@ -20,6 +20,17 @@ namespace D3DPanel
         // texture0
         ImageBytes m_textureBytes;
         ShaderResourceView m_srv;
+        public void CreateSRV(D3D11RenderTarget rt)
+        {
+            if (m_srv != null)
+            {
+                m_srv.Dispose();
+                m_srv = null;
+            }
+
+            var texture = rt.Texture;
+            m_srv = new ShaderResourceView(texture.Device, texture);
+        }
         public ShaderResourceView GetOrCreateSRV(Device device)
         {
             if (m_srv == null)
