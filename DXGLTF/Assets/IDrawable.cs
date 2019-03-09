@@ -24,56 +24,68 @@ namespace DXGLTF.Assets
     /// </summary>
     public class LocalRect
     {
-        int _mx;
-        int _my;
-        bool _leftDown;
-        bool _middleDown;
-        bool _rightDown;
+        public int MouseX { get; private set; }
+        public int MouseY { get; private set; }
+        public bool IsMouseLeftDown { get; private set; }
+        public bool IsMouseMiddleDown { get; private set; }
+        public bool IsMouseRightDown { get; private set; }
         public bool DownAny
         {
-            get { return _leftDown || _middleDown || _rightDown; }
+            get { return IsMouseLeftDown || IsMouseMiddleDown || IsMouseRightDown; }
         }
 
         public void MouseLeftDown(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _leftDown = true;
+            MouseX = x;
+            MouseY = y;
+            IsMouseLeftDown = true;
         }
 
         public void MouseMiddleDown(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _middleDown = true;
+            MouseX = x;
+            MouseY = y;
+            IsMouseMiddleDown = true;
         }
 
         public void MouseRightDown(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _rightDown = true;
+            MouseX = x;
+            MouseY = y;
+            IsMouseRightDown = true;
         }
 
         public void MouseLeftUp(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _leftDown = false;
+            MouseX = x;
+            MouseY = y;
+            IsMouseLeftDown = false;
         }
 
         public void MouseMiddleUp(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _middleDown = false;
+            MouseX = x;
+            MouseY = y;
+            IsMouseMiddleDown = false;
         }
 
         public void MouseRightUp(int x, int y)
         {
-            _mx = x;
-            _my = y;
-            _rightDown = false;
+            MouseX = x;
+            MouseY = y;
+            IsMouseRightDown = false;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>x==y==0 なら dragしない</returns>
+        public void MouseMove(int x, int y)
+        {
+            MouseX = x;
+            MouseY = y;
         }
 
         public int _x;

@@ -209,92 +209,82 @@ namespace DXGLTF.Assets
         }
 
         #region Mouse
-        public bool MouseIsCaptured => m_leftDown || m_middleDown || m_rightDown;
-        int m_mouseX;
-        int m_mouseY;
-        bool m_leftDown;
-        bool m_middleDown;
-        bool m_rightDown;
-        bool m_capture;
         public bool MouseMove(int x, int y)
         {
             var invalidate = false;
-            if (m_mouseX != 0 && m_mouseY != 0)
+            var deltaX = x - _rect.MouseX;
+            var deltaY = y - _rect.MouseY;
+            _rect.MouseMove(x, y);
+
+            if (_rect.IsMouseLeftDown)
             {
-                var deltaX = x - m_mouseX;
-                var deltaY = y - m_mouseY;
-
-                if (m_leftDown)
+                // drag
+                if (Manipulate(x, y))
                 {
-                    // drag
-                    if (Manipulate(x, y))
-                    {
-                        invalidate = true;
-                    }
-                }
-
-                if (m_rightDown)
-                {
-                    _camera.YawPitch(deltaX, deltaY);
-                    invalidate = true;
-                }
-
-                if (m_middleDown)
-                {
-                    _camera.Shift(deltaX, deltaY);
                     invalidate = true;
                 }
             }
-            m_mouseX = x;
-            m_mouseY = y;
+
+            if (_rect.IsMouseRightDown)
+            {
+                _camera.YawPitch(deltaX, deltaY);
+                invalidate = true;
+            }
+
+            if (_rect.IsMouseMiddleDown)
+            {
+                _camera.Shift(deltaX, deltaY);
+                invalidate = true;
+            }
+
             return invalidate;
         }
 
         public bool MouseLeftDown(int x, int y)
         {
             var invalidate = false;
-            if (!m_leftDown)
+            if (!_rect.IsMouseLeftDown)
             {
                 StartDrag(_camera, x, y);
                 invalidate = true;
             }
-            m_leftDown = true;
+            _rect.MouseLeftDown(x, y);
             return invalidate;
         }
 
         public bool MouseLeftUp(int x, int y)
         {
             var invalidate = false;
-            if (m_leftDown)
+            if (_rect.IsMouseLeftDown)
             {
                 EndDrag();
                 invalidate = true;
             }
-            m_leftDown = false;
+            _rect.MouseLeftUp(x, y);
             return invalidate;
         }
 
         public bool MouseMiddleDown(int x, int y)
         {
-            m_middleDown = true;
+            _rect.MouseMiddleDown(x, y);
             return false;
         }
 
         public bool MouseMiddleUp(int x, int y)
         {
-            m_middleDown = false;
+            _rect.MouseMiddleUp(x, y);
             return false;
         }
 
         public bool MouseRightDown(int x, int y)
         {
-            m_rightDown = true;
+            _rect.MouseRightDown(x, y);
             return false;
         }
 
         public bool MouseRightUp(int x, int y)
         {
-            m_rightDown = false;
+            _rect.MouseRightUp(x, y);
             return false;
         }
 
