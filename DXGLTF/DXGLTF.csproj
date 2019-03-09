@@ -125,7 +125,7 @@
     <Compile Include="Controls\NodeContent.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\SceneHierarchy.cs">
+    <Compile Include="Controls\SceneHierarchyContent.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Controls\SelectedNodeContent.cs">

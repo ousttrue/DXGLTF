@@ -62,7 +62,7 @@ namespace DXGLTF
               };
         }
 
-        SceneHierarchy m_hierarchy;
+        SceneHierarchyContent m_hierarchy;
         D3DContent m_d3d;
 
         LoggerContent m_logger;
@@ -86,7 +86,7 @@ namespace DXGLTF
                 }
             });
 
-            m_hierarchy = new SceneHierarchy(m_scene);
+            m_hierarchy = new SceneHierarchyContent(m_scene);
             AddContent("scene hierarchy", m_hierarchy, DockState.DockRight);
 
             m_selected = new SelectedNodeContent(m_hierarchy);

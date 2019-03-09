@@ -23,9 +23,9 @@ namespace DXGLTF
             View = Matrix.Identity,
         };
 
-        SceneHierarchy _hierarchy;
+        SceneHierarchyContent _hierarchy;
 
-        public D3DContent(SceneHierarchy hierarchy)
+        public D3DContent(SceneHierarchyContent hierarchy)
         {
             InitializeComponent();
 

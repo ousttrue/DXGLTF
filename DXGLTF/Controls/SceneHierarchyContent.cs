@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace DXGLTF
 {
-    public class SceneHierarchy : TreeViewContentBase
+    public class SceneHierarchyContent : TreeViewContentBase
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -90,7 +90,7 @@ namespace DXGLTF
             get { return _updated.AsObservable(); }
         }
 
-        public SceneHierarchy(Scene scene) : base(scene)
+        public SceneHierarchyContent(Scene scene) : base(scene)
         {
             var unlit = _shaderLoader.CreateShader(ShaderType.Unlit);
             var gizmo = _shaderLoader.CreateShader(ShaderType.Gizmo);
