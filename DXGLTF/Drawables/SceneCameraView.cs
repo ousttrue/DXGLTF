@@ -15,9 +15,12 @@ namespace DXGLTF.Drawables
             View = Matrix.Identity,
         };
 
+        #region Rect
         LocalRect _rect = new LocalRect();
         public void SetLocalRect(int x, int y, int w, int h)
         {
+            DisposeSizeDependent();
+
             _camera.Resize(w, h);
             _rect.SetLocalRect(x, y, w, h);
         }
@@ -27,23 +30,19 @@ namespace DXGLTF.Drawables
             return _rect.IsOnRect(x, y);
         }
 
-        public int Width
-        {
-            get
-            {
-                return _rect.Width;
-            }
-        }
-
-        public int Height
-        {
-            get
-            {
-                return _rect.Height;
-            }
-        }
+        public int Width => _rect.Width;
+        public int Height => _rect.Height;
+        #endregion
 
         Scene _scene;
+        int _index = -1;
+        Node _manipulator;
+        Node _cursor;
+        Vector3 _cursorPosition;
+
+        public void DisposeSizeDependent()
+        {
+        }
 
         public void Dispose()
         {
@@ -52,12 +51,21 @@ namespace DXGLTF.Drawables
                 _manipulator.Dispose();
                 _manipulator = null;
             }
-        }
 
-        int _index = -1;
-        Node _manipulator;
-        Node _cursor;
-        Vector3 _cursorPosition;
+            if (_cursor != null)
+            {
+                _cursor.Dispose();
+                _cursor = null;
+            }
+
+            /*
+            if (_scene != null)
+            {
+                _scene.Dispose();
+                _scene = null;
+            }
+            */
+        }
 
         public SceneCameraView(Scene scene)
         {

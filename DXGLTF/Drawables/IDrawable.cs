@@ -6,6 +6,7 @@ namespace DXGLTF.Drawables
 {
     public interface IDrawable : IDisposable
     {
+        void DisposeSizeDependent();
         void SetLocalRect(int x, int y, int w, int h);
         bool IsOnRect(int x, int y);
         int Width { get; }

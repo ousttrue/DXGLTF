@@ -100,6 +100,7 @@
   <ItemGroup>
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Camera.cs" />
+    <Compile Include="Drawables\D2DDrawable.cs" />
     <Compile Include="Drawables\D2DView.cs" />
     <Compile Include="Drawables\DrawableView.cs" />
     <Compile Include="Drawables\SceneCameraView.cs" />

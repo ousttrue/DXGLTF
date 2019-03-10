@@ -16,6 +16,10 @@ namespace DXGLTF.Drawables
             _bottom = bottom;
         }
 
+        public void DisposeSizeDependent()
+        {
+        }
+
         public void Dispose()
         {
             if (_top != null)
@@ -65,6 +69,8 @@ namespace DXGLTF.Drawables
 
         public void SetLocalRect(int x, int y, int w, int h)
         {
+            DisposeSizeDependent();
+
             _rect.SetLocalRect(x, y, w, h);
 
             h = h / 2;

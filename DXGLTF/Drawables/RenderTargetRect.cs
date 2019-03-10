@@ -9,17 +9,24 @@ namespace DXGLTF.Drawables
     {
         D3D11RenderTarget _renderTarget;
         Mesh _mesh;
-        public virtual void Dispose()
+
+        public virtual void DisposeSizeDependent()
         {
-            if (_mesh != null)
-            {
-                _mesh.Dispose();
-                _mesh = null;
-            }
             if (_renderTarget != null)
             {
                 _renderTarget.Dispose();
                 _renderTarget = null;
+            }
+        }
+
+        public virtual void Dispose()
+        {
+            DisposeSizeDependent();
+
+            if (_mesh != null)
+            {
+                _mesh.Dispose();
+                _mesh = null;
             }
         }
 
@@ -61,7 +68,7 @@ namespace DXGLTF.Drawables
 
         public virtual void SetLocalRect(int x, int y, int w, int h)
         {
-            Dispose();
+            DisposeSizeDependent();
         }
 
         public abstract bool IsOnRect(int x, int y);

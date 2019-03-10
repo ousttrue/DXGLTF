@@ -1,7 +1,6 @@
 ﻿using D3DPanel;
-using DXGLTF.Assets;
-using SharpDX;
 using SharpDX.Direct2D1;
+
 
 namespace DXGLTF.Drawables
 {
@@ -12,7 +11,8 @@ namespace DXGLTF.Drawables
     {
         LocalRect _rect = new LocalRect();
         Bitmap1 _bitmap;
-        SolidColorBrush _brush;
+
+        ID2DDrawable _scene = new D2DWriter();
 
         public override int Width => _rect.Width;
 
@@ -20,11 +20,7 @@ namespace DXGLTF.Drawables
 
         public override void Dispose()
         {
-            if (_brush != null)
-            {
-                _brush.Dispose();
-                _brush = null;
-            }
+            _scene.Dispose();
 
             if (_bitmap != null)
             {
@@ -52,16 +48,11 @@ namespace DXGLTF.Drawables
                 }
             }
 
-            if (_brush == null)
-            {
-                _brush = new SolidColorBrush(device.D2DDeviceContext, Color4.White);
-            }
-
-            // draw
             device.D2DDeviceContext.Target = _bitmap;
             device.D2DDeviceContext.BeginDraw();
-            device.D2DDeviceContext.Clear(Color4.Black);
-            device.D2DDeviceContext.FillEllipse(new Ellipse(new Vector2(_rect.MouseX, _rect.MouseY), 50.0f, 50.0f), _brush);
+            {
+                _scene.Draw(device.D2DDeviceContext, new SharpDX.RectangleF(0, 0, _rect.Width, _rect.Height));
+            }
             device.D2DDeviceContext.EndDraw();
             device.D2DDeviceContext.Target = null;
         }
