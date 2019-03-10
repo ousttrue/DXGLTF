@@ -1,9 +1,10 @@
 ﻿using D3DPanel;
+using DXGLTF.Assets;
 using NLog;
 using SharpDX;
 
 
-namespace DXGLTF.Assets
+namespace DXGLTF.Drawables
 {
     public class SceneCameraView: IDrawable
     {

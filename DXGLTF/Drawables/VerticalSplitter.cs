@@ -2,7 +2,7 @@
 using SharpDX;
 
 
-namespace DXGLTF.Assets
+namespace DXGLTF.Drawables
 {
     public class VerticalSplitter : IDrawable
     {

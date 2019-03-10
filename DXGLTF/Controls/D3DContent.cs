@@ -1,5 +1,5 @@
 ﻿using D3DPanel;
-using DXGLTF.Assets;
+using DXGLTF.Drawables;
 using NLog;
 using SharpDX;
 using System;

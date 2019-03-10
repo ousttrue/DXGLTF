@@ -2,7 +2,7 @@
 using System;
 
 
-namespace DXGLTF.Assets
+namespace DXGLTF.Drawables
 {
     public interface IDrawable : IDisposable
     {

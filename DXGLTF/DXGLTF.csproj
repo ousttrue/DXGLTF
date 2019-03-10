@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Camera.cs" />
+    <Compile Include="Drawables\D2DView.cs" />
     <Compile Include="Drawables\SceneCameraView.cs" />
     <Compile Include="Drawables\IDrawable.cs" />
     <Compile Include="Assets\Mesh.cs" />
