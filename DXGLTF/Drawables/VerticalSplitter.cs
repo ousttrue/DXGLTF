@@ -6,22 +6,14 @@ namespace DXGLTF.Drawables
 {
     public class VerticalSplitter : IDrawable
     {
-        RenderTargetRect _top;
-        RenderTargetRect _bottom;
+        IDrawable _top;
+        IDrawable _bottom;
 
         IDrawable _target;
         public VerticalSplitter(IDrawable top, IDrawable bottom)
         {
-            _top = new RenderTargetRect(top)
-            {
-                ClearColor = new Color4(1, 0.5f, 0.5f, 1)
-            }
-            ;
-            _bottom = new RenderTargetRect(bottom)
-            {
-                ClearColor = new Color4(0.5f, 1, 0.5f, 1)
-            }
-            ;
+            _top = top;
+            _bottom = bottom;
         }
 
         public void Dispose()

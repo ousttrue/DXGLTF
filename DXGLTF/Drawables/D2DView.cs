@@ -1,81 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using D3DPanel;
+﻿using D3DPanel;
+
 
 namespace DXGLTF.Drawables
 {
     class D2DView : IDrawable
     {
-        public int Width => throw new NotImplementedException();
+        LocalRect _rect = new LocalRect();
 
-        public int Height => throw new NotImplementedException();
+        public int Width => _rect.Width;
+
+        public int Height => _rect.Height;
 
         public void Dispose()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Draw(D3D11Device device, int left, int top)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsOnRect(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseLeftDown(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseLeftUp(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseMiddleDown(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseMiddleUp(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseMove(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseRightDown(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseRightUp(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MouseWheel(int d)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetLocalRect(int x, int y, int w, int h)
-        {
-            throw new NotImplementedException();
         }
 
         public void Update(D3D11Device device)
         {
-            throw new NotImplementedException();
+        }
+
+        public void Draw(D3D11Device device, int left, int top)
+        {
+        }
+
+        public bool IsOnRect(int x, int y)
+        {
+            return _rect.IsOnRect(x, y);
+        }
+
+        public bool MouseLeftDown(int x, int y)
+        {
+            _rect.MouseLeftDown(x, y);
+            return false;
+        }
+
+        public bool MouseLeftUp(int x, int y)
+        {
+            _rect.MouseLeftUp(x, y);
+            return false;
+        }
+
+        public bool MouseMiddleDown(int x, int y)
+        {
+            _rect.MouseMiddleDown(x, y);
+            return false;
+        }
+
+        public bool MouseMiddleUp(int x, int y)
+        {
+            _rect.MouseMiddleUp(x, y);
+            return false;
+        }
+
+        public bool MouseMove(int x, int y)
+        {
+            _rect.MouseMove(x, y);
+            return false;
+        }
+
+        public bool MouseRightDown(int x, int y)
+        {
+            _rect.MouseRightDown(x, y);
+            return false;
+        }
+
+        public bool MouseRightUp(int x, int y)
+        {
+            _rect.MouseRightUp(x, y);
+            return false;
+        }
+
+        public bool MouseWheel(int d)
+        {
+            return false;
+        }
+
+        public void SetLocalRect(int x, int y, int w, int h)
+        {
+            _rect.SetLocalRect(x, y, w, h);
         }
     }
 }
