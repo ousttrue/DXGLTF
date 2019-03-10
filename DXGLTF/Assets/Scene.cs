@@ -39,8 +39,9 @@ namespace DXGLTF.Assets
                 {
                     _asset.Dispose();
                 }
-                ClearDrawables();
                 _selected.Value = null;
+                _timeline.Stop();
+                ClearDrawables();
 
                 // update
                 _asset = value;
@@ -51,7 +52,27 @@ namespace DXGLTF.Assets
                 }
 
                 _updated.OnNext(Unit.Default);
+
+                if (_asset.Animations.Any())
+                {
+                    StartAnimation(_asset.Animations[0], _asset.Nodes);
+                }
             }
+        }
+
+        Timeline _timeline = new Timeline();
+        void StartAnimation(Animation animation, Node[] nodes)
+        {
+            // start
+            _timeline.Duration = TimeSpan.FromSeconds(animation.Length);
+
+            // アニメーション
+            _timeline.Start(x =>
+            {
+                animation.Animate(x, nodes);
+
+                _updated.OnNext(Unit.Default);
+            });
         }
 
         Subject<Unit> _updated = new Subject<Unit>();

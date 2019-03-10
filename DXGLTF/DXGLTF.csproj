@@ -98,8 +98,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Animation.cs" />
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Camera.cs" />
+    <Compile Include="Assets\Skin.cs" />
+    <Compile Include="Assets\Timeline.cs" />
     <Compile Include="Drawables\D2DDrawable.cs" />
     <Compile Include="Drawables\D2DView.cs" />
     <Compile Include="Drawables\DrawableView.cs" />

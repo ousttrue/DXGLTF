@@ -45,6 +45,15 @@ namespace DXGLTF.Assets
             }
         }
 
+        List<Animation> _animations = new List<Animation>();
+        public List<Animation> Animations
+        {
+            get
+            {
+                return _animations;
+            }
+        }
+
         public void Dispose()
         {
         }
@@ -102,6 +111,11 @@ namespace DXGLTF.Assets
                 asset._skins.Add(Skin.FromGLTF(source, skin));
             }
 
+            foreach(var animation in gltf.animations)
+            {
+                asset._animations.Add(Animation.FromGLTF(source, animation));
+            }
+
             Logger.Info($"LoadAsset: {sw.Elapsed.TotalSeconds} sec");
 
             asset.BuildHierarchy();
@@ -149,6 +163,7 @@ namespace DXGLTF.Assets
             if (node.matrix != null)
             {
                 var m = new Matrix(node.matrix);
+                //m.Transpose();
                 drawable.LocalMatrix = m;
             }
             else
