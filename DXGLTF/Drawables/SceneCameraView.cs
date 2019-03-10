@@ -55,8 +55,8 @@ namespace DXGLTF.Drawables
         }
 
         int _index = -1;
-        Mesh _manipulator;
-        Mesh _cursor;
+        Node _manipulator;
+        Node _cursor;
         Vector3 _cursorPosition;
 
         public SceneCameraView(Scene scene)
@@ -69,20 +69,20 @@ namespace DXGLTF.Drawables
             {
                 var radius = 0.008f;
                 var length = 0.2f;
-                _manipulator = new Mesh(
+                _manipulator = new Node(new Mesh(
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 0, true, new Color4(1, 0, 0, 1))),
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 0, false, new Color4(0.5f, 0, 0, 1))),
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 1, true, new Color4(0, 1, 0, 1))),
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 1, false, new Color4(0, 0.5f, 0, 1))),
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 2, true, new Color4(0, 0, 1.0f, 1))),
                     new Submesh(nodepth, D3D11MeshFactory.CreateArrow(radius, length, 2, false, new Color4(0, 0, 0.5f, 1)))
-                    );
+                    ));
             }
 
             // cursor(drag position)
             {
-                _cursor = new Mesh(
-                    new Submesh(nodepth, D3D11MeshFactory.CreateCube(0.01f)));
+                _cursor = new Node(new Mesh(
+                    new Submesh(nodepth, D3D11MeshFactory.CreateCube(0.01f))));
             }
         }
 
@@ -102,8 +102,8 @@ namespace DXGLTF.Drawables
             if (_scene.Selected != null)
             {
                 var s = Matrix.Scaling(1.0f);
-                _manipulator.Draw(device/*, camera, s * Selected.WorldMatrix*/);
-                _cursor.Draw(device/*, camera, s * Matrix.Translation(_cursorPosition)*/);
+                _manipulator.Draw(device, _scene.Selected.WorldMatrix * camera);
+                _cursor.Draw(device, Matrix.Translation(_cursorPosition) * camera);
             }
         }
 
@@ -205,7 +205,7 @@ namespace DXGLTF.Drawables
             Logger.Debug(ray);
 
             var i = default(SubmeshIntersection?);
-            foreach (var t in _manipulator.Intersect(_scene.Selected.WorldMatrix, ray))
+            foreach (var t in _manipulator.Mesh.Intersect(_scene.Selected.WorldMatrix, ray))
             {
                 if (!i.HasValue || t.Triangle.Distance < i.Value.Triangle.Distance)
                 {

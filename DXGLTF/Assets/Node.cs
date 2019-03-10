@@ -115,9 +115,13 @@ namespace DXGLTF.Assets
         {
         }
 
-        public Node(D3D11Material material, D3D11Mesh mesh)
+        public Node(D3D11Material material, D3D11Mesh mesh): this(new Mesh(new Submesh(material, mesh)))
         {
-            Mesh = new Mesh(new Submesh(material, mesh));
+        }
+
+        public Node(Mesh mesh)
+        {
+            Mesh = mesh;
         }
 
         public IEnumerable<SubmeshIntersection> Intersect(Ray ray)

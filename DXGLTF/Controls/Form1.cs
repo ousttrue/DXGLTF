@@ -92,6 +92,7 @@ namespace DXGLTF
             // setup docks
             var hierarchy = new SceneHierarchyContent(node =>
             {
+                Logger.Debug("Selected: {0}", node.Name);
                 scene.Selected = node;
             });
             AddContent("scene hierarchy", hierarchy, DockState.DockRight);
