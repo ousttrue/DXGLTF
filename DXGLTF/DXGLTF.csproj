@@ -94,15 +94,15 @@
   <ItemGroup>
     <Compile Include="Assets\AssetContext.cs" />
     <Compile Include="Assets\Camera.cs" />
-    <Compile Include="Assets\CameraSceneView.cs" />
-    <Compile Include="Assets\IDrawable.cs" />
+    <Compile Include="Drawables\SceneCameraView.cs" />
+    <Compile Include="Drawables\IDrawable.cs" />
     <Compile Include="Assets\Mesh.cs" />
-    <Compile Include="Assets\RenderTargetRect.cs" />
+    <Compile Include="Drawables\RenderTargetRect.cs" />
     <Compile Include="Assets\Scene.cs" />
     <Compile Include="Assets\AssetLoader.cs" />
     <Compile Include="Assets\AssetSource.cs" />
     <Compile Include="Assets\Submesh.cs" />
-    <Compile Include="Assets\VerticalSplitter.cs" />
+    <Compile Include="Drawables\VerticalSplitter.cs" />
     <Compile Include="Controls\D3DContent.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -5,7 +5,7 @@ using SharpDX;
 
 namespace DXGLTF.Assets
 {
-    public class CameraSceneView: IDrawable
+    public class SceneCameraView: IDrawable
     {
         static Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -58,7 +58,7 @@ namespace DXGLTF.Assets
         Mesh _cursor;
         Vector3 _cursorPosition;
 
-        public CameraSceneView(Scene scene)
+        public SceneCameraView(Scene scene)
         {
             _scene = scene;
 
