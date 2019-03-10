@@ -78,11 +78,14 @@ namespace DXGLTF
             InitializeComponent();
 
             var scene = new Scene();
-            var view0 = new RenderTargetRect(new SceneCameraView(scene))
+            var view0 = new DrawableView(new SceneCameraView(scene))
             {
                 ClearColor = new Color4(0.4f, 0.2f, 0.2f, 1)
             };
-            var view1 = new D2DView();
+            var view1 = new D2DView()
+            {
+                ClearColor = new Color4(0.2f, 0.4f, 0.2f, 1)
+            };
             var splitter = new VerticalSplitter(view0, view1);
             _disposable.Add(splitter);
 

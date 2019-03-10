@@ -1,4 +1,5 @@
-﻿using SharpDX.DXGI;
+﻿using SharpDX;
+using SharpDX.DXGI;
 using System;
 
 
@@ -26,9 +27,39 @@ namespace D3DPanel
             private set;
         }
 
+        public SharpDX.Direct2D1.Device D2DDevice
+        {
+            get;
+            private set;
+        }
+
+        public SharpDX.Direct2D1.DeviceContext D2DDeviceContext
+        {
+            get;
+            private set;
+        }
+
+        public Size2F Dpi
+        {
+            get;
+            private set;
+        }
+
         public void Dispose()
         {
             _hWnd = IntPtr.Zero;
+
+            if (D2DDeviceContext != null)
+            {
+                D2DDeviceContext.Dispose();
+                D2DDeviceContext = null;
+            }
+
+            if (D2DDevice != null)
+            {
+                D2DDevice.Dispose();
+                D2DDevice = null;
+            }
 
             if (SwapChain != null)
             {
@@ -75,7 +106,7 @@ namespace D3DPanel
             SwapChain swapChain;
             SharpDX.Direct3D11.Device.CreateWithSwapChain(
                 SharpDX.Direct3D.DriverType.Hardware,
-                SharpDX.Direct3D11.DeviceCreationFlags.Debug,
+                SharpDX.Direct3D11.DeviceCreationFlags.Debug | SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
                 desc,
                 out device, out swapChain);
 
@@ -88,6 +119,19 @@ namespace D3DPanel
             Device = device;
             Context = Device.ImmediateContext;
             SwapChain = new DXGISwapChain(swapChain);
+
+            // D2D
+            using (var dxgi = Device.QueryInterface<Device2>())
+            {
+                D2DDevice = new SharpDX.Direct2D1.Device(dxgi);
+                D2DDeviceContext = new SharpDX.Direct2D1.DeviceContext(D2DDevice,
+                    SharpDX.Direct2D1.DeviceContextOptions.None);
+            }
+
+            using (var factroy = new SharpDX.Direct2D1.Factory(SharpDX.Direct2D1.FactoryType.SingleThreaded))
+            {
+                Dpi = factroy.DesktopDpi;
+            }
         }
 
         public void Present()
