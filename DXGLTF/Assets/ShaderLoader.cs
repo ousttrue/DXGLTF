@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace DXGLTF
+namespace DXGLTF.Assets
 {
     enum ShaderType
     {

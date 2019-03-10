@@ -158,7 +158,7 @@
     <Compile Include="Controls\DataGridViewContentBase.Designer.cs">
       <DependentUpon>DataGridViewContentBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="ShaderLoader.cs" />
+    <Compile Include="Assets\ShaderLoader.cs" />
     <Compile Include="Controls\TreeViewContentBase.cs">
       <SubType>Form</SubType>
     </Compile>
