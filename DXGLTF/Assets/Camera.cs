@@ -27,7 +27,7 @@ namespace DXGLTF.Assets
         }
 
         const float ANGLE = 0.008f;
-        public Matrix View;
+        public Matrix View = Matrix.Identity;
         public float Yaw;
         public float Pitch;
         public void YawPitch(int dx, int dy)
