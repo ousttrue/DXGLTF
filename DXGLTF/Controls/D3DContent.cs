@@ -20,9 +20,8 @@ namespace DXGLTF
 
         public D3DContent(IDrawable drawable)
         {
-            InitializeComponent();
-
             _drawable = drawable;
+            InitializeComponent();
         }
 
         public void Shutdown()
